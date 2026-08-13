@@ -2,18 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { pantryApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { AddProductDialog } from '../components/AddProductDialog.jsx'
+import { AppHeader } from '../components/AppHeader.jsx'
 import { ConsumeDialog } from '../components/ConsumeDialog.jsx'
 import { PantryDock } from '../components/PantryDock.jsx'
 import { ProductCard } from '../components/ProductCard.jsx'
 import { WasteDialog } from '../components/WasteDialog.jsx'
-import {
-  BellIcon,
-  CheckIcon,
-  ClockIcon,
-  MenuIcon,
-  SearchIcon,
-  WarningIcon,
-} from '../components/icons.jsx'
+import { CheckIcon, ClockIcon, SearchIcon, WarningIcon } from '../components/icons.jsx'
 import { formatAmount, statusOf } from '../lib/pantry.js'
 import { useHorizontalScroll } from '../lib/useHorizontalScroll.js'
 import { useToast } from '../lib/useToast.js'
@@ -160,39 +154,18 @@ export default function PantryPage() {
   return (
     <div className={`pantry${menuOpen ? ' pantry--menu-open' : ''}`}>
       <div className="pantry__app">
-        <header className="topbar">
-          <h1 className="topbar__name">{user.login}</h1>
-
-          <div className="topbar__actions">
-            <button
-              className="icon-btn icon-btn--round"
-              type="button"
-              onClick={() => setMenuOpen((open) => !open)}
-              aria-label={menuOpen ? 'Скрыть меню' : 'Показать меню'}
-              aria-expanded={menuOpen}
-            >
-              <MenuIcon />
-            </button>
-
-            <button
-              className="icon-btn icon-btn--round"
-              type="button"
-              onClick={() =>
-                setToast(
-                  stats.expired + stats.soon > 0
-                    ? `Требуют внимания: ${stats.expired + stats.soon}`
-                    : 'Всё в порядке, сроки не горят',
-                )
-              }
-              aria-label={`Уведомления, ${stats.expired + stats.soon}`}
-            >
-              <BellIcon />
-              {stats.expired + stats.soon > 0 && (
-                <span className="icon-btn__badge">{stats.expired + stats.soon}</span>
-              )}
-            </button>
-          </div>
-        </header>
+        <AppHeader
+          menuOpen={menuOpen}
+          onToggleMenu={() => setMenuOpen((open) => !open)}
+          alerts={stats.expired + stats.soon}
+          onBell={() =>
+            setToast(
+              stats.expired + stats.soon > 0
+                ? `Требуют внимания: ${stats.expired + stats.soon}`
+                : 'Всё в порядке, сроки не горят',
+            )
+          }
+        />
 
         <main className="content">
           <section className="stats" aria-label="Сводка по кладовой">

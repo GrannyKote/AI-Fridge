@@ -5,6 +5,7 @@ import ForecastPage from './pages/ForecastPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import PantryPage from './pages/PantryPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
+import ShoppingPage from './pages/ShoppingPage.jsx'
 
 function RequireAuth({ children }) {
   const { isAuthenticated } = useAuth()
@@ -34,6 +35,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <ForecastPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/shopping"
+            element={
+              <RequireAuth>
+                <ShoppingPage />
               </RequireAuth>
             }
           />

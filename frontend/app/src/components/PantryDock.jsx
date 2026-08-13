@@ -5,7 +5,7 @@ import { CartIcon, ChartIcon, FridgeIcon, LogoutIcon, PlusIcon, UserIcon } from 
 const TABS = [
   { key: 'pantry', title: 'Кладовая', icon: <FridgeIcon />, path: '/' },
   { key: 'forecast', title: 'Прогнозы', icon: <ChartIcon />, path: '/forecast' },
-  { key: 'shopping', title: 'Покупки', icon: <CartIcon /> },
+  { key: 'shopping', title: 'Покупки', icon: <CartIcon />, path: '/shopping' },
   { key: 'profile', title: 'Профиль', icon: <UserIcon /> },
 ]
 

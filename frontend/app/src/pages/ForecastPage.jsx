@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { pantryApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
+import { AppHeader } from '../components/AppHeader.jsx'
 import { ConsumptionView } from '../components/ConsumptionView.jsx'
 import { ForecastCard } from '../components/ForecastCard.jsx'
 import { PantryDock } from '../components/PantryDock.jsx'
-import { BarsIcon, ClockIcon, MenuIcon, RefreshIcon, WarningIcon } from '../components/icons.jsx'
+import { BarsIcon, ClockIcon, WarningIcon } from '../components/icons.jsx'
 import { statusOf } from '../lib/pantry.js'
 import { useToast } from '../lib/useToast.js'
 import '../styles/pantry.css'
@@ -23,7 +24,6 @@ export default function ForecastPage() {
   const [state, setState] = useState('loading')
   const [error, setError] = useState('')
   const [tab, setTab] = useState('dates')
-  const [refreshKey, setRefreshKey] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [toast, setToast] = useToast()
 
@@ -66,37 +66,24 @@ export default function ForecastPage() {
     ]
   }, [products])
 
+  const alerts = useMemo(
+    () => products.filter((product) => statusOf(product) !== 'fresh').length,
+    [products],
+  )
+
   return (
     <div className={`pantry${menuOpen ? ' pantry--menu-open' : ''}`}>
       <div className="pantry__app">
-        <header className="topbar">
-          <h1 className="topbar__name">Прогнозы</h1>
-
-          <div className="topbar__actions">
-            <button
-              className="icon-btn icon-btn--round"
-              type="button"
-              onClick={() => setMenuOpen((open) => !open)}
-              aria-label={menuOpen ? 'Скрыть меню' : 'Показать меню'}
-              aria-expanded={menuOpen}
-            >
-              <MenuIcon />
-            </button>
-
-            <button
-              className="icon-btn icon-btn--round"
-              type="button"
-              onClick={() => {
-                load()
-                setRefreshKey((key) => key + 1)
-                setToast('Обновляем прогноз')
-              }}
-              aria-label="Обновить"
-            >
-              <RefreshIcon />
-            </button>
-          </div>
-        </header>
+        <AppHeader
+          menuOpen={menuOpen}
+          onToggleMenu={() => setMenuOpen((open) => !open)}
+          alerts={alerts}
+          onBell={() =>
+            setToast(
+              alerts > 0 ? `Требуют внимания: ${alerts}` : 'Всё в порядке, сроки не горят',
+            )
+          }
+        />
 
         <main className="content">
           <div className="segmented" role="tablist" aria-label="Тип прогноза">
@@ -158,7 +145,7 @@ export default function ForecastPage() {
 
           {tab === 'usage' &&
             (groupId ? (
-              <ConsumptionView groupId={groupId} refreshKey={refreshKey} />
+              <ConsumptionView groupId={groupId} />
             ) : (
               <p className="pantry__message">{error}</p>
             ))}
