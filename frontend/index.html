@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0c0b" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>AI-Fridge — Кладовая</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar__greeting">
+        <p class="topbar__hello">Добро пожаловать</p>
+        <h1 class="topbar__name">test <span aria-hidden="true">👋</span></h1>
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-btn icon-btn--round" type="button" aria-label="Списки">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" />
+          </svg>
+        </button>
+        <button class="icon-btn icon-btn--round" type="button" aria-label="Уведомления, 6 новых">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 8a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6" />
+            <path d="M13.7 20a2 2 0 0 1-3.4 0" />
+          </svg>
+          <span class="icon-btn__badge">6</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="stats" aria-label="Сводка по кладовой">
+        <article class="stat">
+          <p class="stat__value" data-stat="total">0</p>
+          <p class="stat__label">Продуктов</p>
+        </article>
+        <article class="stat">
+          <p class="stat__value stat__value--warning" data-stat="soon">0</p>
+          <p class="stat__label">Истекает</p>
+        </article>
+        <article class="stat">
+          <p class="stat__value stat__value--danger" data-stat="expired">0</p>
+          <p class="stat__label">Просрочено</p>
+        </article>
+      </section>
+
+      <form class="search" role="search" onsubmit="return false">
+        <svg class="search__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.2-3.2" />
+        </svg>
+        <input
+          class="search__input"
+          id="search"
+          type="search"
+          placeholder="Поиск продукта..."
+          autocomplete="off"
+          aria-label="Поиск продукта"
+        />
+      </form>
+
+      <nav class="chips" id="chips" aria-label="Категории">
+        <button class="chip is-active" type="button" data-category="all">Все</button>
+        <button class="chip" type="button" data-category="dairy"><span aria-hidden="true">🥛</span> Молочные</button>
+        <button class="chip" type="button" data-category="meat"><span aria-hidden="true">🥩</span> Мясо и рыба</button>
+        <button class="chip" type="button" data-category="veg"><span aria-hidden="true">🥦</span> Овощи и фрукты</button>
+        <button class="chip" type="button" data-category="grocery"><span aria-hidden="true">🍞</span> Бакалея</button>
+        <button class="chip" type="button" data-category="frozen"><span aria-hidden="true">🧊</span> Заморозка</button>
+      </nav>
+
+      <div class="groups" id="groups"></div>
+
+      <p class="empty" id="empty" hidden>Ничего не нашлось. Попробуйте другой запрос.</p>
+    </main>
+  </div>
+
+  <div class="dock">
+    <div class="dock__inner">
+      <button class="fab" type="button" aria-label="Добавить продукт">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+      </button>
+
+      <nav class="tabbar" aria-label="Основная навигация">
+        <a class="tab is-active" href="#" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="5" y="2.5" width="14" height="19" rx="3" />
+            <path d="M5 10h14M8.5 6.2v1.6M8.5 13.2v1.8" />
+          </svg>
+          <span>Кладовая</span>
+        </a>
+        <a class="tab" href="#">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 13h3l2.5 5.5L12 5l3 9 1.8-3H21" />
+          </svg>
+          <span>Прогнозы</span>
+        </a>
+        <a class="tab" href="#">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 7h14l-1 13H6L5 7Z" />
+            <path d="M9 7a3 3 0 0 1 6 0" />
+          </svg>
+          <span>Покупки</span>
+        </a>
+        <a class="tab" href="#">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="9" r="3.2" />
+            <path d="M5.5 20a6.5 6.5 0 0 1 13 0" />
+          </svg>
+          <span>Профиль</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <template id="card-template">
+    <article class="card">
+      <div class="card__thumb" aria-hidden="true"></div>
+      <div class="card__body">
+        <h3 class="card__title"></h3>
+        <p class="card__meta">
+          <span class="card__amount"></span>
+          <span class="card__dot" aria-hidden="true">·</span>
+          <span class="card__badge"></span>
+        </p>
+      </div>
+      <div class="card__actions">
+        <button class="icon-btn" type="button" data-action="use" aria-label="Использовать продукт">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 3v7a2 2 0 0 0 4 0V3M8 10v11" />
+            <path d="M17 3c-1.4 1.6-2 3.5-2 5.5S15.6 12 17 12.5V21" />
+          </svg>
+        </button>
+        <button class="icon-btn icon-btn--danger" type="button" data-action="delete" aria-label="Удалить продукт">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16M9.5 7V5h5v2M6.5 7l1 13h9l1-13" />
+          </svg>
+        </button>
+      </div>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

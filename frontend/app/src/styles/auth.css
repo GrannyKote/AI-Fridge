@@ -1,0 +1,143 @@
+.auth {
+  display: flex;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: calc(24px + env(safe-area-inset-top)) var(--gutter)
+    calc(24px + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgba(39, 221, 109, 0.12), transparent 60%),
+    var(--bg);
+}
+
+.auth__card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+}
+
+.auth__head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth__logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.auth__title {
+  margin: 6px 0 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.auth__subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.auth__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  height: 40px;
+  margin-left: -8px;
+  padding: 0 12px 0 8px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.auth__back:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.auth__submit {
+  margin-top: 4px;
+}
+
+.auth__divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.auth__divider::before,
+.auth__divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.auth__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  text-align: center;
+}
+
+.auth__note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.auth__install {
+  display: inline-flex;
+  align-self: center;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.auth__install:hover {
+  color: var(--text);
+  border-color: rgba(39, 221, 109, 0.45);
+}
+
+.auth__install svg {
+  width: 17px;
+  height: 17px;
+}
+
+@media (min-width: 480px) {
+  .auth__card {
+    gap: 26px;
+    padding: 32px;
+    border: 1px solid var(--border);
+    border-radius: 26px;
+    background: var(--surface);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  }
+
+  .auth__logo,
+  .field__input,
+  .btn--ghost {
+    background: var(--surface-2);
+  }
+
+  .auth__back:hover {
+    background: var(--surface-2);
+  }
+}

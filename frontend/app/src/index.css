@@ -1,0 +1,232 @@
+:root {
+  --bg: #0b0c0b;
+  --surface: #171a19;
+  --surface-2: #212523;
+  --border: #2a2f2c;
+  --text: #f1f4f2;
+  --muted: #8d9490;
+  --green: #27dd6d;
+  --green-soft: rgba(39, 221, 109, 0.14);
+  --red: #ff4d4f;
+  --red-soft: rgba(255, 77, 79, 0.13);
+  --radius-sm: 12px;
+  --radius: 16px;
+  --control-h: 52px;
+  --gutter: 20px;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+body {
+  min-height: 100dvh;
+  color: var(--text);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+/* ---------- Поля формы ---------- */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field__label {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.field__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field__input {
+  width: 100%;
+  height: var(--control-h);
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field__input::placeholder {
+  color: #5f6764;
+}
+
+.field__input:focus {
+  border-color: rgba(39, 221, 109, 0.5);
+  box-shadow: 0 0 0 3px var(--green-soft);
+}
+
+.field__input--with-action {
+  padding-right: 52px;
+}
+
+.field--invalid .field__input {
+  border-color: rgba(255, 77, 79, 0.55);
+}
+
+.field--invalid .field__input:focus {
+  box-shadow: 0 0 0 3px var(--red-soft);
+}
+
+.field__toggle {
+  position: absolute;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.field__toggle:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.field__hint,
+.field__error {
+  font-size: 12px;
+}
+
+.field__hint {
+  color: var(--muted);
+}
+
+.field__error {
+  color: var(--red);
+}
+
+/* ---------- Кнопки ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: var(--control-h);
+  padding: 0 18px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 600;
+  transition: transform 0.12s ease, background 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--green);
+  color: #06210f;
+  box-shadow: 0 8px 20px rgba(39, 221, 109, 0.22);
+}
+
+.btn--ghost {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.btn--link {
+  width: auto;
+  height: auto;
+  padding: 0;
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ---------- Уведомление об ошибке ---------- */
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 77, 79, 0.3);
+  border-radius: var(--radius-sm);
+  background: var(--red-soft);
+  color: #ffb3b4;
+  font-size: 13px;
+}
+
+.alert svg {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  color: var(--red);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
