@@ -1,0 +1,278 @@
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.segmented__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.segmented__item svg {
+  width: 17px;
+  height: 17px;
+}
+
+.segmented__item.is-active {
+  background: var(--green);
+  color: #06210f;
+}
+
+/* ---------- Потребление ---------- */
+
+.usage {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.usage__label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.panel {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.panel__title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.panel__title svg {
+  width: 16px;
+  height: 16px;
+  color: var(--green);
+}
+
+.panel__note {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.usage__list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.usage__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.usage__emoji {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.usage__name {
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usage__value {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.usage__track {
+  grid-column: 1 / -1;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.usage__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green);
+}
+
+/* ---------- Карточка продукта ---------- */
+
+.ucard {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.ucard__head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.ucard__title {
+  margin: 0;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ucard__badge {
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ucard__meta {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 36px;
+  margin-top: 10px;
+}
+
+.spark__bar {
+  flex: 1;
+  min-height: 2px;
+  border-radius: 4px;
+  background: var(--green);
+}
+
+/* ---------- Карточка прогноза ---------- */
+
+.fcard {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.fcard--expired {
+  border-color: rgba(255, 77, 79, 0.4);
+  background: linear-gradient(180deg, rgba(255, 77, 79, 0.07), transparent), var(--surface);
+}
+
+.fcard__body {
+  min-width: 0;
+}
+
+.fcard__deadline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 5px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fcard__deadline svg {
+  width: 14px;
+  height: 14px;
+}
+
+.fcard__deadline--expired {
+  color: var(--red);
+}
+
+.fcard__deadline--soon {
+  color: var(--yellow);
+}
+
+.fcard__deadline--fresh {
+  color: var(--green);
+}
+
+.fcard__meta {
+  margin: 5px 0 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fcard__counter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  margin: 0;
+  padding-left: 4px;
+  text-align: right;
+}
+
+.fcard__value {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.fcard__label {
+  font-size: 11px;
+}
+
+.fcard__counter--expired {
+  color: var(--red);
+}
+
+.fcard__counter--soon {
+  color: var(--yellow);
+}
+
+.fcard__counter--fresh {
+  color: var(--green);
+}

@@ -1,3 +1,5 @@
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
@@ -5,13 +7,14 @@ from ..database import get_session
 from ..schemas import (
     CategoryOut,
     ConsumptionCreate,
+    ConsumptionStatsOut,
     PantryItemCreate,
     PantryItemOut,
     ProductSuggestionOut,
     UnitOut,
     WasteCreate,
 )
-from ..services import pantry
+from ..services import pantry, stats
 
 router = APIRouter(prefix="/api", tags=["pantry"])
 
@@ -97,6 +100,15 @@ def consume_product(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Продукт не найден")
 
     return _to_item(updated)
+
+
+@router.get("/groups/{group_id}/consumption", response_model=ConsumptionStatsOut)
+def consumption_stats(
+    group_id: int,
+    period: Literal["day", "week", "month", "quarter", "year"] = "week",
+    session: Session = Depends(get_session),
+) -> ConsumptionStatsOut:
+    return ConsumptionStatsOut(**stats.consumption(session, group_id, period))
 
 
 @router.post(

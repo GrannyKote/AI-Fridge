@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthProvider.jsx'
 import { useAuth } from './auth/useAuth.js'
+import ForecastPage from './pages/ForecastPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import PantryPage from './pages/PantryPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
@@ -25,6 +26,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <PantryPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/forecast"
+            element={
+              <RequireAuth>
+                <ForecastPage />
               </RequireAuth>
             }
           />

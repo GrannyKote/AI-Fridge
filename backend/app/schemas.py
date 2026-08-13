@@ -80,6 +80,31 @@ class ConsumptionCreate(BaseModel):
     quantity: float = Field(gt=0)
 
 
+class CategoryUsageOut(BaseModel):
+    id: int | None = None
+    name: str
+    quantity: float
+    unit: str | None = None
+
+
+class ProductUsageOut(BaseModel):
+    name: str
+    category: str | None = None
+    category_id: int | None = None
+    unit: str | None = None
+    entries: int
+    total: float
+    per_day: float
+    buckets: list[float]
+
+
+class ConsumptionStatsOut(BaseModel):
+    period: str
+    period_days: int
+    categories: list[CategoryUsageOut]
+    products: list[ProductUsageOut]
+
+
 class WasteCreate(BaseModel):
     # spoiled — продукт испортился, mistake — запись добавлена ошибочно.
     reason: Literal["spoiled", "mistake"]

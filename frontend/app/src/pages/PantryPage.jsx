@@ -16,6 +16,7 @@ import {
 } from '../components/icons.jsx'
 import { formatAmount, statusOf } from '../lib/pantry.js'
 import { useHorizontalScroll } from '../lib/useHorizontalScroll.js'
+import { useToast } from '../lib/useToast.js'
 import '../styles/pantry.css'
 
 const GROUPS = [
@@ -38,7 +39,7 @@ export default function PantryPage() {
   const [addOpen, setAddOpen] = useState(false)
   const [consumeTarget, setConsumeTarget] = useState(null)
   const [wasteTarget, setWasteTarget] = useState(null)
-  const [toast, setToast] = useState('')
+  const [toast, setToast] = useToast()
   const chipsRef = useHorizontalScroll()
 
   const load = useCallback(async () => {
@@ -66,30 +67,6 @@ export default function PantryPage() {
   useEffect(() => {
     load()
   }, [load])
-
-  useEffect(() => {
-    if (!toast) {
-      return undefined
-    }
-
-    const timer = setTimeout(() => setToast(''), 2200)
-    return () => clearTimeout(timer)
-  }, [toast])
-
-  useEffect(() => {
-    if (!menuOpen) {
-      return undefined
-    }
-
-    function handleKeyDown(event) {
-      if (event.key === 'Escape') {
-        setMenuOpen(false)
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [menuOpen])
 
   const stats = useMemo(() => {
     const counters = { total: products.length, soon: 0, expired: 0 }

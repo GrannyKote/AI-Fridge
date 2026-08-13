@@ -137,6 +137,31 @@ export function ChartIcon() {
   )
 }
 
+export function BarsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 20V11M12 20V4M19 20v-6" />
+    </svg>
+  )
+}
+
+export function SparkIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3v18M3 12h18M6.5 6.5l11 11M17.5 6.5l-11 11" />
+    </svg>
+  )
+}
+
+export function RefreshIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 11a8 8 0 1 0-.9 5" />
+      <path d="M20 4v7h-7" />
+    </svg>
+  )
+}
+
 export function CartIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

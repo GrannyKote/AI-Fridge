@@ -20,18 +20,22 @@ export function statusOf(item) {
   return days <= SOON_THRESHOLD_DAYS ? 'soon' : 'fresh'
 }
 
-function pluralDays(count) {
+export function daysWord(count) {
   const tail = count % 10
   const hundreds = count % 100
 
   if (tail === 1 && hundreds !== 11) {
-    return `${count} день`
+    return 'день'
   }
   if (tail >= 2 && tail <= 4 && (hundreds < 12 || hundreds > 14)) {
-    return `${count} дня`
+    return 'дня'
   }
 
-  return `${count} дней`
+  return 'дней'
+}
+
+function pluralDays(count) {
+  return `${count} ${daysWord(count)}`
 }
 
 export function badgeTextOf(item) {
@@ -58,6 +62,61 @@ export function formatAmount(item) {
   const value = formatNumber(item.remaining ?? item.quantity)
 
   return item.unit ? `${value} ${item.unit}` : value
+}
+
+const MONTHS = [
+  'янв.',
+  'фев.',
+  'мар.',
+  'апр.',
+  'мая',
+  'июн.',
+  'июл.',
+  'авг.',
+  'сен.',
+  'окт.',
+  'ноя.',
+  'дек.',
+]
+
+export function formatShortDate(bestBefore) {
+  const date = new Date(`${bestBefore}T00:00:00`)
+
+  return `${date.getDate()} ${MONTHS[date.getMonth()]}`
+}
+
+// Срок годности хранится датой, поэтому продукт считается годным до её конца.
+function hoursUntil(bestBefore) {
+  const end = new Date(`${bestBefore}T00:00:00`)
+  end.setDate(end.getDate() + 1)
+
+  return Math.max(0, Math.ceil((end - Date.now()) / 3_600_000))
+}
+
+export function deadlineText(item) {
+  const days = daysUntil(item.best_before)
+
+  if (days < 0) {
+    return `Просрочен ${-days} дн.`
+  }
+  if (days === 0) {
+    return `${hoursUntil(item.best_before)} ч.`
+  }
+
+  return `${days} дн.`
+}
+
+// Крупный счётчик справа: сколько дней осталось или сколько прошло с конца срока.
+export function deadlineCounter(item) {
+  const days = daysUntil(item.best_before)
+
+  if (days < 0) {
+    return { value: -days, label: 'дн. назад', status: 'expired' }
+  }
+
+  const left = Math.max(days, 1)
+
+  return { value: left, label: daysWord(left), status: statusOf(item) }
 }
 
 export function parseAmount(raw) {
