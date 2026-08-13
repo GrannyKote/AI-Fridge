@@ -1,4 +1,4 @@
-"""Статистика потребления для вкладки «Прогнозы»."""
+"""Статистика потребления и списаний для вкладки «Прогнозы»."""
 
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -11,6 +11,7 @@ from ..models import (
     UnitOfMeasurement,
     UserGroupProduct,
     UserGroupProductConsumption,
+    UserGroupProductWaste,
 )
 
 PERIOD_DAYS = {"day": 1, "week": 7, "month": 30, "quarter": 90, "year": 365}
@@ -23,20 +24,18 @@ def _round(value: float) -> float:
     return round(float(value), 2)
 
 
-def _fetch(session: Session, group_id: int, since: datetime):
+def _fetch(session: Session, model, group_id: int, since: datetime):
+    """Читает списания из user_group_product_consumption или ..._waste."""
     statement = (
         select(
-            UserGroupProductConsumption.quantity,
-            UserGroupProductConsumption.date_time,
+            model.quantity,
+            model.date_time,
             UserGroupProduct.product_name,
             UserGroupProduct.id_product_category,
             ProductCategory.name.label("category"),
             UnitOfMeasurement.name.label("unit"),
         )
-        .join(
-            UserGroupProduct,
-            UserGroupProduct.id == UserGroupProductConsumption.id_user_group_product,
-        )
+        .join(UserGroupProduct, UserGroupProduct.id == model.id_user_group_product)
         .outerjoin(
             ProductCategory,
             ProductCategory.id == UserGroupProduct.id_product_category,
@@ -47,84 +46,111 @@ def _fetch(session: Session, group_id: int, since: datetime):
         )
         .where(
             UserGroupProduct.id_user_group == group_id,
-            UserGroupProductConsumption.date_time >= since,
+            model.date_time >= since,
         )
     )
 
     return session.execute(statement).mappings().all()
 
 
-def _categories(rows) -> list[dict]:
-    totals: dict[tuple[int | None, str], float] = defaultdict(float)
+def _categories(eaten, wasted) -> list[dict]:
+    totals: dict[tuple[int | None, str], dict[str, float]] = defaultdict(
+        lambda: {"consumed": 0.0, "wasted": 0.0}
+    )
     units: dict[tuple[int | None, str], dict[str | None, float]] = defaultdict(
         lambda: defaultdict(float)
     )
 
-    for row in rows:
-        key = (row["id_product_category"], row["category"] or "Без категории")
-        quantity = float(row["quantity"])
-        totals[key] += quantity
-        units[key][row["unit"]] += quantity
+    for rows, key_name in ((eaten, "consumed"), (wasted, "wasted")):
+        for row in rows:
+            key = (row["id_product_category"], row["category"] or "Без категории")
+            quantity = float(row["quantity"])
+            totals[key][key_name] += quantity
+            units[key][row["unit"]] += quantity
 
     result = []
-    for (category_id, name), quantity in totals.items():
+    for (category_id, name), amounts in totals.items():
         # У категории могут встречаться разные единицы измерения — берём ту,
-        # в которой съедено больше всего.
+        # в которой прошло больше всего.
         unit = max(units[(category_id, name)].items(), key=lambda item: item[1])[0]
         result.append(
-            {"id": category_id, "name": name, "quantity": _round(quantity), "unit": unit}
+            {
+                "id": category_id,
+                "name": name,
+                "unit": unit,
+                "consumed": _round(amounts["consumed"]),
+                "wasted": _round(amounts["wasted"]),
+            }
         )
 
-    return sorted(result, key=lambda item: item["quantity"], reverse=True)
+    return sorted(result, key=lambda item: item["consumed"] + item["wasted"], reverse=True)
 
 
-def _products(rows, start: datetime, period_days: int) -> list[dict]:
+def _series(rows, start: datetime, period_days: int) -> dict[str, dict]:
     bucket_seconds = period_days * 86_400 / BUCKETS
-    products: dict[str, dict] = {}
+    series: dict[str, dict] = {}
 
     for row in rows:
         name = row["product_name"]
-        product = products.get(name)
+        item = series.get(name)
 
-        if product is None:
-            product = {
-                "name": name,
-                "category": row["category"],
-                "category_id": row["id_product_category"],
-                "unit": row["unit"],
-                "entries": 0,
-                "total": 0.0,
-                "buckets": [0.0] * BUCKETS,
-            }
-            products[name] = product
+        if item is None:
+            item = {"entries": 0, "total": 0.0, "buckets": [0.0] * BUCKETS}
+            series[name] = item
 
         quantity = float(row["quantity"])
         index = int((row["date_time"] - start).total_seconds() / bucket_seconds)
         index = min(max(index, 0), BUCKETS - 1)
 
-        product["entries"] += 1
-        product["total"] += quantity
-        product["buckets"][index] += quantity
+        item["entries"] += 1
+        item["total"] += quantity
+        item["buckets"][index] += quantity
 
-    result = []
-    for product in products.values():
-        product["per_day"] = _round(product["total"] / period_days)
-        product["total"] = _round(product["total"])
-        product["buckets"] = [_round(value) for value in product["buckets"]]
-        result.append(product)
+    for item in series.values():
+        item["per_day"] = _round(item["total"] / period_days)
+        item["total"] = _round(item["total"])
+        item["buckets"] = [_round(value) for value in item["buckets"]]
 
-    return sorted(result, key=lambda item: item["total"], reverse=True)
+    return series
 
 
-def consumption(session: Session, group_id: int, period: str) -> dict:
-    """Считает потребление за выбранный период: и по категориям, и по продуктам."""
+def _products(eaten, wasted, start: datetime, period_days: int) -> list[dict]:
+    consumption = _series(eaten, start, period_days)
+    waste = _series(wasted, start, period_days)
+    view: dict[str, dict] = {}
+
+    for rows in (eaten, wasted):
+        for row in rows:
+            name = row["product_name"]
+
+            if name not in view:
+                view[name] = {
+                    "name": name,
+                    "category": row["category"],
+                    "category_id": row["id_product_category"],
+                    "unit": row["unit"],
+                    "consumption": consumption.get(name),
+                    "waste": waste.get(name),
+                }
+
+    return sorted(
+        view.values(),
+        key=lambda item: (item["consumption"] or {}).get("total", 0)
+        + (item["waste"] or {}).get("total", 0),
+        reverse=True,
+    )
+
+
+def usage(session: Session, group_id: int, period: str) -> dict:
+    """Считает потребление и списания за выбранный период."""
     period_days = PERIOD_DAYS[period]
     start = datetime.now() - timedelta(days=period_days)
-    rows = _fetch(session, group_id, start)
+    eaten = _fetch(session, UserGroupProductConsumption, group_id, start)
+    wasted = _fetch(session, UserGroupProductWaste, group_id, start)
 
     return {
         "period": period,
         "period_days": period_days,
-        "categories": _categories(rows),
-        "products": _products(rows, start, period_days),
+        "categories": _categories(eaten, wasted),
+        "products": _products(eaten, wasted, start, period_days),
     }

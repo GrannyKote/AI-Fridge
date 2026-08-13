@@ -54,7 +54,7 @@ export const pantryApi = {
   searchProducts: (query) =>
     request(`/products/search?query=${encodeURIComponent(query)}&limit=5`),
   products: (groupId) => request(`/groups/${groupId}/products`),
-  consumption: (groupId, period) => request(`/groups/${groupId}/consumption?period=${period}`),
+  usage: (groupId, period) => request(`/groups/${groupId}/usage?period=${period}`),
   addProduct: (groupId, payload) =>
     request(`/groups/${groupId}/products`, { method: 'POST', body: payload }),
   consumeProduct: (groupId, itemId, quantity) =>

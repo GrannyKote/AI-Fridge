@@ -1,7 +1,7 @@
-from datetime import date, datetime, time
+from datetime import date, datetime
 from decimal import Decimal
 
-from sqlalchemy import Boolean, Date, DateTime, Integer, Numeric, String, Time
+from sqlalchemy import Boolean, Date, DateTime, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .config import settings
@@ -100,5 +100,4 @@ class UserGroupProductWaste(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     id_user_group_product: Mapped[int] = mapped_column(Integer, nullable=False)
     quantity: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
-    # В базе у колонки тип time without time zone, поэтому здесь не datetime.
-    date_time: Mapped[time] = mapped_column(Time, nullable=False)
+    date_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)

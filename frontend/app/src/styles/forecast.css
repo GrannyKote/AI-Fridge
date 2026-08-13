@@ -111,10 +111,25 @@
   white-space: nowrap;
 }
 
+.chip--waste.is-active {
+  background: var(--red);
+  color: #2b0708;
+}
+
+.usage__values {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .usage__value {
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
+}
+
+.usage__value--waste {
+  color: var(--red);
 }
 
 .usage__track {
@@ -130,6 +145,10 @@
   height: 100%;
   border-radius: inherit;
   background: var(--green);
+}
+
+.usage__fill--waste {
+  background: var(--red);
 }
 
 /* ---------- Карточка продукта ---------- */
@@ -167,10 +186,25 @@
   white-space: nowrap;
 }
 
+.ucard__badge--waste {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
 .ucard__meta {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   color: var(--muted);
   font-size: 12px;
+}
+
+.ucard__tag {
+  margin-right: 6px;
+  color: var(--green);
+  font-weight: 600;
+}
+
+.ucard__meta--waste .ucard__tag {
+  color: var(--red);
 }
 
 .spark {
@@ -178,7 +212,7 @@
   align-items: flex-end;
   gap: 4px;
   height: 36px;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .spark__bar {
@@ -186,6 +220,10 @@
   min-height: 2px;
   border-radius: 4px;
   background: var(--green);
+}
+
+.spark__bar--waste {
+  background: var(--red);
 }
 
 /* ---------- Карточка прогноза ---------- */

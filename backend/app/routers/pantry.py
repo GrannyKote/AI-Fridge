@@ -7,11 +7,11 @@ from ..database import get_session
 from ..schemas import (
     CategoryOut,
     ConsumptionCreate,
-    ConsumptionStatsOut,
     PantryItemCreate,
     PantryItemOut,
     ProductSuggestionOut,
     UnitOut,
+    UsageStatsOut,
     WasteCreate,
 )
 from ..services import pantry, stats
@@ -102,13 +102,13 @@ def consume_product(
     return _to_item(updated)
 
 
-@router.get("/groups/{group_id}/consumption", response_model=ConsumptionStatsOut)
-def consumption_stats(
+@router.get("/groups/{group_id}/usage", response_model=UsageStatsOut)
+def usage_stats(
     group_id: int,
     period: Literal["day", "week", "month", "quarter", "year"] = "week",
     session: Session = Depends(get_session),
-) -> ConsumptionStatsOut:
-    return ConsumptionStatsOut(**stats.consumption(session, group_id, period))
+) -> UsageStatsOut:
+    return UsageStatsOut(**stats.usage(session, group_id, period))
 
 
 @router.post(

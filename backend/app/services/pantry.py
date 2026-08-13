@@ -236,8 +236,7 @@ def waste_product(
             UserGroupProductWaste(
                 id_user_group_product=item_id,
                 quantity=_checked_amount(row, quantity),
-                # В базе у колонки тип time, поэтому берём только время.
-                date_time=datetime.now().time(),
+                date_time=datetime.now(),
             )
         )
         session.flush()

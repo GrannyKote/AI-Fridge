@@ -83,8 +83,16 @@ class ConsumptionCreate(BaseModel):
 class CategoryUsageOut(BaseModel):
     id: int | None = None
     name: str
-    quantity: float
     unit: str | None = None
+    consumed: float
+    wasted: float
+
+
+class UsageSeriesOut(BaseModel):
+    entries: int
+    total: float
+    per_day: float
+    buckets: list[float]
 
 
 class ProductUsageOut(BaseModel):
@@ -92,13 +100,11 @@ class ProductUsageOut(BaseModel):
     category: str | None = None
     category_id: int | None = None
     unit: str | None = None
-    entries: int
-    total: float
-    per_day: float
-    buckets: list[float]
+    consumption: UsageSeriesOut | None = None
+    waste: UsageSeriesOut | None = None
 
 
-class ConsumptionStatsOut(BaseModel):
+class UsageStatsOut(BaseModel):
     period: str
     period_days: int
     categories: list[CategoryUsageOut]
