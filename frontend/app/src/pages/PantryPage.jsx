@@ -15,6 +15,7 @@ import {
   WarningIcon,
 } from '../components/icons.jsx'
 import { formatAmount, statusOf } from '../lib/pantry.js'
+import { useHorizontalScroll } from '../lib/useHorizontalScroll.js'
 import '../styles/pantry.css'
 
 const GROUPS = [
@@ -38,6 +39,7 @@ export default function PantryPage() {
   const [consumeTarget, setConsumeTarget] = useState(null)
   const [wasteTarget, setWasteTarget] = useState(null)
   const [toast, setToast] = useState('')
+  const chipsRef = useHorizontalScroll()
 
   const load = useCallback(async () => {
     if (!groupId) {
@@ -244,7 +246,7 @@ export default function PantryPage() {
             />
           </form>
 
-          <nav className="chips" aria-label="Категории">
+          <nav className="chips" aria-label="Категории" ref={chipsRef}>
             <button
               className={`chip${activeCategory === 'all' ? ' is-active' : ''}`}
               type="button"

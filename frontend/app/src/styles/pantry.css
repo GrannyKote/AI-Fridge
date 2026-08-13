@@ -157,8 +157,12 @@
   margin: 0 calc(var(--gutter) * -1);
   padding: 2px var(--gutter);
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
   scroll-snap-type: x proximity;
+  /* Без этого снэп не учитывает боковой отступ и обрезает чип «Все». */
+  scroll-padding: 0 var(--gutter);
+  -webkit-overflow-scrolling: touch;
 }
 
 .chips::-webkit-scrollbar {
