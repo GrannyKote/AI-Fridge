@@ -15,17 +15,21 @@ function extractMessage(payload, fallback) {
   return fallback
 }
 
-async function post(path, body) {
+async function request(path, { method = 'GET', body } = {}) {
   let response
 
   try {
     response = await fetch(`${BASE_URL}${path}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      method,
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
     })
   } catch {
     throw new Error('Сервер недоступен. Проверьте, что бэкенд запущен')
+  }
+
+  if (response.status === 204) {
+    return null
   }
 
   const payload = await response.json().catch(() => null)
@@ -38,6 +42,28 @@ async function post(path, body) {
 }
 
 export const authApi = {
-  register: (login, password) => post('/auth/register', { login, password }),
-  login: (login, password) => post('/auth/login', { login, password }),
+  register: (login, password) =>
+    request('/auth/register', { method: 'POST', body: { login, password } }),
+  login: (login, password) =>
+    request('/auth/login', { method: 'POST', body: { login, password } }),
+}
+
+export const pantryApi = {
+  categories: () => request('/categories'),
+  units: () => request('/units'),
+  searchProducts: (query) =>
+    request(`/products/search?query=${encodeURIComponent(query)}&limit=5`),
+  products: (groupId) => request(`/groups/${groupId}/products`),
+  addProduct: (groupId, payload) =>
+    request(`/groups/${groupId}/products`, { method: 'POST', body: payload }),
+  consumeProduct: (groupId, itemId, quantity) =>
+    request(`/groups/${groupId}/products/${itemId}/consumption`, {
+      method: 'POST',
+      body: { quantity },
+    }),
+  wasteProduct: (groupId, itemId, payload) =>
+    request(`/groups/${groupId}/products/${itemId}/waste`, {
+      method: 'POST',
+      body: payload,
+    }),
 }

@@ -1,8 +1,8 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthProvider.jsx'
 import { useAuth } from './auth/useAuth.js'
-import HomePage from './pages/HomePage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
+import PantryPage from './pages/PantryPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
 
 function RequireAuth({ children }) {
@@ -24,7 +24,7 @@ export default function App() {
             path="/"
             element={
               <RequireAuth>
-                <HomePage />
+                <PantryPage />
               </RequireAuth>
             }
           />

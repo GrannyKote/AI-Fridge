@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from .config import settings
 from .database import get_session
-from .routers import auth
+from .routers import auth, pantry
 
 app = FastAPI(title="AI-Fridge API", version="0.1.0")
 
@@ -20,6 +20,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(pantry.router)
 
 
 @app.exception_handler(OperationalError)

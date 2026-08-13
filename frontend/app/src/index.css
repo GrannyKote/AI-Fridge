@@ -9,6 +9,8 @@
   --green-soft: rgba(39, 221, 109, 0.14);
   --red: #ff4d4f;
   --red-soft: rgba(255, 77, 79, 0.13);
+  --yellow: #f2b430;
+  --yellow-soft: rgba(242, 180, 48, 0.13);
   --radius-sm: 12px;
   --radius: 16px;
   --control-h: 52px;
@@ -40,7 +42,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
   color: inherit;
 }
@@ -201,6 +204,31 @@ svg {
   color: var(--green);
   font-size: 14px;
   font-weight: 600;
+}
+
+/* ---------- Кнопки-иконки ---------- */
+
+.icon-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--muted);
+  transition: transform 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+
+.icon-btn--danger {
+  border-color: rgba(255, 77, 79, 0.28);
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+.icon-btn:active {
+  transform: scale(0.92);
 }
 
 /* ---------- Уведомление об ошибке ---------- */

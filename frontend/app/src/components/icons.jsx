@@ -43,6 +43,127 @@ export function DownloadIcon() {
   )
 }
 
+export function MenuIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" />
+    </svg>
+  )
+}
+
+export function BellIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M18 8a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6" />
+      <path d="M13.7 20a2 2 0 0 1-3.4 0" />
+    </svg>
+  )
+}
+
+export function SearchIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.2-3.2" />
+    </svg>
+  )
+}
+
+export function PlusIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  )
+}
+
+export function UtensilsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 3v7a2 2 0 0 0 4 0V3M8 10v11" />
+      <path d="M17 3c-1.4 1.6-2 3.5-2 5.5S15.6 12 17 12.5V21" />
+    </svg>
+  )
+}
+
+export function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 7h16M9.5 7V5h5v2M6.5 7l1 13h9l1-13" />
+    </svg>
+  )
+}
+
+export function WarningIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 4 2.5 20h19L12 4Z" />
+      <path d="M12 10v4M12 17h.01" />
+    </svg>
+  )
+}
+
+export function ClockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="13" r="8" />
+      <path d="M12 9v4l2.5 2M9 2h6" />
+    </svg>
+  )
+}
+
+export function CheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m4 12.5 5 5L20 6.5" />
+    </svg>
+  )
+}
+
+export function FridgeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="5" y="2.5" width="14" height="19" rx="3" />
+      <path d="M5 10h14M8.5 6.2v1.6M8.5 13.2v1.8" />
+    </svg>
+  )
+}
+
+export function ChartIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 13h3l2.5 5.5L12 5l3 9 1.8-3H21" />
+    </svg>
+  )
+}
+
+export function CartIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 7h14l-1 13H6L5 7Z" />
+      <path d="M9 7a3 3 0 0 1 6 0" />
+    </svg>
+  )
+}
+
+export function UserIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="9" r="3.2" />
+      <path d="M5.5 20a6.5 6.5 0 0 1 13 0" />
+    </svg>
+  )
+}
+
+export function LogoutIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" />
+      <path d="M10 16l-4-4 4-4M6 12h10" />
+    </svg>
+  )
+}
+
 export function LogoMark({ className }) {
   return (
     <svg className={className} viewBox="0 0 60 60" aria-hidden="true">

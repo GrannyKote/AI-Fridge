@@ -13,7 +13,6 @@ const apiProxy = {
 export default defineConfig({
   server: { host: true, proxy: apiProxy },
   preview: { host: true, proxy: apiProxy },
-  build: { emptyOutDir: true },
   plugins: [
     react(),
     VitePWA({
