@@ -9,6 +9,7 @@ from ..schemas import (
     ConsumptionCreate,
     PantryItemCreate,
     PantryItemOut,
+    PlaceOut,
     ProductSuggestionOut,
     UnitOut,
     UsageStatsOut,
@@ -28,6 +29,8 @@ def _to_item(row) -> PantryItemOut:
         unit=row["unit"],
         category_id=row["id_product_category"],
         category=row["category_name"],
+        storage_place_id=row["id_storage_place"],
+        storage_place=row["storage_place"],
         best_before=row["best_before"],
         is_consumed=bool(row["is_consumed"]),
         is_wasted=bool(row["is_wasted"]),
@@ -44,6 +47,11 @@ def categories(session: Session = Depends(get_session)) -> list[CategoryOut]:
 @router.get("/units", response_model=list[UnitOut])
 def units(session: Session = Depends(get_session)) -> list[UnitOut]:
     return [UnitOut.model_validate(item) for item in pantry.list_units(session)]
+
+
+@router.get("/places", response_model=list[PlaceOut])
+def places(session: Session = Depends(get_session)) -> list[PlaceOut]:
+    return [PlaceOut.model_validate(item) for item in pantry.list_places(session)]
 
 
 @router.get("/products/search", response_model=list[ProductSuggestionOut])

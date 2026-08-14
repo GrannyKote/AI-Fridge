@@ -64,6 +64,16 @@ export function formatAmount(item) {
   return item.unit ? `${value} ${item.unit}` : value
 }
 
+export function actionAmount(raw, unit) {
+  const amount = parseAmount(raw)
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return ''
+  }
+
+  return unit ? `${formatNumber(amount)} ${unit}` : formatNumber(amount)
+}
+
 const MONTHS = [
   'янв.',
   'фев.',

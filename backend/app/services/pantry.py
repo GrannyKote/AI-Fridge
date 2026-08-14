@@ -8,12 +8,14 @@ from sqlalchemy.orm import Session
 from ..models import (
     Product,
     ProductCategory,
+    StoragePlace,
     UnitOfMeasurement,
     UserGroupProduct,
     UserGroupProductConsumption,
     UserGroupProductWaste,
 )
 from ..schemas import PantryItemCreate
+from . import catalog, storage
 
 
 def list_categories(session: Session) -> Sequence[ProductCategory]:
@@ -22,6 +24,10 @@ def list_categories(session: Session) -> Sequence[ProductCategory]:
 
 def list_units(session: Session) -> Sequence[UnitOfMeasurement]:
     return session.scalars(select(UnitOfMeasurement).order_by(UnitOfMeasurement.id)).all()
+
+
+def list_places(session: Session) -> Sequence[StoragePlace]:
+    return session.scalars(select(StoragePlace).order_by(StoragePlace.id)).all()
 
 
 def search_products(session: Session, query: str, limit: int = 5):
@@ -73,17 +79,23 @@ def _products_statement():
             UserGroupProduct.quantity,
             UserGroupProduct.best_before,
             UserGroupProduct.id_product_category,
+            UserGroupProduct.id_storage_place,
             UserGroupProduct.is_consumed,
             UserGroupProduct.is_wasted,
             UserGroupProduct.is_deleted,
             UserGroupProduct.is_over,
             remaining.label("remaining"),
             ProductCategory.name.label("category_name"),
+            StoragePlace.name.label("storage_place"),
             UnitOfMeasurement.name.label("unit"),
         )
         .outerjoin(
             ProductCategory,
             ProductCategory.id == UserGroupProduct.id_product_category,
+        )
+        .outerjoin(
+            StoragePlace,
+            StoragePlace.id == UserGroupProduct.id_storage_place,
         )
         .outerjoin(
             UnitOfMeasurement,
@@ -114,11 +126,6 @@ def get_product(session: Session, group_id: int, item_id: int):
     return session.execute(statement).mappings().first()
 
 
-def _find_by_name(session: Session, model, name: str):
-    statement = select(model).where(func.lower(model.name) == name.strip().lower())
-    return session.scalars(statement).first()
-
-
 def create_pantry_item(session: Session, group_id: int, payload: PantryItemCreate) -> dict:
     """Кладёт продукт в кладовую, заводя справочники, если их ещё нет."""
     unit = session.get(UnitOfMeasurement, payload.unit_id)
@@ -126,21 +133,9 @@ def create_pantry_item(session: Session, group_id: int, payload: PantryItemCreat
         raise ValueError("Единица измерения не найдена")
 
     name = payload.name.strip()
-    category_name = payload.category.strip()
-
-    category = _find_by_name(session, ProductCategory, category_name)
-    if category is None:
-        category = ProductCategory(name=category_name)
-        session.add(category)
-        session.flush()
-
-    product = session.get(Product, payload.product_id) if payload.product_id else None
-    if product is None:
-        product = _find_by_name(session, Product, name)
-    if product is None:
-        product = Product(name=name, id_product_category=category.id)
-        session.add(product)
-        session.flush()
+    product, category = catalog.ensure_product(
+        session, name, payload.category, payload.product_id
+    )
 
     item = UserGroupProduct(
         id_user_group=group_id,
@@ -150,6 +145,8 @@ def create_pantry_item(session: Session, group_id: int, payload: PantryItemCreat
         quantity=Decimal(str(payload.quantity)),
         best_before=payload.best_before,
         id_product_category=category.id,
+        id_storage_place=payload.storage_place_id
+        or storage.place_id_for(session, name, category.name),
     )
     session.add(item)
     session.commit()

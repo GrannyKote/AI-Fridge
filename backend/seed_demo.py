@@ -14,14 +14,14 @@ from sqlalchemy.orm import Session
 
 from app.database import engine
 from app.models import Product, ProductCategory, UnitOfMeasurement, UserGroupProduct
-from app.services import users
+from app.services import storage, users
 
-UNITS = ["шт", "г", "кг", "мл", "л"]
+UNITS = ["шт", "г", "мл"]
 
 # (название, категория, количество, единица, дней до конца срока годности)
 DEMO_PRODUCTS = [
-    ("Кефир 2.5%", "Молочные", "0.5", "л", -3),
-    ("Молоко 2.5%", "Молочные", "0.8", "л", -1),
+    ("Кефир 2.5%", "Молочные", "500", "мл", -3),
+    ("Молоко 2.5%", "Молочные", "800", "мл", -1),
     ("Куриное филе", "Мясо и рыба", "300", "г", 1),
     ("Сметана 20%", "Молочные", "150", "г", 2),
     ("Творог 5%", "Молочные", "200", "г", 2),
@@ -39,7 +39,7 @@ DEMO_PRODUCTS = [
     ("Рис басмати", "Крупы и макароны", "900", "г", 180),
     ("Макароны перья", "Крупы и макароны", "500", "г", 200),
     ("Соус соевый", "Соусы и специи", "250", "мл", 300),
-    ("Мука пшеничная", "Крупы и макароны", "2", "кг", 240),
+    ("Мука пшеничная", "Крупы и макароны", "2000", "г", 240),
 ]
 
 
@@ -113,6 +113,7 @@ def main() -> None:
                     quantity=Decimal(quantity),
                     best_before=today + timedelta(days=days),
                     id_product_category=categories[category],
+                    id_storage_place=storage.place_id_for(session, name, category),
                 )
             )
 

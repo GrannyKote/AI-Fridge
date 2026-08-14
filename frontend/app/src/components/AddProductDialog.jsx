@@ -2,6 +2,18 @@ import { useEffect, useState } from 'react'
 import { pantryApi } from '../api/client.js'
 import { FormAlert } from './FormAlert.jsx'
 import { SuggestInput } from './SuggestInput.jsx'
+import {
+  ArrowLeftIcon,
+  CabinetIcon,
+  CameraIcon,
+  CanIcon,
+  HouseIcon,
+  IceIcon,
+  MicIcon,
+  PencilIcon,
+  SnowflakeIcon,
+  SpiceIcon,
+} from './icons.jsx'
 import '../styles/dialog.css'
 
 const EMPTY_FORM = {
@@ -9,27 +21,77 @@ const EMPTY_FORM = {
   productId: null,
   category: '',
   unitId: '',
-  quantity: '',
+  quantity: '1',
+  purchasedAt: today(),
   bestBefore: '',
+  placeId: '',
+}
+
+const METHODS = [
+  { key: 'manual', title: 'Вручную', icon: <PencilIcon /> },
+  { key: 'receipt', title: 'Чек', icon: <CameraIcon /> },
+  { key: 'voice', title: 'Голос', icon: <MicIcon /> },
+]
+
+const PLACE_ICONS = {
+  Холодильник: <SnowflakeIcon />,
+  Морозилка: <IceIcon />,
+  Бакалея: <HouseIcon />,
+  Шкаф: <CabinetIcon />,
+  Специи: <SpiceIcon />,
+  Консервы: <CanIcon />,
+}
+
+const PLACE_BY_NAME = {
+  'Фарш говяжий': 'Морозилка',
+  'Куриное филе': 'Морозилка',
+}
+
+const PLACE_BY_CATEGORY = {
+  Молочные: 'Холодильник',
+  Яйца: 'Холодильник',
+  'Мясо и рыба': 'Холодильник',
+  'Хлеб и выпечка': 'Шкаф',
+  'Крупы и макароны': 'Бакалея',
+  'Соусы и специи': 'Специи',
+}
+
+function today() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function placeIdOf(places, name, category) {
+  const wanted = PLACE_BY_NAME[name] || PLACE_BY_CATEGORY[category] || 'Шкаф'
+  return String(places.find((place) => place.name === wanted)?.id ?? places[0]?.id ?? '')
 }
 
 export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
   const [form, setForm] = useState(EMPTY_FORM)
+  const [method, setMethod] = useState('manual')
   const [units, setUnits] = useState([])
+  const [places, setPlaces] = useState([])
   const [nameSuggestions, setNameSuggestions] = useState([])
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
   const [pending, setPending] = useState(false)
+  const [placeTouched, setPlaceTouched] = useState(false)
 
   useEffect(() => {
     let cancelled = false
 
-    pantryApi
-      .units()
-      .then((list) => {
-        if (!cancelled) {
-          setUnits(list)
+    Promise.all([pantryApi.units(), pantryApi.places()])
+      .then(([unitList, placeList]) => {
+        if (cancelled) {
+          return
         }
+
+        setUnits(unitList)
+        setPlaces(placeList)
+        setForm((current) => ({
+          ...current,
+          unitId: current.unitId || String(unitList.find((unit) => unit.name === 'шт')?.id ?? ''),
+          placeId: current.placeId || placeIdOf(placeList, current.name, current.category),
+        }))
       })
       .catch((error) => setFormError(error.message))
 
@@ -49,8 +111,6 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
-  // Подсказки по названию — из таблицы product, с задержкой, чтобы не слать
-  // запрос на каждое нажатие клавиши.
   useEffect(() => {
     const query = form.name.trim()
 
@@ -78,15 +138,16 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
     return () => clearTimeout(timer)
   }, [form.name])
 
-  const categorySuggestions = categories
-    .filter((category) =>
-      category.name.toLowerCase().startsWith(form.category.trim().toLowerCase()),
-    )
-    .slice(0, 5)
-    .map((category) => ({ key: category.id, label: category.name }))
-
   function update(patch) {
-    setForm((current) => ({ ...current, ...patch }))
+    setForm((current) => {
+      const next = { ...current, ...patch }
+
+      if (!placeTouched && places.length > 0 && ('name' in patch || 'category' in patch)) {
+        next.placeId = placeIdOf(places, next.name.trim(), next.category)
+      }
+
+      return next
+    })
   }
 
   function clearError(field) {
@@ -97,9 +158,9 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
     const quantity = Number(form.quantity.replace(',', '.'))
 
     return {
-      name: form.name.trim() ? '' : 'Введите наименование',
-      category: form.category.trim() ? '' : 'Укажите категорию',
-      unitId: form.unitId ? '' : 'Выберите единицу измерения',
+      name: form.name.trim() ? '' : 'Введите название',
+      category: form.category ? '' : 'Выберите категорию',
+      unitId: form.unitId ? '' : 'Выберите единицу',
       quantity:
         form.quantity.trim() === ''
           ? 'Введите количество'
@@ -107,6 +168,7 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
             ? ''
             : 'Количество должно быть больше нуля',
       bestBefore: form.bestBefore ? '' : 'Укажите срок годности',
+      placeId: form.placeId ? '' : 'Выберите место хранения',
     }
   }
 
@@ -125,10 +187,11 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
     try {
       const created = await pantryApi.addProduct(groupId, {
         name: form.name.trim(),
-        category: form.category.trim(),
+        category: form.category,
         unit_id: Number(form.unitId),
         quantity: Number(form.quantity.replace(',', '.')),
         best_before: form.bestBefore,
+        storage_place_id: Number(form.placeId),
         product_id: form.productId,
       })
       onCreated(created)
@@ -140,16 +203,44 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
   }
 
   return (
-    <div className="dialog" role="dialog" aria-modal="true" aria-label="Добавить продукт">
-      <button className="dialog__backdrop" type="button" onClick={onClose} aria-label="Закрыть" />
+    <div className="dialog dialog--page" role="dialog" aria-modal="true" aria-labelledby="add-title">
+      <div className="add">
+        <header className="add__head">
+          <button className="icon-btn icon-btn--round" type="button" onClick={onClose} aria-label="Назад">
+            <ArrowLeftIcon />
+          </button>
+          <h2 className="add__title" id="add-title">
+            Добавить продукт
+          </h2>
+        </header>
 
-      <div className="dialog__sheet">
-        <div className="dialog__grabber" aria-hidden="true" />
-        <h2 className="dialog__title">Добавить продукт</h2>
+        <div className="method" role="tablist" aria-label="Способ добавления">
+          {METHODS.map((item) => (
+            <button
+              key={item.key}
+              className={`method__item${method === item.key ? ' is-active' : ''}`}
+              type="button"
+              role="tab"
+              aria-selected={method === item.key}
+              onClick={() => {
+                if (item.key === 'manual') {
+                  setMethod(item.key)
+                  setFormError('')
+                  return
+                }
 
-        <form className="form" onSubmit={handleSubmit} noValidate>
+                setFormError(`Способ «${item.title}» появится позже`)
+              }}
+            >
+              {item.icon}
+              {item.title}
+            </button>
+          ))}
+        </div>
+
+        <form className="form add__form" onSubmit={handleSubmit} noValidate>
           <SuggestInput
-            label="Наименование"
+            label="Название"
             value={form.name}
             onChange={(value) => {
               update({ name: value, productId: null })
@@ -166,31 +257,59 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
             }}
             suggestions={nameSuggestions}
             error={errors.name}
-            hint="Начните вводить название — предложим то, что уже есть в справочнике"
-            placeholder="Например, Кефир 2.5%"
+            placeholder="Начните вводить..."
             autoFocus
           />
 
-          <SuggestInput
-            label="Категория"
-            value={form.category}
-            onChange={(value) => {
-              update({ category: value })
-              clearError('category')
-            }}
-            onPick={({ label }) => {
-              update({ category: label })
-              clearError('category')
-            }}
-            suggestions={categorySuggestions}
-            error={errors.category}
-            placeholder="Например, Молочные"
-          />
+          <div className={`field${errors.category ? ' field--invalid' : ''}`}>
+            <label className="field__label" htmlFor="category">
+              Категория
+            </label>
+            <div className="field__control">
+              <select
+                id="category"
+                className="field__input field__select"
+                value={form.category}
+                onChange={(event) => {
+                  update({ category: event.target.value })
+                  clearError('category')
+                }}
+              >
+                <option value="">Выберите категорию</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.name}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errors.category && <p className="field__error">{errors.category}</p>}
+          </div>
 
           <div className="dialog__row">
+            <div className={`field${errors.quantity ? ' field--invalid' : ''}`}>
+              <label className="field__label" htmlFor="quantity">
+                Количество
+              </label>
+              <div className="field__control">
+                <input
+                  id="quantity"
+                  className="field__input"
+                  type="text"
+                  inputMode="decimal"
+                  value={form.quantity}
+                  onChange={(event) => {
+                    update({ quantity: event.target.value })
+                    clearError('quantity')
+                  }}
+                />
+              </div>
+              {errors.quantity && <p className="field__error">{errors.quantity}</p>}
+            </div>
+
             <div className={`field${errors.unitId ? ' field--invalid' : ''}`}>
               <label className="field__label" htmlFor="unit">
-                Единицы измерения
+                Единица
               </label>
               <div className="field__control">
                 <select
@@ -212,58 +331,73 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
               </div>
               {errors.unitId && <p className="field__error">{errors.unitId}</p>}
             </div>
+          </div>
 
-            <div className={`field${errors.quantity ? ' field--invalid' : ''}`}>
-              <label className="field__label" htmlFor="quantity">
-                Количество
+          <div className="dialog__row">
+            <div className="field">
+              <label className="field__label" htmlFor="purchased-at">
+                Дата покупки
               </label>
               <div className="field__control">
                 <input
-                  id="quantity"
+                  id="purchased-at"
                   className="field__input"
-                  type="text"
-                  inputMode="decimal"
-                  value={form.quantity}
-                  onChange={(event) => {
-                    update({ quantity: event.target.value })
-                    clearError('quantity')
-                  }}
-                  placeholder="0"
+                  type="date"
+                  value={form.purchasedAt}
+                  onChange={(event) => update({ purchasedAt: event.target.value })}
                 />
               </div>
-              {errors.quantity && <p className="field__error">{errors.quantity}</p>}
+            </div>
+
+            <div className={`field${errors.bestBefore ? ' field--invalid' : ''}`}>
+              <label className="field__label" htmlFor="best-before">
+                Срок годности
+              </label>
+              <div className="field__control">
+                <input
+                  id="best-before"
+                  className="field__input"
+                  type="date"
+                  value={form.bestBefore}
+                  onChange={(event) => {
+                    update({ bestBefore: event.target.value })
+                    clearError('bestBefore')
+                  }}
+                />
+              </div>
+              {errors.bestBefore && <p className="field__error">{errors.bestBefore}</p>}
             </div>
           </div>
 
-          <div className={`field${errors.bestBefore ? ' field--invalid' : ''}`}>
-            <label className="field__label" htmlFor="best-before">
-              Срок годности
-            </label>
-            <div className="field__control">
-              <input
-                id="best-before"
-                className="field__input"
-                type="date"
-                value={form.bestBefore}
-                onChange={(event) => {
-                  update({ bestBefore: event.target.value })
-                  clearError('bestBefore')
-                }}
-              />
+          <fieldset className={`places${errors.placeId ? ' field--invalid' : ''}`}>
+            <legend className="field__label">Хранение</legend>
+            <div className="places__grid">
+              {places.map((place) => (
+                <button
+                  key={place.id}
+                  className={`place${String(place.id) === String(form.placeId) ? ' is-active' : ''}`}
+                  type="button"
+                  onClick={() => {
+                    setPlaceTouched(true)
+                    update({ placeId: String(place.id) })
+                    clearError('placeId')
+                  }}
+                >
+                  <span className="place__icon" aria-hidden="true">
+                    {PLACE_ICONS[place.name] ?? <HouseIcon />}
+                  </span>
+                  {place.name}
+                </button>
+              ))}
             </div>
-            {errors.bestBefore && <p className="field__error">{errors.bestBefore}</p>}
-          </div>
+            {errors.placeId && <p className="field__error">{errors.placeId}</p>}
+          </fieldset>
 
           <FormAlert>{formError}</FormAlert>
 
-          <div className="dialog__actions">
-            <button className="btn btn--ghost" type="button" onClick={onClose}>
-              Отмена
-            </button>
-            <button className="btn btn--primary" type="submit" disabled={pending}>
-              {pending ? 'Добавляем...' : 'Добавить'}
-            </button>
-          </div>
+          <button className="btn btn--primary" type="submit" disabled={pending}>
+            {pending ? 'Сохраняем...' : 'Сохранить'}
+          </button>
         </form>
       </div>
     </div>

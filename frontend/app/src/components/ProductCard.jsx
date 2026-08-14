@@ -13,6 +13,7 @@ export function ProductCard({ product, onAction }) {
 
       <div className="card__body">
         <h3 className="card__title">{product.name}</h3>
+        {product.storage_place && <p className="card__place">{product.storage_place}</p>}
         <p className="card__meta">
           <span>{formatAmount(product)}</span>
           <span className="card__dot" aria-hidden="true">

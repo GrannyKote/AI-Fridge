@@ -45,6 +45,13 @@ class UnitOut(BaseModel):
     name: str
 
 
+class PlaceOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+
+
 class ProductSuggestionOut(BaseModel):
     id: int
     name: str
@@ -60,6 +67,8 @@ class PantryItemOut(BaseModel):
     unit: str | None = None
     category_id: int | None = None
     category: str | None = None
+    storage_place_id: int | None = None
+    storage_place: str | None = None
     best_before: date
     is_consumed: bool = False
     is_wasted: bool = False
@@ -73,6 +82,7 @@ class PantryItemCreate(BaseModel):
     unit_id: int
     quantity: float = Field(gt=0)
     best_before: date
+    storage_place_id: int | None = None
     product_id: int | None = None
 
 
@@ -115,3 +125,42 @@ class WasteCreate(BaseModel):
     # spoiled — продукт испортился, mistake — запись добавлена ошибочно.
     reason: Literal["spoiled", "mistake"]
     quantity: float | None = Field(default=None, gt=0)
+
+
+class PurchaseCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=512)
+    category: str = Field(min_length=1, max_length=512)
+    unit_id: int
+    quantity: float = Field(gt=0)
+    product_id: int | None = None
+
+
+class PurchaseOut(BaseModel):
+    id: int
+    name: str
+    quantity: float
+    unit: str | None = None
+    category_id: int | None = None
+    category: str | None = None
+
+
+class PlanDateUpdate(BaseModel):
+    plan_date: date
+
+
+class PurchaseHeaderOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    plan_date: date | None = None
+
+
+class CheckoutItem(BaseModel):
+    id: int
+    quantity: float = Field(gt=0)
+    best_before: date
+    storage_place_id: int
+
+
+class PurchaseCheckout(BaseModel):
+    items: list[CheckoutItem] = Field(min_length=1)

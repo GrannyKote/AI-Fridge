@@ -34,6 +34,14 @@ export function ArrowLeftIcon() {
   )
 }
 
+export function ArrowRightIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9 5l7 7-7 7" />
+    </svg>
+  )
+}
+
 export function DownloadIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -73,6 +81,14 @@ export function PlusIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M12 5v14M5 12h14" />
+    </svg>
+  )
+}
+
+export function MinusIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 12h14" />
     </svg>
   )
 }
@@ -209,11 +225,110 @@ export function UserIcon() {
   )
 }
 
+export function MoonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M19 13.5A7.5 7.5 0 0 1 10.5 5 6.5 6.5 0 1 0 19 13.5Z" />
+    </svg>
+  )
+}
+
 export function LogoutIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" />
       <path d="M10 16l-4-4 4-4M6 12h10" />
+    </svg>
+  )
+}
+
+export function ClipboardListIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="6" y="5" width="12" height="15" rx="2" />
+      <path d="M9 5V3.8A1.3 1.3 0 0 1 10.3 2.5h3.4A1.3 1.3 0 0 1 15 3.8V5" />
+      <path d="m8.6 10.6 1.3 1.3 2.4-2.5M8.6 15.6l1.3 1.3 2.4-2.5" />
+      <path d="M14 11.4h2.4M14 16.4h2.4" />
+    </svg>
+  )
+}
+
+export function PencilIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 20h4.2L19 9.2a2.1 2.1 0 0 0-3-3L5.2 17.8Z" />
+      <path d="M14.8 5.4l3.8 3.8" />
+    </svg>
+  )
+}
+
+export function CameraIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4.5 8.5h3l1.4-2h6.2l1.4 2h3v11h-15Z" />
+      <circle cx="12" cy="13.2" r="3.2" />
+    </svg>
+  )
+}
+
+export function MicIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="9" y="3.5" width="6" height="11" rx="3" />
+      <path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v3.5" />
+    </svg>
+  )
+}
+
+export function SnowflakeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3v18M5.5 7.5 12 12l6.5-4.5M5.5 16.5 12 12l6.5 4.5" />
+    </svg>
+  )
+}
+
+export function IceIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="5" y="6" width="8" height="8" rx="1.5" />
+      <rect x="11" y="10" width="8" height="8" rx="1.5" />
+    </svg>
+  )
+}
+
+export function HouseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 11.5 12 4l8 7.5V20H4Z" />
+      <path d="M10 20v-6h4v6" />
+    </svg>
+  )
+}
+
+export function CabinetIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="5" y="4" width="14" height="16" rx="2" />
+      <path d="M5 12h14M12 8v2M12 15v2" />
+    </svg>
+  )
+}
+
+export function SpiceIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9 8h6l.8 12H8.2Z" />
+      <path d="M10 8V5.5h4V8" />
+    </svg>
+  )
+}
+
+export function CanIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M8 7h8v12H8Z" />
+      <path d="M8 7c0-1.5 8-1.5 8 0M8 19c0 1.5 8 1.5 8 0" />
     </svg>
   )
 }

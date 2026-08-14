@@ -19,6 +19,19 @@
   color-scheme: dark;
 }
 
+html[data-theme='light'] {
+  --bg: #f3f5f3;
+  --surface: #ffffff;
+  --surface-2: #ecefed;
+  --border: #d5dad6;
+  --text: #121613;
+  --muted: #5f6764;
+  --green-soft: rgba(39, 221, 109, 0.18);
+  --red-soft: rgba(255, 77, 79, 0.12);
+  --yellow-soft: rgba(242, 180, 48, 0.16);
+  color-scheme: light;
+}
+
 * {
   box-sizing: border-box;
 }

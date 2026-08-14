@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { pantryApi } from '../api/client.js'
-import { AmountField } from './AmountField.jsx'
 import { FormAlert } from './FormAlert.jsx'
-import { amountError, parseAmount } from '../lib/pantry.js'
+import { QuantityPicker, ProductHead } from './QuantityPicker.jsx'
+import { actionAmount, amountError, parseAmount } from '../lib/pantry.js'
 import '../styles/dialog.css'
 
 const REASONS = [
@@ -18,6 +18,8 @@ export function WasteDialog({ groupId, product, onClose, onWasted }) {
   const [pending, setPending] = useState(false)
 
   const available = Number(product.remaining ?? product.quantity)
+  const spoiled = reason === 'spoiled'
+  const summary = actionAmount(quantity, product.unit)
 
   useEffect(() => {
     function handleKeyDown(event) {
@@ -34,7 +36,6 @@ export function WasteDialog({ groupId, product, onClose, onWasted }) {
     event.preventDefault()
     setFormError('')
 
-    const spoiled = reason === 'spoiled'
     const nextError = spoiled ? amountError(quantity, available, product.unit) : ''
     setError(nextError)
 
@@ -62,59 +63,56 @@ export function WasteDialog({ groupId, product, onClose, onWasted }) {
 
       <div className="dialog__sheet">
         <div className="dialog__grabber" aria-hidden="true" />
-        <h2 className="dialog__title">Списать продукт</h2>
-        <p className="dialog__subtitle">{product.name}</p>
 
         <form className="form" onSubmit={handleSubmit} noValidate>
+          <ProductHead product={product} available={available} />
+
           <fieldset className="radios">
-            <legend className="field__label">Причина списания</legend>
+            <legend className="writeoff__label">Причина списания</legend>
 
             {REASONS.map((option) => (
-              <div className="radio" key={option.value}>
-                <label className="radio__option">
-                  <input
-                    className="radio__input"
-                    type="radio"
-                    name="waste-reason"
-                    value={option.value}
-                    checked={reason === option.value}
-                    onChange={() => {
-                      setReason(option.value)
-                      setError('')
-                    }}
-                  />
-                  <span>{option.title}</span>
-                </label>
-
-                {option.value === 'spoiled' && reason === 'spoiled' && (
-                  <div className="radio__extra">
-                    <AmountField
-                      id="waste-quantity"
-                      value={quantity}
-                      onChange={(value) => {
-                        setQuantity(value)
-                        setError('')
-                      }}
-                      unit={product.unit}
-                      available={available}
-                      error={error}
-                    />
-                  </div>
-                )}
-              </div>
+              <label className="radio__option" key={option.value}>
+                <input
+                  className="radio__input"
+                  type="radio"
+                  name="waste-reason"
+                  value={option.value}
+                  checked={reason === option.value}
+                  onChange={() => {
+                    setReason(option.value)
+                    setError('')
+                  }}
+                />
+                <span>{option.title}</span>
+              </label>
             ))}
           </fieldset>
 
+          {spoiled ? (
+            <QuantityPicker
+              product={product}
+              available={available}
+              value={quantity}
+              onChange={(value) => {
+                setQuantity(value)
+                setError('')
+              }}
+              label="Сколько списать?"
+              error={error}
+            />
+          ) : (
+            <p className="writeoff__note">Запись скроется из кладовой, количество списывать не нужно.</p>
+          )}
+
           <FormAlert>{formError}</FormAlert>
 
-          <div className="dialog__actions">
-            <button className="btn btn--ghost" type="button" onClick={onClose}>
-              Отмена
-            </button>
-            <button className="btn btn--primary" type="submit" disabled={pending}>
-              {pending ? 'Списываем...' : 'Списать'}
-            </button>
-          </div>
+          <button className="btn btn--primary" type="submit" disabled={pending}>
+            {pending
+              ? 'Списываем...'
+              : spoiled && summary
+                ? `Списать ${summary}`
+                : 'Списать'}
+          </button>
         </form>
       </div>
     </div>

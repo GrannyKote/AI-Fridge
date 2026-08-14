@@ -7,6 +7,7 @@ import { ForecastCard } from '../components/ForecastCard.jsx'
 import { PantryDock } from '../components/PantryDock.jsx'
 import { BarsIcon, ClockIcon, WarningIcon } from '../components/icons.jsx'
 import { statusOf } from '../lib/pantry.js'
+import { usePurchaseChanged } from '../lib/purchaseEvents.js'
 import { useToast } from '../lib/useToast.js'
 import '../styles/pantry.css'
 import '../styles/forecast.css'
@@ -27,26 +28,34 @@ export default function ForecastPage() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [toast, setToast] = useToast()
 
-  const load = useCallback(async () => {
-    if (!groupId) {
-      setState('error')
-      setError('У пользователя нет группы, прогноз построить не получится')
-      return
-    }
+  const load = useCallback(
+    async (silent = false) => {
+      if (!groupId) {
+        setState('error')
+        setError('У пользователя нет группы, прогноз построить не получится')
+        return
+      }
 
-    setState('loading')
-    try {
-      setProducts(await pantryApi.products(groupId))
-      setState('ready')
-    } catch (loadError) {
-      setError(loadError.message)
-      setState('error')
-    }
-  }, [groupId])
+      if (silent !== true) {
+        setState('loading')
+      }
+
+      try {
+        setProducts(await pantryApi.products(groupId))
+        setState('ready')
+      } catch (loadError) {
+        setError(loadError.message)
+        setState('error')
+      }
+    },
+    [groupId],
+  )
 
   useEffect(() => {
     load()
   }, [load])
+
+  usePurchaseChanged(useCallback(() => load(true), [load]))
 
   const sections = useMemo(() => {
     const soon = []
@@ -83,6 +92,7 @@ export default function ForecastPage() {
               alerts > 0 ? `Требуют внимания: ${alerts}` : 'Всё в порядке, сроки не горят',
             )
           }
+          onToast={setToast}
         />
 
         <main className="content">
@@ -109,7 +119,7 @@ export default function ForecastPage() {
           {tab === 'dates' && state === 'error' && (
             <div className="pantry__message">
               <p>{error}</p>
-              <button className="btn btn--ghost" type="button" onClick={load}>
+              <button className="btn btn--ghost" type="button" onClick={() => load()}>
                 Повторить
               </button>
             </div>

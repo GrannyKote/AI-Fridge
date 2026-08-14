@@ -26,15 +26,15 @@ from app.models import (
     UserGroupProductConsumption,
     UserGroupProductWaste,
 )
-from app.services import users
+from app.services import storage, users
 
 WINDOW_DAYS = 90
 
 # (название, категория, единица, размер упаковки, покупок за 90 дней,
 #  записей на упаковку, срок годности в днях)
 CONSUMPTION = [
-    ("Молоко 2.5%", "Молочные", "л", "1", 12, 3, 7),
-    ("Кефир 2.5%", "Молочные", "л", "0.5", 8, 2, 7),
+    ("Молоко 2.5%", "Молочные", "мл", "1000", 12, 3, 7),
+    ("Кефир 2.5%", "Молочные", "мл", "500", 8, 2, 7),
     ("Сметана 20%", "Молочные", "г", "300", 5, 3, 14),
     ("Масло сливочное", "Молочные", "г", "180", 6, 5, 30),
     ("Куриное филе", "Мясо и рыба", "г", "700", 6, 2, 5),
@@ -50,7 +50,7 @@ CONSUMPTION = [
 
 # Испорченного заметно меньше, чем съеденного.
 WASTE = [
-    ("Кефир 2.5%", "Молочные", "л", "0.5", 4, 1, 7),
+    ("Кефир 2.5%", "Молочные", "мл", "500", 4, 1, 7),
     ("Творог 5%", "Молочные", "г", "200", 3, 1, 5),
     ("Сметана 20%", "Молочные", "г", "300", 2, 2, 14),
     ("Хлеб бородинский", "Хлеб и выпечка", "г", "400", 4, 1, 4),
@@ -134,6 +134,7 @@ def generate(session: Session, group_id: int, plan, model, flags: dict, refs, no
                 quantity=quantity,
                 best_before=(bought + timedelta(days=shelf)).date(),
                 id_product_category=categories[category],
+                id_storage_place=storage.place_id_for(session, name, category),
                 **flags,
             )
             session.add(item)

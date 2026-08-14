@@ -50,6 +50,7 @@ export const authApi = {
 
 export const pantryApi = {
   categories: () => request('/categories'),
+  places: () => request('/places'),
   units: () => request('/units'),
   searchProducts: (query) =>
     request(`/products/search?query=${encodeURIComponent(query)}&limit=5`),
@@ -67,4 +68,20 @@ export const pantryApi = {
       method: 'POST',
       body: payload,
     }),
+}
+
+export const shoppingApi = {
+  list: (groupId) => request(`/groups/${groupId}/purchases`),
+  header: (groupId) => request(`/groups/${groupId}/purchase`),
+  add: (groupId, payload) =>
+    request(`/groups/${groupId}/purchases`, { method: 'POST', body: payload }),
+  remove: (groupId, itemId) =>
+    request(`/groups/${groupId}/purchases/${itemId}`, { method: 'DELETE' }),
+  setPlanDate: (groupId, planDate) =>
+    request(`/groups/${groupId}/purchase/plan`, {
+      method: 'PATCH',
+      body: { plan_date: planDate },
+    }),
+  checkout: (groupId, items) =>
+    request(`/groups/${groupId}/purchase/checkout`, { method: 'POST', body: { items } }),
 }

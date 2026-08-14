@@ -19,17 +19,20 @@
 
 /* ---------- Шапка ---------- */
 
-.topbar {
+.app-header {
   position: sticky;
   top: 0;
   z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   padding: calc(14px + env(safe-area-inset-top)) var(--gutter) 12px;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter: blur(12px);
 }
 
 .topbar__name {
@@ -68,6 +71,91 @@
   text-align: center;
 }
 
+.app-header__plan {
+  padding: 0 var(--gutter) 12px;
+}
+
+.plan-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.plan-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(39, 221, 109, 0.16);
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, rgba(39, 221, 109, 0.08), transparent 62%), var(--surface);
+}
+
+.plan-card__info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  text-align: left;
+}
+
+.plan-card__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--green);
+}
+
+.plan-card__icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.plan-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.plan-card__date {
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plan-card__eta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.plan-card__calc {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--green);
+  color: #06210f;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.plan-card__calc svg {
+  width: 16px;
+  height: 16px;
+}
+
+.plan-card__calc:active {
+  transform: scale(0.96);
+}
+
 /* ---------- Контент и сводка ---------- */
 
 .content {
@@ -96,6 +184,10 @@
   font-size: 24px;
   font-weight: 700;
   line-height: 1;
+}
+
+.stat__value--ok {
+  color: var(--green);
 }
 
 .stat__value--warning {
@@ -167,6 +259,12 @@
 
 .chips::-webkit-scrollbar {
   display: none;
+}
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .chip {
@@ -299,6 +397,15 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.card__place {
+  margin: 3px 0 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .card__meta {

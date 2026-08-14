@@ -6,7 +6,7 @@ const TABS = [
   { key: 'pantry', title: 'Кладовая', icon: <FridgeIcon />, path: '/' },
   { key: 'forecast', title: 'Прогнозы', icon: <ChartIcon />, path: '/forecast' },
   { key: 'shopping', title: 'Покупки', icon: <CartIcon />, path: '/shopping' },
-  { key: 'profile', title: 'Профиль', icon: <UserIcon /> },
+  { key: 'settings', title: 'Настройки', icon: <UserIcon />, path: '/settings' },
 ]
 
 export function PantryDock({ open, onClose, onSignOut, onAdd, onSelectTab }) {

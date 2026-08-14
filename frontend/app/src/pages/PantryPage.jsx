@@ -9,6 +9,7 @@ import { ProductCard } from '../components/ProductCard.jsx'
 import { WasteDialog } from '../components/WasteDialog.jsx'
 import { CheckIcon, ClockIcon, SearchIcon, WarningIcon } from '../components/icons.jsx'
 import { formatAmount, statusOf } from '../lib/pantry.js'
+import { notifyPurchaseChanged, usePurchaseChanged } from '../lib/purchaseEvents.js'
 import { useHorizontalScroll } from '../lib/useHorizontalScroll.js'
 import { useToast } from '../lib/useToast.js'
 import '../styles/pantry.css'
@@ -24,43 +25,56 @@ export default function PantryPage() {
   const groupId = user.groups?.[0]?.id
 
   const [categories, setCategories] = useState([])
+  const [places, setPlaces] = useState([])
   const [products, setProducts] = useState([])
   const [state, setState] = useState('loading')
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
+  const [activePlace, setActivePlace] = useState('all')
   const [menuOpen, setMenuOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
   const [consumeTarget, setConsumeTarget] = useState(null)
   const [wasteTarget, setWasteTarget] = useState(null)
   const [toast, setToast] = useToast()
-  const chipsRef = useHorizontalScroll()
+  const categoryChipsRef = useHorizontalScroll()
+  const placeChipsRef = useHorizontalScroll()
 
-  const load = useCallback(async () => {
-    if (!groupId) {
-      setState('error')
-      setError('У пользователя нет группы, кладовую показать не получится')
-      return
-    }
+  const load = useCallback(
+    async (silent = false) => {
+      if (!groupId) {
+        setState('error')
+        setError('У пользователя нет группы, кладовую показать не получится')
+        return
+      }
 
-    setState('loading')
-    try {
-      const [categoryList, productList] = await Promise.all([
-        pantryApi.categories(),
-        pantryApi.products(groupId),
-      ])
-      setCategories(categoryList)
-      setProducts(productList)
-      setState('ready')
-    } catch (loadError) {
-      setError(loadError.message)
-      setState('error')
-    }
-  }, [groupId])
+      if (silent !== true) {
+        setState('loading')
+      }
+
+      try {
+        const [categoryList, placeList, productList] = await Promise.all([
+          pantryApi.categories(),
+          pantryApi.places(),
+          pantryApi.products(groupId),
+        ])
+        setCategories(categoryList)
+        setPlaces(placeList)
+        setProducts(productList)
+        setState('ready')
+      } catch (loadError) {
+        setError(loadError.message)
+        setState('error')
+      }
+    },
+    [groupId],
+  )
 
   useEffect(() => {
     load()
   }, [load])
+
+  usePurchaseChanged(useCallback(() => load(true), [load]))
 
   const stats = useMemo(() => {
     const counters = { total: products.length, soon: 0, expired: 0 }
@@ -81,14 +95,19 @@ export default function PantryPage() {
     return products.filter((product) => {
       const matchesCategory =
         activeCategory === 'all' || product.category_id === activeCategory
-      return matchesCategory && product.name.toLowerCase().includes(normalized)
+      const matchesPlace =
+        activePlace === 'all' || product.storage_place_id === activePlace
+      return (
+        matchesCategory && matchesPlace && product.name.toLowerCase().includes(normalized)
+      )
     })
-  }, [products, query, activeCategory])
+  }, [products, query, activeCategory, activePlace])
 
   async function handleCreated(item) {
     setAddOpen(false)
     setProducts((current) => [...current, item])
     setToast(`«${item.name}» добавлен`)
+    notifyPurchaseChanged()
 
     try {
       // Продукт мог завести новую категорию — обновляем фильтры.
@@ -118,6 +137,7 @@ export default function PantryPage() {
 
   function handleConsumed(item) {
     setConsumeTarget(null)
+    notifyPurchaseChanged()
 
     // Продукт закончился — карточке в кладовой больше не место.
     if (item.is_over) {
@@ -134,6 +154,7 @@ export default function PantryPage() {
 
   function handleWasted(item, reason) {
     setWasteTarget(null)
+    notifyPurchaseChanged()
 
     if (reason === 'mistake') {
       dropProduct(item)
@@ -165,6 +186,7 @@ export default function PantryPage() {
                 : 'Всё в порядке, сроки не горят',
             )
           }
+          onToast={setToast}
         />
 
         <main className="content">
@@ -196,32 +218,54 @@ export default function PantryPage() {
             />
           </form>
 
-          <nav className="chips" aria-label="Категории" ref={chipsRef}>
-            <button
-              className={`chip${activeCategory === 'all' ? ' is-active' : ''}`}
-              type="button"
-              onClick={() => setActiveCategory('all')}
-            >
-              Все
-            </button>
-            {categories.map((category) => (
+          <div className="filters">
+            <nav className="chips" aria-label="Категории" ref={categoryChipsRef}>
               <button
-                key={category.id}
-                className={`chip${activeCategory === category.id ? ' is-active' : ''}`}
+                className={`chip${activeCategory === 'all' ? ' is-active' : ''}`}
                 type="button"
-                onClick={() => setActiveCategory(category.id)}
+                onClick={() => setActiveCategory('all')}
               >
-                {category.name}
+                Все
               </button>
-            ))}
-          </nav>
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  className={`chip${activeCategory === category.id ? ' is-active' : ''}`}
+                  type="button"
+                  onClick={() => setActiveCategory(category.id)}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </nav>
+
+            <nav className="chips" aria-label="Места хранения" ref={placeChipsRef}>
+              <button
+                className={`chip${activePlace === 'all' ? ' is-active' : ''}`}
+                type="button"
+                onClick={() => setActivePlace('all')}
+              >
+                Все
+              </button>
+              {places.map((place) => (
+                <button
+                  key={place.id}
+                  className={`chip${activePlace === place.id ? ' is-active' : ''}`}
+                  type="button"
+                  onClick={() => setActivePlace(place.id)}
+                >
+                  {place.name}
+                </button>
+              ))}
+            </nav>
+          </div>
 
           {state === 'loading' && <p className="pantry__message">Загружаем кладовую...</p>}
 
           {state === 'error' && (
             <div className="pantry__message">
               <p>{error}</p>
-              <button className="btn btn--ghost" type="button" onClick={load}>
+              <button className="btn btn--ghost" type="button" onClick={() => load()}>
                 Повторить
               </button>
             </div>

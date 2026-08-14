@@ -97,7 +97,7 @@
 
 .shop__item {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 12px;
   padding: 12px;
@@ -106,40 +106,27 @@
   background: var(--surface);
 }
 
-.shop__check {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  color: #06210f;
-}
-
-.shop__check svg {
-  width: 15px;
-  height: 15px;
-  stroke-width: 2.4;
-}
-
-.shop__item.is-done .shop__check {
-  border-color: transparent;
-  background: var(--green);
+.shop__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
 .shop__name {
   overflow: hidden;
   font-size: 14px;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.shop__item.is-done .shop__name {
+.shop__meta {
   color: var(--muted);
-  text-decoration: line-through;
+  font-size: 12px;
 }
 
-/* ---------- Поле добавления ---------- */
+/* ---------- Кнопка добавления ---------- */
 
 .composer {
   position: fixed;
@@ -154,49 +141,173 @@
 }
 
 .composer__inner {
-  display: flex;
-  gap: 10px;
   width: 100%;
   max-width: calc(var(--app-max) - var(--gutter) * 2);
   pointer-events: auto;
 }
 
-.composer__input {
-  flex: 1;
-  min-width: 0;
-  height: 48px;
-  padding: 0 16px;
+/* ---------- Планировщик покупок ---------- */
+
+.planner {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.planner__top {
+  margin-bottom: 18px;
+}
+
+.planner__title {
+  margin: 0 0 6px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.planner__hint {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.cal {
+  padding: 16px 14px 18px;
+  border-radius: 22px;
+  background: var(--surface);
+}
+
+.cal__nav {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.cal__nav .icon-btn {
+  width: 36px;
+  height: 36px;
+}
+
+.cal__month {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cal__week,
+.cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.cal__week {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.cal__grid {
+  gap: 6px;
+}
+
+.cal__empty {
+  aspect-ratio: 1;
+}
+
+.cal__day {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cal__day:hover:not(.is-selected) {
+  background: var(--surface-2);
+}
+
+.cal__day.is-today:not(.is-selected) {
+  border: 1.5px solid var(--green);
+  color: var(--green);
+}
+
+.cal__day.is-selected {
+  background: var(--green);
+  color: #06210f;
+}
+
+.planner__submit {
+  margin-top: auto;
+}
+
+/* ---------- Расчёт покупки ---------- */
+
+.checkout-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
-  outline: none;
 }
 
-.composer__input::placeholder {
-  color: #5f6764;
+.checkout-card.is-off {
+  opacity: 0.55;
 }
 
-.composer__input:focus {
-  border-color: rgba(39, 221, 109, 0.45);
+.checkout-card__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.composer__add {
+.checkout-card__name {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.add__form .checkout-card .field__label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.checkout-card .field {
+  gap: 5px;
+}
+
+.checkout-card__check {
   display: grid;
+  flex-shrink: 0;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius);
-  background: var(--green);
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
   color: #06210f;
-  transition: transform 0.12s ease;
 }
 
-.composer__add svg {
-  width: 22px;
-  height: 22px;
+.checkout-card__check svg {
+  width: 16px;
+  height: 16px;
   stroke-width: 2.4;
 }
 
-.composer__add:active {
-  transform: scale(0.94);
+.checkout-card__check.is-on {
+  border-color: transparent;
+  background: var(--green);
 }

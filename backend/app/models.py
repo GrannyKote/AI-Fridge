@@ -65,6 +65,14 @@ class UnitOfMeasurement(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
 
 
+class StoragePlace(Base):
+    __tablename__ = "storage_place"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+
+
 class UserGroupProduct(Base):
     __tablename__ = "user_group_product"
     __table_args__ = {"schema": SCHEMA}
@@ -77,10 +85,40 @@ class UserGroupProduct(Base):
     quantity: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     best_before: Mapped[date] = mapped_column(Date, nullable=False)
     id_product_category: Mapped[int] = mapped_column(Integer, nullable=False)
+    # В базе колонка создана как "Id_storage_place".
+    id_storage_place: Mapped[int | None] = mapped_column("Id_storage_place", Integer)
     is_deleted: Mapped[bool | None] = mapped_column(Boolean)
     is_consumed: Mapped[bool | None] = mapped_column(Boolean)
     is_wasted: Mapped[bool | None] = mapped_column(Boolean)
     is_over: Mapped[bool | None] = mapped_column(Boolean)
+
+
+class UserGroupPurchase(Base):
+    __tablename__ = "user_group_purchase"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id_user_group: Mapped[int] = mapped_column(Integer, nullable=False)
+    plan_date: Mapped[date | None] = mapped_column(Date)
+    actual_date: Mapped[datetime | None] = mapped_column(DateTime)
+    create_date_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class UserGroupPurchaseProduct(Base):
+    __tablename__ = "user_group_purchase_product"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id_user_group: Mapped[int] = mapped_column(Integer, nullable=False)
+    id_product: Mapped[int] = mapped_column(Integer, nullable=False)
+    product_name: Mapped[str] = mapped_column(String(512), nullable=False)
+    id_unit_of_measurement: Mapped[int] = mapped_column(Integer, nullable=False)
+    quantity: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
+    id_product_category: Mapped[int] = mapped_column(Integer, nullable=False)
+    id_user_group_purchase: Mapped[int] = mapped_column(Integer, nullable=False)
+    create_date_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    is_deleted: Mapped[bool | None] = mapped_column(Boolean)
+    is_purchased: Mapped[bool | None] = mapped_column(Boolean)
 
 
 class UserGroupProductConsumption(Base):
