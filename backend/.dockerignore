@@ -1,0 +1,9 @@
+.venv
+__pycache__
+*.pyc
+.env
+.git
+.tmp-login.json
+README.md
+seed_demo.py
+seed_consumption.py
