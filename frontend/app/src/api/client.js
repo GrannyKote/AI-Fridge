@@ -43,9 +43,15 @@ async function request(path, { method = 'GET', body } = {}) {
 
 export const authApi = {
   register: (login, password) =>
-    request('/auth/register', { method: 'POST', body: { login, password } }),
+    request('/auth/register', {
+      method: 'POST',
+      body: { login, password, user_agent: navigator.userAgent },
+    }),
   login: (login, password) =>
-    request('/auth/login', { method: 'POST', body: { login, password } }),
+    request('/auth/login', {
+      method: 'POST',
+      body: { login, password, user_agent: navigator.userAgent },
+    }),
 }
 
 export const pantryApi = {

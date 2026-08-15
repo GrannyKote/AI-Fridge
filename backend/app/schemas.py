@@ -9,11 +9,13 @@ LOGIN_PATTERN = r"^[a-zA-Z0-9._-]+$"
 class RegisterRequest(BaseModel):
     login: str = Field(min_length=3, max_length=20, pattern=LOGIN_PATTERN)
     password: str = Field(min_length=6, max_length=256)
+    user_agent: str = Field(default="", max_length=1024)
 
 
 class LoginRequest(BaseModel):
     login: str = Field(min_length=1, max_length=256)
     password: str = Field(min_length=1, max_length=256)
+    user_agent: str = Field(default="", max_length=1024)
 
 
 class GroupOut(BaseModel):

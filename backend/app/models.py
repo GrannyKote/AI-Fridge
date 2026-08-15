@@ -1,7 +1,7 @@
-from datetime import date, datetime
+from datetime import date, datetime, time
 from decimal import Decimal
 
-from sqlalchemy import Boolean, Date, DateTime, Integer, Numeric, String
+from sqlalchemy import Boolean, Date, DateTime, Integer, Numeric, String, Time
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .config import settings
@@ -17,6 +17,30 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     login: Mapped[str] = mapped_column(String(256), nullable=False)
     password: Mapped[str] = mapped_column(String(256), nullable=False)
+
+
+class CreatedUser(Base):
+    __tablename__ = "created_user"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    login: Mapped[str | None] = mapped_column(String(512))
+    date_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    user_agent: Mapped[str] = mapped_column(String(512), nullable=False)
+    ip: Mapped[str] = mapped_column(String(256), nullable=False)
+
+
+class LoginAttempt(Base):
+    __tablename__ = "login_attempt"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    login: Mapped[str] = mapped_column(String(512), nullable=False)
+    # В базе это TIME WITH TIME ZONE, не timestamp.
+    date_time: Mapped[time] = mapped_column(Time(timezone=True), nullable=False)
+    is_success: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    user_agent: Mapped[str] = mapped_column(String(512), nullable=False)
+    ip: Mapped[str] = mapped_column(String(256), nullable=False)
 
 
 # В базе у user_group и user_group_user составные первичные ключи —
