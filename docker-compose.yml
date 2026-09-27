@@ -5,12 +5,12 @@ services:
     environment:
       POSTGRES_DB: diplom
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-    expose:
-      - "5432"
+    ports:
+      - "${POSTGRES_BIND_ADDR:-0.0.0.0}:${POSTGRES_PUBLIC_PORT:-5432}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d diplom"]
       interval: 5s
@@ -23,7 +23,7 @@ services:
       context: ./backend
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/diplom
+      DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/diplom
       DB_SCHEMA: diplom_all
     expose:
       - "8000"
