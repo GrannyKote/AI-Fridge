@@ -91,3 +91,26 @@ export const shoppingApi = {
   checkout: (groupId, items) =>
     request(`/groups/${groupId}/purchase/checkout`, { method: 'POST', body: { items } }),
 }
+
+async function recognize(groupId, file, kind) {
+  const body = new FormData()
+  body.append('file', file)
+  const path = kind === 'voice' ? 'asr' : 'ocr'
+
+  let response
+  try {
+    response = await fetch(`/ml/groups/${groupId}/${path}`, { method: 'POST', body })
+  } catch {
+    throw new Error('Сервис чеков недоступен')
+  }
+
+  const payload = await response.json().catch(() => null)
+  if (!response.ok) {
+    throw new Error(extractMessage(payload, 'Не удалось прочитать чек'))
+  }
+  return payload
+}
+
+export const receiptApi = {
+  recognize,
+}

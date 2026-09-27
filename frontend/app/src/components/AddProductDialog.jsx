@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { pantryApi } from '../api/client.js'
+import { useEffect, useRef, useState } from 'react'
+import { pantryApi, receiptApi } from '../api/client.js'
 import { FormAlert } from './FormAlert.jsx'
 import { SuggestInput } from './SuggestInput.jsx'
 import {
@@ -75,6 +75,16 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
   const [formError, setFormError] = useState('')
   const [pending, setPending] = useState(false)
   const [placeTouched, setPlaceTouched] = useState(false)
+  const [drafts, setDrafts] = useState([])
+  const [recording, setRecording] = useState(false)
+  const cameraRef = useRef(null)
+  const libraryRef = useRef(null)
+  const audioRef = useRef(null)
+  const kindRef = useRef('receipt')
+  const recorderRef = useRef(null)
+  const streamRef = useRef(null)
+  const chunksRef = useRef([])
+  const discardRef = useRef(false)
 
   useEffect(() => {
     let cancelled = false
@@ -114,7 +124,7 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
   useEffect(() => {
     const query = form.name.trim()
 
-    if (query.length < 1) {
+    if (method !== 'manual' || query.length < 1) {
       setNameSuggestions([])
       return undefined
     }
@@ -136,7 +146,7 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
     }, 250)
 
     return () => clearTimeout(timer)
-  }, [form.name])
+  }, [form.name, method])
 
   function update(patch) {
     setForm((current) => {
@@ -152,6 +162,133 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
 
   function clearError(field) {
     setErrors((current) => ({ ...current, [field]: '' }))
+  }
+
+  function releaseMic() {
+    streamRef.current?.getTracks().forEach((track) => track.stop())
+    streamRef.current = null
+  }
+
+  function cancelVoice() {
+    discardRef.current = true
+    const recorder = recorderRef.current
+    if (recorder && recorder.state !== 'inactive') {
+      recorder.stop()
+      return
+    }
+    discardRef.current = false
+    releaseMic()
+    setRecording(false)
+  }
+
+  useEffect(() => {
+    return () => {
+      discardRef.current = true
+      if (recorderRef.current && recorderRef.current.state !== 'inactive') {
+        recorderRef.current.stop()
+      }
+      releaseMic()
+    }
+  }, [])
+
+  function pickFile(input) {
+    if (!input) {
+      return
+    }
+    input.value = ''
+    input.click()
+  }
+
+  function openPhoto(fromLibrary) {
+    setMethod('receipt')
+    kindRef.current = 'receipt'
+    setFormError('')
+    pickFile(fromLibrary ? libraryRef.current : cameraRef.current)
+  }
+
+  function openAudioFile() {
+    setMethod('voice')
+    kindRef.current = 'voice'
+    setFormError('')
+    pickFile(audioRef.current)
+  }
+
+  async function startVoice() {
+    setMethod('voice')
+    kindRef.current = 'voice'
+    setFormError('')
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      openAudioFile()
+      return
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+      streamRef.current = stream
+      const mimeType = ['audio/mp4', 'audio/webm', 'audio/ogg'].find((type) =>
+        MediaRecorder.isTypeSupported(type),
+      )
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined)
+      chunksRef.current = []
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunksRef.current.push(event.data)
+        }
+      }
+      recorder.onstop = () => {
+        const discard = discardRef.current
+        discardRef.current = false
+        const type = recorder.mimeType || 'audio/mp4'
+        const blob = new Blob(chunksRef.current, { type })
+        releaseMic()
+        setRecording(false)
+        if (discard || blob.size === 0) {
+          return
+        }
+        const ext = type.includes('webm') ? 'webm' : type.includes('ogg') ? 'ogg' : 'm4a'
+        submitFile(new File([blob], `voice.${ext}`, { type }), 'voice')
+      }
+      recorderRef.current = recorder
+      recorder.start()
+      setRecording(true)
+    } catch {
+      releaseMic()
+      setRecording(false)
+      setFormError('Микрофон недоступен. Загрузите аудиофайл.')
+    }
+  }
+
+  function stopVoice() {
+    const recorder = recorderRef.current
+    if (recorder && recorder.state !== 'inactive') {
+      recorder.stop()
+    }
+  }
+
+  async function submitFile(file, kind) {
+    setPending(true)
+    setFormError('')
+    try {
+      const result = await receiptApi.recognize(groupId, file, kind)
+      const items = result.items ?? []
+      setDrafts(items)
+      if (items.length === 0) {
+        setFormError('На записи не нашлось продуктов')
+      }
+    } catch (error) {
+      setDrafts([])
+      setFormError(error.message)
+    } finally {
+      setPending(false)
+    }
+  }
+
+  function onCapture(event) {
+    const file = event.target.files?.[0]
+    if (!file) {
+      return
+    }
+    submitFile(file, kindRef.current)
   }
 
   function validate() {
@@ -223,13 +360,19 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
               role="tab"
               aria-selected={method === item.key}
               onClick={() => {
-                if (item.key === 'manual') {
-                  setMethod(item.key)
-                  setFormError('')
+                if (item.key === method) {
                   return
                 }
-
-                setFormError(`Способ «${item.title}» появится позже`)
+                if (recording) {
+                  cancelVoice()
+                }
+                setMethod(item.key)
+                setFormError('')
+                setDrafts([])
+                setErrors((current) => ({ ...current, name: '' }))
+                if (item.key !== 'manual') {
+                  update({ name: '', productId: null })
+                }
               }}
             >
               {item.icon}
@@ -238,28 +381,84 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
           ))}
         </div>
 
+        {method === 'receipt' && (
+          <div className="capture">
+            <button className="capture__btn" type="button" onClick={() => openPhoto(false)} disabled={pending}>
+              Сфотографировать
+            </button>
+            <button className="capture__btn" type="button" onClick={() => openPhoto(true)} disabled={pending}>
+              Из библиотеки
+            </button>
+          </div>
+        )}
+
+        {method === 'voice' && (
+          <div className="capture">
+            <button
+              className={`capture__btn${recording ? ' is-recording' : ''}`}
+              type="button"
+              onClick={recording ? stopVoice : startVoice}
+              disabled={pending}
+            >
+              {recording ? 'Стоп' : 'Записать'}
+            </button>
+            <button className="capture__btn" type="button" onClick={openAudioFile} disabled={pending || recording}>
+              Загрузить запись
+            </button>
+          </div>
+        )}
+
+        <input ref={cameraRef} type="file" accept="image/*" capture="environment" hidden onChange={onCapture} />
+        <input ref={libraryRef} type="file" accept="image/*" hidden onChange={onCapture} />
+        <input ref={audioRef} type="file" accept="audio/*" hidden onChange={onCapture} />
+
+        {method !== 'manual' && pending && <p className="drafts__hint">Разбираем запись...</p>}
+
+        {method !== 'manual' && drafts.length > 0 && (
+          <div className="drafts">
+            <p className="drafts__hint">Что куплено, сколько и где хранить.</p>
+            <div className="drafts__head">
+              <span>Куплено</span>
+              <span>Сколько</span>
+              <span>Хранение</span>
+            </div>
+            {drafts.map((item, index) => (
+              <div key={index} className="drafts__item">
+                <span>{item.name}</span>
+                <span>
+                  {item.quantity} {item.unit}
+                </span>
+                <span>{item.storage || 'Шкаф'}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {method !== 'manual' && <FormAlert>{formError}</FormAlert>}
+
+        {method === 'manual' && (
         <form className="form add__form" onSubmit={handleSubmit} noValidate>
           <SuggestInput
-            label="Название"
-            value={form.name}
-            onChange={(value) => {
-              update({ name: value, productId: null })
-              clearError('name')
-            }}
-            onPick={({ product }) => {
-              update({
-                name: product.name,
-                productId: product.id,
-                category: product.category ?? '',
-              })
-              clearError('name')
-              clearError('category')
-            }}
-            suggestions={nameSuggestions}
-            error={errors.name}
-            placeholder="Начните вводить..."
-            autoFocus
-          />
+              label="Название"
+              value={form.name}
+              onChange={(value) => {
+                update({ name: value, productId: null })
+                clearError('name')
+              }}
+              onPick={({ product }) => {
+                update({
+                  name: product.name,
+                  productId: product.id,
+                  category: product.category ?? '',
+                })
+                clearError('name')
+                clearError('category')
+              }}
+              suggestions={nameSuggestions}
+              error={errors.name}
+              placeholder="Начните вводить..."
+              autoFocus
+            />
 
           <div className={`field${errors.category ? ' field--invalid' : ''}`}>
             <label className="field__label" htmlFor="category">
@@ -399,6 +598,7 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
             {pending ? 'Сохраняем...' : 'Сохранить'}
           </button>
         </form>
+        )}
       </div>
     </div>
   )

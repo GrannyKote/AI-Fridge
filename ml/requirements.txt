@@ -1,0 +1,6 @@
+easyocr
+faster-whisper
+psycopg[binary]
+fastapi
+uvicorn
+python-multipart
