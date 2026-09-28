@@ -32,6 +32,7 @@ function toRows(items, places) {
     category: item.category,
     unit: item.unit ?? '',
     quantity: formatNumber(item.quantity),
+    price: '',
     bestBefore: '',
     placeId: places.length ? placeIdOf(places, item.name, item.category) : '',
     checked: true,
@@ -99,6 +100,7 @@ export function CheckoutDialog({ groupId, items, onClose, onDone }) {
       }
 
       const quantity = Number(String(row.quantity).replace(',', '.'))
+      const price = Number(String(row.price).replace(',', '.'))
       const errors = {
         quantity:
           String(row.quantity).trim() === ''
@@ -106,6 +108,11 @@ export function CheckoutDialog({ groupId, items, onClose, onDone }) {
             : Number.isFinite(quantity) && quantity > 0
               ? ''
               : 'Количество должно быть больше нуля',
+        // Цена необязательна, но если её ввели — должна быть неотрицательным числом.
+        price:
+          String(row.price).trim() === '' || (Number.isFinite(price) && price >= 0)
+            ? ''
+            : 'Цена должна быть числом не меньше нуля',
         bestBefore: row.bestBefore ? '' : 'Укажите срок годности',
         placeId: row.placeId ? '' : 'Выберите место хранения',
       }
@@ -140,6 +147,10 @@ export function CheckoutDialog({ groupId, items, onClose, onDone }) {
           .map((row) => ({
             id: row.id,
             quantity: Number(String(row.quantity).replace(',', '.')),
+            price:
+              String(row.price).trim() === ''
+                ? null
+                : Number(String(row.price).replace(',', '.')),
             best_before: row.bestBefore,
             storage_place_id: Number(row.placeId),
           })),
@@ -228,32 +239,59 @@ export function CheckoutDialog({ groupId, items, onClose, onDone }) {
                 </div>
               </div>
 
-              <div className={`field${row.errors.placeId ? ' field--invalid' : ''}`}>
-                <label className="field__label" htmlFor={`place-${row.id}`}>
-                  Место хранения
-                </label>
-                <div className="field__control">
-                  <select
-                    id={`place-${row.id}`}
-                    className="field__input field__select"
-                    value={row.placeId}
-                    disabled={!row.checked}
-                    onChange={(event) =>
-                      patchRow(row.id, {
-                        placeId: event.target.value,
-                        errors: { ...row.errors, placeId: '' },
-                      })
-                    }
-                  >
-                    <option value="">Выберите место</option>
-                    {places.map((place) => (
-                      <option key={place.id} value={place.id}>
-                        {place.name}
-                      </option>
-                    ))}
-                  </select>
+              <div className="dialog__row">
+                <div className={`field${row.errors.placeId ? ' field--invalid' : ''}`}>
+                  <label className="field__label" htmlFor={`place-${row.id}`}>
+                    Место хранения
+                  </label>
+                  <div className="field__control">
+                    <select
+                      id={`place-${row.id}`}
+                      className="field__input field__select"
+                      value={row.placeId}
+                      disabled={!row.checked}
+                      onChange={(event) =>
+                        patchRow(row.id, {
+                          placeId: event.target.value,
+                          errors: { ...row.errors, placeId: '' },
+                        })
+                      }
+                    >
+                      <option value="">Выберите место</option>
+                      {places.map((place) => (
+                        <option key={place.id} value={place.id}>
+                          {place.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {row.errors.placeId && <p className="field__error">{row.errors.placeId}</p>}
                 </div>
-                {row.errors.placeId && <p className="field__error">{row.errors.placeId}</p>}
+
+                <div className={`field${row.errors.price ? ' field--invalid' : ''}`}>
+                  <label className="field__label" htmlFor={`price-${row.id}`}>
+                    Цена
+                  </label>
+                  <div className="field__control">
+                    <input
+                      id={`price-${row.id}`}
+                      className="field__input field__input--with-suffix"
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="Необязательно"
+                      value={row.price}
+                      disabled={!row.checked}
+                      onChange={(event) =>
+                        patchRow(row.id, {
+                          price: event.target.value,
+                          errors: { ...row.errors, price: '' },
+                        })
+                      }
+                    />
+                    <span className="field__suffix">₽</span>
+                  </div>
+                  {row.errors.price && <p className="field__error">{row.errors.price}</p>}
+                </div>
               </div>
             </article>
           ))}

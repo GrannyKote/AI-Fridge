@@ -57,6 +57,21 @@ export function formatNumber(value) {
   return Number.isInteger(number) ? String(number) : String(Number(number.toFixed(3)))
 }
 
+// Цену указывать необязательно, поэтому пустое значение превращается в пустую строку.
+export function formatPrice(value) {
+  if (value === null || value === undefined || value === '') {
+    return ''
+  }
+
+  const number = Number(value)
+
+  if (!Number.isFinite(number)) {
+    return ''
+  }
+
+  return `${Number.isInteger(number) ? number : number.toFixed(2)} ₽`
+}
+
 // В карточке показываем остаток: часть продукта могли уже употребить или списать.
 export function formatAmount(item) {
   const value = formatNumber(item.remaining ?? item.quantity)

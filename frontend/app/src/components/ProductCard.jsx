@@ -1,9 +1,10 @@
 import { TrashIcon, UtensilsIcon } from './icons.jsx'
-import { badgeTextOf, categoryView, formatAmount, statusOf } from '../lib/pantry.js'
+import { badgeTextOf, categoryView, formatAmount, formatPrice, statusOf } from '../lib/pantry.js'
 
 export function ProductCard({ product, onAction }) {
   const status = statusOf(product)
   const { emoji, tone } = categoryView(product.category, product.category_id ?? 0)
+  const subtitle = [product.storage_place, formatPrice(product.price)].filter(Boolean).join(' · ')
 
   return (
     <article className={`card${status === 'expired' ? ' card--expired' : ''}`}>
@@ -13,7 +14,7 @@ export function ProductCard({ product, onAction }) {
 
       <div className="card__body">
         <h3 className="card__title">{product.name}</h3>
-        {product.storage_place && <p className="card__place">{product.storage_place}</p>}
+        {subtitle && <p className="card__place">{subtitle}</p>}
         <p className="card__meta">
           <span>{formatAmount(product)}</span>
           <span className="card__dot" aria-hidden="true">

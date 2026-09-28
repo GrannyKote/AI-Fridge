@@ -66,6 +66,7 @@ class PantryItemOut(BaseModel):
     name: str
     quantity: float
     remaining: float
+    price: float | None = None
     unit: str | None = None
     category_id: int | None = None
     category: str | None = None
@@ -83,6 +84,7 @@ class PantryItemCreate(BaseModel):
     category: str = Field(min_length=1, max_length=512)
     unit_id: int
     quantity: float = Field(gt=0)
+    price: float | None = Field(default=None, ge=0)
     best_before: date
     storage_place_id: int | None = None
     product_id: int | None = None
@@ -160,6 +162,7 @@ class PurchaseHeaderOut(BaseModel):
 class CheckoutItem(BaseModel):
     id: int
     quantity: float = Field(gt=0)
+    price: float | None = Field(default=None, ge=0)
     best_before: date
     storage_place_id: int
 

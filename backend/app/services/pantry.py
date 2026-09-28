@@ -77,6 +77,7 @@ def _products_statement():
             UserGroupProduct.id,
             UserGroupProduct.product_name,
             UserGroupProduct.quantity,
+            UserGroupProduct.price,
             UserGroupProduct.best_before,
             UserGroupProduct.id_product_category,
             UserGroupProduct.id_storage_place,
@@ -126,6 +127,11 @@ def get_product(session: Session, group_id: int, item_id: int):
     return session.execute(statement).mappings().first()
 
 
+def money(value: float | None) -> Decimal | None:
+    """Цена необязательна, а float переводим в Decimal через строку — без потери копеек."""
+    return None if value is None else Decimal(str(value))
+
+
 def create_pantry_item(session: Session, group_id: int, payload: PantryItemCreate) -> dict:
     """Кладёт продукт в кладовую, заводя справочники, если их ещё нет."""
     unit = session.get(UnitOfMeasurement, payload.unit_id)
@@ -143,6 +149,7 @@ def create_pantry_item(session: Session, group_id: int, payload: PantryItemCreat
         product_name=name,
         id_unit_of_measurement=unit.id,
         quantity=Decimal(str(payload.quantity)),
+        price=money(payload.price),
         best_before=payload.best_before,
         id_product_category=category.id,
         id_storage_place=payload.storage_place_id

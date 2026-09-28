@@ -26,6 +26,7 @@ def _to_item(row) -> PantryItemOut:
         name=row["product_name"],
         quantity=float(row["quantity"]),
         remaining=float(row["remaining"]),
+        price=None if row["price"] is None else float(row["price"]),
         unit=row["unit"],
         category_id=row["id_product_category"],
         category=row["category_name"],

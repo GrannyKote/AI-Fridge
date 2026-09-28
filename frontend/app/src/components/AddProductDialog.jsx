@@ -22,6 +22,7 @@ const EMPTY_FORM = {
   category: '',
   unitId: '',
   quantity: '1',
+  price: '',
   purchasedAt: today(),
   bestBefore: '',
   placeId: '',
@@ -156,6 +157,7 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
 
   function validate() {
     const quantity = Number(form.quantity.replace(',', '.'))
+    const price = Number(form.price.replace(',', '.'))
 
     return {
       name: form.name.trim() ? '' : 'Введите название',
@@ -167,6 +169,11 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
           : Number.isFinite(quantity) && quantity > 0
             ? ''
             : 'Количество должно быть больше нуля',
+      // Цена необязательна, но если её ввели — должна быть неотрицательным числом.
+      price:
+        form.price.trim() === '' || (Number.isFinite(price) && price >= 0)
+          ? ''
+          : 'Цена должна быть числом не меньше нуля',
       bestBefore: form.bestBefore ? '' : 'Укажите срок годности',
       placeId: form.placeId ? '' : 'Выберите место хранения',
     }
@@ -190,6 +197,7 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
         category: form.category,
         unit_id: Number(form.unitId),
         quantity: Number(form.quantity.replace(',', '.')),
+        price: form.price.trim() === '' ? null : Number(form.price.replace(',', '.')),
         best_before: form.bestBefore,
         storage_place_id: Number(form.placeId),
         product_id: form.productId,
@@ -331,6 +339,28 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
               </div>
               {errors.unitId && <p className="field__error">{errors.unitId}</p>}
             </div>
+          </div>
+
+          <div className={`field${errors.price ? ' field--invalid' : ''}`}>
+            <label className="field__label" htmlFor="price">
+              Цена
+            </label>
+            <div className="field__control">
+              <input
+                id="price"
+                className="field__input field__input--with-suffix"
+                type="text"
+                inputMode="decimal"
+                placeholder="Необязательно"
+                value={form.price}
+                onChange={(event) => {
+                  update({ price: event.target.value })
+                  clearError('price')
+                }}
+              />
+              <span className="field__suffix">₽</span>
+            </div>
+            {errors.price && <p className="field__error">{errors.price}</p>}
           </div>
 
           <div className="dialog__row">

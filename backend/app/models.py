@@ -107,6 +107,8 @@ class UserGroupProduct(Base):
     product_name: Mapped[str] = mapped_column(String(512), nullable=False)
     id_unit_of_measurement: Mapped[int] = mapped_column(Integer, nullable=False)
     quantity: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
+    # Цена за всю позицию целиком, а не за единицу измерения.
+    price: Mapped[Decimal | None] = mapped_column(Numeric)
     best_before: Mapped[date] = mapped_column(Date, nullable=False)
     id_product_category: Mapped[int] = mapped_column(Integer, nullable=False)
     # В базе колонка создана как "Id_storage_place".
