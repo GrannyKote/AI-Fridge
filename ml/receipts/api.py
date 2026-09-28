@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
@@ -11,16 +12,31 @@ from fastapi.middleware.cors import CORSMiddleware
 from receipts.normalize import normalize_lines
 from receipts.payload import to_payload
 from receipts.photo import read_lines as read_photo
+from receipts.photo import warm as warm_photo
 from receipts.store import DatabaseUnavailable, save_receipt
 from receipts.voice import read_lines as read_voice
+from receipts.voice import warm as warm_voice
 
-app = FastAPI(title="AI-Fridge receipts")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    warm_photo()
+    warm_voice()
+    yield
+
+
+app = FastAPI(title="AI-Fridge receipts", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"status": "ok"}
 
 
 @app.post("/groups/{group_id}/ocr")
