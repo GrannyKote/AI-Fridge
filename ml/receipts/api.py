@@ -9,6 +9,7 @@ from tempfile import NamedTemporaryFile
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
+from receipts.llm import warm as warm_llm
 from receipts.normalize import normalize_lines
 from receipts.payload import to_payload
 from receipts.photo import read_lines as read_photo
@@ -22,6 +23,7 @@ from receipts.voice import warm as warm_voice
 async def lifespan(_app: FastAPI):
     warm_photo()
     warm_voice()
+    warm_llm()
     yield
 
 

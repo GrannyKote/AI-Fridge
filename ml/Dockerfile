@@ -50,6 +50,21 @@ RUN ok=0 \
     done \
     && test "$ok" = 1
 
+# CPU-колесо: сборка llama.cpp из исходников на этом шаге не нужна.
+RUN ok=0 \
+    && for _ in 1 2 3 4 5; do \
+        if pip install --no-cache-dir --default-timeout=300 --retries 8 \
+            llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu; then \
+            ok=1; \
+            break; \
+        fi; \
+        sleep 15; \
+    done \
+    && test "$ok" = 1
+
+COPY .model-cache/llm/ /opt/llm/
+ENV LLM_MODEL=/opt/llm/qwen2.5-1.5b-instruct-q4_k_m.gguf
+
 COPY receipts ./receipts
 COPY schema.sql ./schema.sql
 

@@ -1,2 +1,9 @@
 # Сгенерированный граф и локальный кэш Graphify
 graphify-out/
+
+# Локальные окружения, байткод и веса моделей
+.venv/
+__pycache__/
+*.pyc
+ml/.model-cache/
+.env
