@@ -70,7 +70,7 @@ export default function SettingsPage() {
                   <ClipboardListIcon />
                 </span>
                 <h2 className="settings-about__title">AI-Fridge</h2>
-                <span className="settings-about__badge">MVP 0.0.1</span>
+                <span className="settings-about__badge">{import.meta.env.VITE_APP_VERSION || 'MVP 0.0.1'}</span>
               </div>
               <p className="settings-about__text">
                 Умный помощник для учёта продуктов дома. Прогнозирует потребление,

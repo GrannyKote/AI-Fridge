@@ -38,4 +38,4 @@ async def database_unavailable(_: Request, __: OperationalError) -> JSONResponse
 @app.get("/api/health", tags=["service"])
 def health(session: Session = Depends(get_session)) -> dict[str, str]:
     session.execute(text("select 1"))
-    return {"status": "ok", "schema": settings.db_schema}
+    return {"status": "ok", "schema": settings.db_schema, "version": settings.app_version}

@@ -2,6 +2,9 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
+ARG APP_VERSION="MVP 0.0.1"
+ENV VITE_APP_VERSION=$APP_VERSION
+
 COPY app/package.json app/package-lock.json ./
 RUN npm ci
 

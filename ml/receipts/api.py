@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 
 from receipts.llm import warm as warm_llm
@@ -14,7 +16,7 @@ from receipts.normalize import read_products
 from receipts.payload import to_payload
 from receipts.photo import read_lines as read_photo
 from receipts.photo import warm as warm_photo
-from receipts.store import DatabaseUnavailable, base_product_names, save_receipt
+from receipts.store import DatabaseUnavailable, base_product_names, save_label, save_receipt
 from receipts.voice import read_lines as read_voice
 from receipts.voice import warm as warm_voice
 
@@ -39,7 +41,33 @@ app.add_middleware(
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "ok"}
+    return {"status": "ok", "version": os.environ.get("APP_VERSION", "MVP 0.0.1")}
+
+
+class LineLabelIn(BaseModel):
+    raw_line: str = Field(min_length=1)
+    name: str = Field(min_length=1)
+    quantity: float = Field(gt=0)
+    unit: str = Field(min_length=1, max_length=8)
+    category: str | None = None
+
+
+@app.post("/groups/{group_id}/labels", status_code=204)
+def remember_label(group_id: int, payload: LineLabelIn) -> None:
+    """Правка из ручной формы. group_id в пути тот же, что у чека; разметка общая."""
+    del group_id
+    try:
+        save_label(
+            payload.raw_line,
+            payload.name,
+            payload.quantity,
+            payload.unit,
+            payload.category,
+        )
+    except DatabaseUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.post("/groups/{group_id}/ocr")

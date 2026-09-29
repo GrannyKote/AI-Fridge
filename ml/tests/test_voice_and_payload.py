@@ -38,6 +38,7 @@ class PayloadTest(unittest.TestCase):
                     "shelf_life_days": None,
                     "best_before": None,
                     "storage_place_id": None,
+                    "score": None,
                 }
             ],
         )
@@ -51,9 +52,9 @@ class PayloadTest(unittest.TestCase):
             [(item["name"], item["shelf_life_days"]) for item in payload["items"]],
             [("молоко", 5), ("молоко 2.5%", 5)],
         )
-        self.assertEqual(payload["skipped"], [
-            {"line": "прмт 12.00", "reason": "не сопоставилось с продуктом"},
-        ])
+        self.assertEqual(payload["skipped"][0]["line"], "прмт 12.00")
+        self.assertLess(payload["skipped"][0]["score"], 0.45)
+        self.assertGreaterEqual(payload["items"][0]["score"], 0.45)
         self.assertNotIn("shelf_life_days", payload["skipped"][0])
         self.assertEqual(payload["items"][0]["storage"], "Холодильник")
 

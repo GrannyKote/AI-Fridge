@@ -28,6 +28,7 @@ const EMPTY_FORM = {
   purchasedAt: today(),
   bestBefore: '',
   placeId: '',
+  rawLine: '',
 }
 
 const METHODS = [
@@ -61,6 +62,14 @@ const PLACE_BY_CATEGORY = {
 
 function today() {
   return localDate()
+}
+
+function matchPercent(score) {
+  const value = Number(score)
+  if (!Number.isFinite(value) || value < 0) {
+    return ''
+  }
+  return `${Math.round(value * 100)}%`
 }
 
 function placeChoices(places, storage) {
@@ -118,6 +127,7 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
   const chunksRef = useRef([])
   const discardRef = useRef(false)
   const suggestedBefore = useRef('')
+  const openedFrom = useRef(null)
   const categoryTouched = useRef(false)
 
   useEffect(() => {
@@ -585,9 +595,11 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
   }
 
   function takeSkipped(line) {
+    openedFrom.current = method === 'voice' ? 'voice' : 'receipt'
     const unit = units.find((entry) => entry.name === 'шт')
     openManual({
       name: line,
+      rawLine: line,
       quantity: '1',
       unitId: unit ? String(unit.id) : '',
       placeId: placeIdOf(places, '', ''),
@@ -633,6 +645,16 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
 
     setPending(true)
     try {
+      if (form.rawLine.trim()) {
+        const unit = units.find((entry) => String(entry.id) === String(form.unitId))
+        await receiptApi.saveLabel(groupId, {
+          raw_line: form.rawLine,
+          name: form.name.trim(),
+          quantity: Number(form.quantity.replace(',', '.')),
+          unit: unit.name,
+          category: form.category,
+        })
+      }
       const created = await pantryApi.addProduct(groupId, {
         name: form.name.trim(),
         category: form.category,
@@ -644,7 +666,19 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
         product_id: form.productId,
         user_id: user?.id,
       })
-      onCreated(created)
+      const back = openedFrom.current
+      if (!back) {
+        onCreated(created)
+        return
+      }
+      openedFrom.current = null
+      const raw = form.rawLine
+      const writeSkipped = back === 'voice' ? setVoiceSkipped : setReceiptSkipped
+      writeSkipped((current) => current.filter((row) => row.line !== raw))
+      setMethod(back)
+      setForm({ ...EMPTY_FORM, purchasedAt: today() })
+      setErrors({})
+      onBatchSaved([created], false)
     } catch (error) {
       setFormError(error.message)
     } finally {
@@ -737,17 +771,22 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
             {drafts.map((item, index) => (
               <div key={index} className="drafts__item">
                 <div className="drafts__facts">
-                  <input
-                    className="drafts__name"
-                    aria-label={`Имя для строки ${index + 1}`}
-                    value={item.name}
-                    onChange={(event) => {
-                      const name = event.target.value
-                      setDrafts((current) =>
-                        current.map((row, at) => (at === index ? { ...row, name } : row)),
+                  <div className="drafts__title">
+                    <input
+                      className="drafts__name"
+                      aria-label={`Имя для строки ${index + 1}`}
+                      value={item.name}
+                      onChange={(event) => {
+                        const name = event.target.value
+                        setDrafts((current) =>
+                          current.map((row, at) => (at === index ? { ...row, name } : row)),
                       )
                     }}
                   />
+                    {matchPercent(item.score) && (
+                      <span className="drafts__score">{matchPercent(item.score)}</span>
+                    )}
+                  </div>
                   <label className="drafts__qty">
                     <input
                       type="text"
@@ -839,14 +878,25 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
           <div className="drafts">
             <p className="drafts__hint">Не попало в список. Нажмите строку, чтобы добавить её самим.</p>
             {skipped.map((row) => (
-              <button
-                key={row.line}
-                className="drafts__miss"
-                type="button"
-                onClick={() => takeSkipped(row.line)}
-              >
-                {row.line}
-              </button>
+              <div key={row.line} className="drafts__miss-row">
+                <button className="drafts__miss" type="button" onClick={() => takeSkipped(row.line)}>
+                  <span>{row.line}</span>
+                  {matchPercent(row.score) && (
+                    <span className="drafts__score">{matchPercent(row.score)}</span>
+                  )}
+                </button>
+                <button
+                  className="drafts__drop"
+                  type="button"
+                  aria-label={`Удалить «${row.line}»`}
+                  onClick={() => {
+                    const writeSkipped = method === 'voice' ? setVoiceSkipped : setReceiptSkipped
+                    writeSkipped((current) => current.filter((item) => item.line !== row.line))
+                  }}
+                >
+                  Удалить
+                </button>
+              </div>
             ))}
           </div>
         )}

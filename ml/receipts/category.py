@@ -64,6 +64,8 @@ class Item:
     raw_line: str
     shelf_life_days: int | None = None
     storage: str | None = None
+    category: str | None = None
+    score: float | None = None
 
 
 def to_category(found: list) -> list[Item]:
@@ -85,6 +87,7 @@ def to_category(found: list) -> list[Item]:
             raw_line=match.raw_line,
             shelf_life_days=days,
             storage=place,
+            score=match.score,
         ))
     return items
 

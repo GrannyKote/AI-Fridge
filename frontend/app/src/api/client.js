@@ -170,6 +170,28 @@ async function recognize(groupId, file, kind) {
   return payload
 }
 
+async function saveLabel(groupId, payload) {
+  let response
+  try {
+    response = await fetch(`/ml/groups/${groupId}/labels`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+  } catch {
+    throw new Error('Сервис чеков недоступен')
+  }
+  if (response.status === 204) {
+    return null
+  }
+  const body = await response.json().catch(() => null)
+  if (!response.ok) {
+    throw new Error(extractMessage(body, 'Не удалось запомнить правку'))
+  }
+  return body
+}
+
 export const receiptApi = {
   recognize,
+  saveLabel,
 }

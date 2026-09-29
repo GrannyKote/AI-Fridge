@@ -136,6 +136,23 @@ def _parse_products(text: str) -> list[tuple[int, str]] | None:
     return found
 
 
+def line_score(line: str) -> float | None:
+    """Близость строки к ближайшему имени, даже если она ниже порога узнавания."""
+    _prepare(_names())
+    phrase = _phrase(line)
+    if not phrase:
+        return None
+    if _exact(phrase) is not None:
+        return 1.0
+    vector = embed(phrase)
+    if not vector:
+        return None
+    _name, score = _nearest(vector)
+    if score < 0:
+        return None
+    return score
+
+
 def _match(line: str, named: str | None = None) -> Match | None:
     """named — имя от модели. Без него сверяется сама строка."""
     phrase = _phrase(line)

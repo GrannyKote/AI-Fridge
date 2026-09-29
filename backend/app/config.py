@@ -8,6 +8,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    app_version: str = "MVP 0.0.1"
     database_url: str = "postgresql+psycopg://postgres:postgres@127.0.0.1:5432/diplom"
     db_schema: str = "diplom_all"
     default_group_name: str = "Новая группа пользователей"

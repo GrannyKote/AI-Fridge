@@ -39,9 +39,54 @@ def normalize_lines(lines: list[str]) -> list[Item]:
 
 def read_products(lines: list[str]) -> tuple[list[Item], list[str]]:
     """Продукты и строки, которые остались покупками, но не сопоставились.
-    Касса, адрес и итог сюда не попадают: их снимает отсев."""
+    Касса, адрес и итог сюда не попадают: их снимает отсев.
+    Строка, которую уже поправили вручную, берётся из разметки до сравнения векторов."""
     kept = drop_extra(lines)
-    found = analyze(kept)
-    matched = [fold(match.raw_line) for match in found if match.raw_line.strip()]
+    known = line_labels()
+    labeled, rest = apply_known_labels(kept, known, _label_catalog() if known else None)
+    found = analyze(rest)
+    matched = [fold(item.raw_line) for item in labeled if item.raw_line.strip()]
+    matched.extend(fold(match.raw_line) for match in found if match.raw_line.strip())
     skipped = [line for line in kept if not any(raw in fold(line) for raw in matched)]
-    return to_category(found), skipped
+    return labeled + to_category(found), skipped
+
+
+def apply_known_labels(lines, labels, catalog=None):
+    """Уже размеченная строка становится продуктом. Остальные идут дальше как были."""
+    items: list[Item] = []
+    rest: list[str] = []
+    for line in lines:
+        label = labels.get(fold(line))
+        if label is None:
+            rest.append(line)
+            continue
+        name, quantity, unit, category = label
+        days, place = (None, None)
+        if catalog is not None:
+            days, place = catalog.get(name, (None, None))
+        items.append(Item(
+            name=name,
+            quantity=quantity,
+            unit=unit,
+            raw_line=line,
+            shelf_life_days=days,
+            storage=place or suggest_storage(name),
+            category=category,
+            score=1.0,
+        ))
+    return items, rest
+
+
+def _label_catalog():
+    from receipts.store import base_products
+
+    loaded = base_products()
+    if not loaded:
+        return None
+    return {name: (days, place) for name, days, place in loaded}
+
+
+def line_labels():
+    from receipts.store import line_labels as load_labels
+
+    return load_labels()

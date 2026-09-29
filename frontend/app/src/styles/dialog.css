@@ -437,6 +437,19 @@
   color: var(--muted);
 }
 
+.drafts__title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.drafts__score {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
 .drafts__name,
 .drafts__qty input,
 .drafts__days input {
@@ -567,10 +580,27 @@
   color: var(--text);
 }
 
+.drafts__miss-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
 .drafts__miss {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   text-align: left;
+}
+
+.drafts__miss-row .drafts__drop {
+  flex: none;
+  align-self: center;
 }
 
 .add__form .field__label {

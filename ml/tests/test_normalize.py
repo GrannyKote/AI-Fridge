@@ -1,6 +1,6 @@
 import unittest
 
-from receipts.normalize import normalize_lines, suggest_storage
+from receipts.normalize import apply_known_labels, normalize_lines, suggest_storage
 
 
 class NormalizeTest(unittest.TestCase):
@@ -74,6 +74,19 @@ class NormalizeTest(unittest.TestCase):
         self.assertEqual(suggest_storage("хлеб"), "Шкаф")
         self.assertEqual(suggest_storage("куриное филе"), "Морозилка")
         self.assertEqual(suggest_storage("неизвестный товар"), "Шкаф")
+
+    def test_corrected_line_is_taken_before_the_vector(self):
+        items, rest = apply_known_labels(
+            ["ПАШТЕТ ГОВ 1ШТ", "молоко 1 л"],
+            {"паштет гов 1шт": ("Паштет", 2, "шт", "Мясо и рыба")},
+        )
+
+        self.assertEqual(rest, ["молоко 1 л"])
+        self.assertEqual(items[0].name, "Паштет")
+        self.assertEqual(items[0].quantity, 2)
+        self.assertEqual(items[0].unit, "шт")
+        self.assertEqual(items[0].category, "Мясо и рыба")
+        self.assertEqual(items[0].raw_line, "ПАШТЕТ ГОВ 1ШТ")
 
 
 if __name__ == "__main__":

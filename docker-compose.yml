@@ -1,3 +1,5 @@
+x-app-version: &app_version "MVP 0.0.1"
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -23,6 +25,7 @@ services:
       context: ./backend
     restart: unless-stopped
     environment:
+      APP_VERSION: *app_version
       DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/diplom
       DB_SCHEMA: diplom_all
     expose:
@@ -48,6 +51,7 @@ services:
       context: ./ml
     restart: unless-stopped
     environment:
+      APP_VERSION: *app_version
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/diplom
     expose:
       - "8001"
@@ -70,6 +74,8 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        APP_VERSION: *app_version
     restart: unless-stopped
     ports:
       - "80:80"

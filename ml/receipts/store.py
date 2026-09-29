@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from receipts.drop import fold
 from receipts.normalize import Item
 
 _SCHEMA_PATH = Path(__file__).resolve().parents[1] / "schema.sql"
@@ -62,6 +63,76 @@ def save_receipt(group_id: int, source: str, raw_text: str, items: list[Item]) -
         ) from exc
 
     return receipt_id
+
+
+def save_label(raw_line: str, name: str, quantity: float, unit: str, category: str | None) -> None:
+    """Запоминает правку строки чека. Срок уже известного продукта не меняет."""
+    folded = fold(raw_line.strip())
+    cleaned = " ".join(name.split())
+    if not folded or not cleaned:
+        raise ValueError("Нужны строка чека и название")
+
+    try:
+        import psycopg
+    except ImportError as exc:
+        raise DatabaseUnavailable("Нет пакета psycopg. Разметка не записана.") from exc
+
+    try:
+        with psycopg.connect(database_url()) as connection:
+            with connection.cursor() as cursor:
+                _apply_schema(cursor)
+                cursor.execute(
+                    """
+                    INSERT INTO ml.line_label
+                        (raw_fold, raw_line, name, quantity, unit, category)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (raw_fold) DO UPDATE
+                    SET raw_line = EXCLUDED.raw_line,
+                        name = EXCLUDED.name,
+                        quantity = EXCLUDED.quantity,
+                        unit = EXCLUDED.unit,
+                        category = EXCLUDED.category,
+                        updated_at = now()
+                    """,
+                    (folded, raw_line.strip(), cleaned, quantity, unit, category),
+                )
+                cursor.execute(
+                    """
+                    INSERT INTO ml.base_product (name)
+                    VALUES (%s)
+                    ON CONFLICT (name) DO NOTHING
+                    """,
+                    (cleaned,),
+                )
+            connection.commit()
+    except psycopg.OperationalError as exc:
+        raise DatabaseUnavailable("База недоступна. Разметка не записана.") from exc
+
+
+def line_labels() -> dict[str, tuple[str, float, str, str | None]]:
+    """Правки строк. Пустой словарь, если базы нет: распознавание идёт как раньше."""
+    if not os.environ.get("DATABASE_URL"):
+        return {}
+
+    try:
+        import psycopg
+    except ImportError:
+        return {}
+
+    try:
+        with psycopg.connect(database_url()) as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT raw_fold, name, quantity, unit, category FROM ml.line_label"
+                )
+                rows = cursor.fetchall()
+    except psycopg.Error:
+        return {}
+
+    return {
+        row[0]: (row[1], float(row[2]), row[3], row[4])
+        for row in rows
+    }
 
 
 def base_product_names() -> list[str] | None:
