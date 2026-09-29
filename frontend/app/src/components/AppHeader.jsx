@@ -4,10 +4,11 @@ import { shoppingApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { notifyPurchaseChanged, usePurchaseChanged } from '../lib/purchaseEvents.js'
 import { CheckoutDialog } from './CheckoutDialog.jsx'
+import { NewsDialog } from './NewsDialog.jsx'
 import { NotificationsDialog } from './NotificationsDialog.jsx'
 import { PlanPurchaseDialog } from './PlanPurchaseDialog.jsx'
 import { PlannedPurchaseBanner } from './PlannedPurchaseBanner.jsx'
-import { BellIcon } from './icons.jsx'
+import { BellIcon, NewsIcon } from './icons.jsx'
 
 export function AppHeader({ alerts = 0, onToast }) {
   const { user } = useAuth()
@@ -20,6 +21,7 @@ export function AppHeader({ alerts = 0, onToast }) {
   const [planOpen, setPlanOpen] = useState(false)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [newsOpen, setNewsOpen] = useState(false)
 
   const loadPlan = useCallback(async () => {
     if (!groupId) {
@@ -64,6 +66,16 @@ export function AppHeader({ alerts = 0, onToast }) {
               <BellIcon />
               {alerts > 0 && <span className="icon-btn__badge">{alerts}</span>}
             </button>
+
+            <button
+              className="icon-btn icon-btn--round"
+              type="button"
+              onClick={() => setNewsOpen(true)}
+              aria-label="Новости"
+              aria-expanded={newsOpen}
+            >
+              <NewsIcon />
+            </button>
           </div>
         </div>
 
@@ -88,6 +100,8 @@ export function AppHeader({ alerts = 0, onToast }) {
       {notificationsOpen && (
         <NotificationsDialog onClose={() => setNotificationsOpen(false)} />
       )}
+
+      {newsOpen && <NewsDialog onClose={() => setNewsOpen(false)} />}
 
       {planOpen && groupId && (
         <PlanPurchaseDialog

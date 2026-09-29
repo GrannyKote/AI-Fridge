@@ -68,6 +68,16 @@ export function BellIcon() {
   )
 }
 
+export function NewsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 5.5h12v13H5.5A1.5 1.5 0 0 1 4 17V5.5Z" />
+      <path d="M16 9h2.5A1.5 1.5 0 0 1 20 10.5V17a1.5 1.5 0 0 1-1.5 1.5H16" />
+      <path d="M7 9h6M7 12.5h6M7 15.5h3.5" />
+    </svg>
+  )
+}
+
 export function SearchIcon({ className }) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
