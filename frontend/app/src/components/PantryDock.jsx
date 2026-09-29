@@ -1,12 +1,13 @@
 import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { CartIcon, ChartIcon, FridgeIcon, LogoutIcon, PlusIcon, UserIcon } from './icons.jsx'
+import { CartIcon, ChartIcon, FridgeIcon, LogoutIcon, NewsIcon, PlusIcon, UserIcon } from './icons.jsx'
 
 const TABS = [
   { key: 'pantry', title: 'Кладовая', icon: <FridgeIcon />, path: '/' },
   { key: 'forecast', title: 'Прогнозы', icon: <ChartIcon />, path: '/forecast' },
   { key: 'shopping', title: 'Покупки', icon: <CartIcon />, path: '/shopping' },
   { key: 'settings', title: 'Настройки', icon: <UserIcon />, path: '/settings' },
+  { key: 'news', title: 'Новости', icon: <NewsIcon />, path: '/news' },
 ]
 
 export function PantryDock({ open, onClose, onSignOut, onAdd, onSelectTab }) {

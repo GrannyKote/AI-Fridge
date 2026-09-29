@@ -114,10 +114,21 @@ class PantryItemOut(BaseModel):
     storage_place_id: int | None = None
     storage_place: str | None = None
     best_before: date
+    purchased_on: date | None = None
     is_consumed: bool = False
     is_wasted: bool = False
     is_deleted: bool = False
     is_over: bool = False
+
+
+class PantryItemUpdate(BaseModel):
+    name: str = Field(min_length=1, max_length=512)
+    category: str = Field(min_length=1, max_length=512)
+    unit_id: int
+    quantity: float = Field(gt=0)
+    best_before: date
+    purchased_on: date | None = None
+    storage_place_id: int
 
 
 class PantryItemCreate(BaseModel):
@@ -126,8 +137,10 @@ class PantryItemCreate(BaseModel):
     unit_id: int
     quantity: float = Field(gt=0)
     best_before: date
+    purchased_on: date | None = None
     storage_place_id: int | None = None
     product_id: int | None = None
+    user_id: int | None = None
 
 
 class ConsumptionCreate(BaseModel):
@@ -208,3 +221,39 @@ class CheckoutItem(BaseModel):
 
 class PurchaseCheckout(BaseModel):
     items: list[CheckoutItem] = Field(min_length=1)
+    user_id: int | None = None
+    purchased_on: date | None = None
+
+
+class NewsIn(BaseModel):
+    user_id: int
+    title: str = Field(min_length=1, max_length=200)
+    body: str = Field(min_length=1, max_length=4000)
+
+    @field_validator("title", "body")
+    @classmethod
+    def strip_text(cls, value: str) -> str:
+        text = value.strip()
+        if not text:
+            raise ValueError("Заполните поле")
+        return text
+
+
+class NewsOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    title: str
+    body: str
+    date_time: datetime
+
+
+class WindowCounts(BaseModel):
+    day: int
+    week: int
+    month: int
+
+
+class UploadStatsOut(BaseModel):
+    products: WindowCounts
+    users: WindowCounts

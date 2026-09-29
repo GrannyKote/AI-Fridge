@@ -1,6 +1,6 @@
 import unittest
 
-from app.services.pantry import shelf_lookup_name, snap_to_catalog, stored_name
+from app.services.pantry import product_name_for_pantry, shelf_lookup_name, snap_to_catalog, stored_name
 
 CATALOG = ("молоко", "простокваша", "масло", "сливочное масло", "яблочный сок", "сок", "сыр", "сырники")
 
@@ -28,7 +28,24 @@ class SnapNameTest(unittest.TestCase):
     def test_pantry_name_starts_with_a_capital(self):
         self.assertEqual(stored_name("молоко"), "Молоко")
         self.assertEqual(stored_name("яблочный сок"), "Яблочный сок")
-        self.assertEqual(stored_name("Молоко"), "Молоко")
+        self.assertEqual(stored_name("мясО"), "Мясо")
+        self.assertEqual(stored_name("Сыр Гауда"), "Сыр Гауда")
+        self.assertEqual(stored_name("Яйца С1"), "Яйца С1")
+
+    def test_case_variants_become_one_name(self):
+        self.assertEqual(product_name_for_pantry("мясо", CATALOG), "Мясо")
+        self.assertEqual(product_name_for_pantry("Мясо", CATALOG), "Мясо")
+        self.assertEqual(product_name_for_pantry("мясО", CATALOG), "Мясо")
+        self.assertEqual(product_name_for_pantry("мясО", ("мясо",)), "Мясо")
+
+    def test_brand_still_becomes_the_base_name(self):
+        self.assertEqual(product_name_for_pantry("Молоко Простоквашино", CATALOG), "Молоко")
+        self.assertEqual(product_name_for_pantry("Молоко 2.5%", CATALOG), "Молоко 2.5%")
+        self.assertEqual(product_name_for_pantry("Молоко 3.5%", CATALOG), "Молоко 3.5%")
+        self.assertNotEqual(
+            product_name_for_pantry("Молоко 2.5%", CATALOG),
+            product_name_for_pantry("Молоко 3.5%", CATALOG),
+        )
 
 
 if __name__ == "__main__":

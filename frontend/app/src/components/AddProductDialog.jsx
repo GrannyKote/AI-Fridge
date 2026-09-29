@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { pantryApi, receiptApi } from '../api/client.js'
-import { daysUntil, expiryDate } from '../lib/pantry.js'
+import { useAuth } from '../auth/useAuth.js'
+import { dateFromIso, expiryDate, localDate, quantityForUnit } from '../lib/pantry.js'
 import { DateField } from './DateField.jsx'
 import { FormAlert } from './FormAlert.jsx'
 import { SuggestInput } from './SuggestInput.jsx'
@@ -59,7 +60,7 @@ const PLACE_BY_CATEGORY = {
 }
 
 function today() {
-  return new Date().toISOString().slice(0, 10)
+  return localDate()
 }
 
 function placeChoices(places, storage) {
@@ -85,6 +86,7 @@ function draftDate(item) {
 }
 
 export function AddProductDialog({ groupId, categories, onClose, onCreated, onBatchSaved }) {
+  const { user } = useAuth()
   const [form, setForm] = useState(EMPTY_FORM)
   const [method, setMethod] = useState('receipt')
   const [units, setUnits] = useState([])
@@ -202,7 +204,7 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
       let nextDate = ''
       try {
         const found = await pantryApi.shelfLife(query)
-        nextDate = expiryDate(found.shelf_life_days)
+        nextDate = found.shelf_life_days
       } catch {
         nextDate = ''
       }
@@ -216,11 +218,12 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
         if (current.bestBefore && current.bestBefore !== suggestedBefore.current) {
           return current
         }
-        suggestedBefore.current = nextDate
-        if (current.bestBefore === nextDate) {
+        const fixedDate = nextDate ? expiryDate(nextDate, dateFromIso(current.purchasedAt)) : ''
+        suggestedBefore.current = fixedDate
+        if (current.bestBefore === fixedDate) {
           return current
         }
-        return { ...current, bestBefore: nextDate }
+        return { ...current, bestBefore: fixedDate }
       })
       if (nextDate) {
         clearError('bestBefore')
@@ -231,7 +234,7 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
       cancelled = true
       clearTimeout(timer)
     }
-  }, [form.name, method])
+  }, [form.name, form.purchasedAt, method])
 
   useEffect(() => {
     if (method !== 'manual') {
@@ -417,6 +420,11 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
           ...item,
           originName: item.name,
           originDays: item.shelf_life_days,
+          best_before:
+            item.best_before ||
+            (Number.isInteger(item.shelf_life_days) && item.shelf_life_days > 0
+              ? expiryDate(item.shelf_life_days)
+              : ''),
         })),
       )
       writeSkipped(missed)
@@ -470,7 +478,9 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
       unit_id: Number(job.unit.id),
       quantity: job.quantity,
       best_before: job.bestBefore,
+      purchased_on: today(),
       storage_place_id: Number(job.place.id),
+      user_id: user?.id,
     })
   }
 
@@ -629,8 +639,10 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
         unit_id: Number(form.unitId),
         quantity: Number(form.quantity.replace(',', '.')),
         best_before: form.bestBefore,
+        purchased_on: form.purchasedAt || today(),
         storage_place_id: Number(form.placeId),
         product_id: form.productId,
+        user_id: user?.id,
       })
       onCreated(created)
     } catch (error) {
@@ -799,13 +811,8 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
                       ariaLabel={`Дата для ${item.name}`}
                       value={draftDate(item)}
                       onChange={(best_before) => {
-                        const counted = best_before ? daysUntil(best_before) : null
                         setDrafts((current) =>
-                          current.map((row, at) =>
-                            at === index
-                              ? { ...row, best_before, shelf_life_days: counted }
-                              : row,
-                          ),
+                          current.map((row, at) => (at === index ? { ...row, best_before } : row)),
                         )
                       }}
                     />
@@ -947,8 +954,11 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
                   className="field__input field__select"
                   value={form.unitId}
                   onChange={(event) => {
-                    update({ unitId: event.target.value })
+                    const nextId = event.target.value
+                    const amount = quantityForUnit(units.find((unit) => String(unit.id) === nextId)?.name)
+                    update(amount ? { unitId: nextId, quantity: amount } : { unitId: nextId })
                     clearError('unitId')
+                    if (amount) clearError('quantity')
                   }}
                 >
                   <option value="">Выберите</option>

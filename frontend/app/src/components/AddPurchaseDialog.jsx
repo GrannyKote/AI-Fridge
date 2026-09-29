@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { pantryApi, shoppingApi } from '../api/client.js'
+import { quantityForUnit } from '../lib/pantry.js'
 import { FormAlert } from './FormAlert.jsx'
 import { SuggestInput } from './SuggestInput.jsx'
 import { ArrowLeftIcon } from './icons.jsx'
@@ -225,8 +226,11 @@ export function AddPurchaseDialog({ groupId, categories, onClose, onCreated }) {
                   className="field__input field__select"
                   value={form.unitId}
                   onChange={(event) => {
-                    update({ unitId: event.target.value })
+                    const nextId = event.target.value
+                    const amount = quantityForUnit(units.find((unit) => String(unit.id) === nextId)?.name)
+                    update(amount ? { unitId: nextId, quantity: amount } : { unitId: nextId })
                     clearError('unitId')
+                    if (amount) clearError('quantity')
                   }}
                 >
                   <option value="">Выберите</option>

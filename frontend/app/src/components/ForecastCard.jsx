@@ -21,6 +21,7 @@ export function ForecastCard({ product }) {
 
       <div className="fcard__body">
         <h3 className="card__title">{product.name}</h3>
+        {product.storage_place && <p className="card__place">{product.storage_place}</p>}
         <p className={`fcard__deadline fcard__deadline--${status}`}>
           <ClockIcon />
           {deadlineText(product)}

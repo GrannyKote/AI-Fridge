@@ -109,6 +109,7 @@ class UserGroupProduct(Base):
     id_unit_of_measurement: Mapped[int] = mapped_column(Integer, nullable=False)
     quantity: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     best_before: Mapped[date] = mapped_column(Date, nullable=False)
+    purchased_on: Mapped[date | None] = mapped_column(Date)
     id_product_category: Mapped[int] = mapped_column(Integer, nullable=False)
     # В базе колонка создана как "Id_storage_place".
     id_storage_place: Mapped[int | None] = mapped_column("Id_storage_place", Integer)
@@ -116,6 +117,8 @@ class UserGroupProduct(Base):
     is_consumed: Mapped[bool | None] = mapped_column(Boolean)
     is_wasted: Mapped[bool | None] = mapped_column(Boolean)
     is_over: Mapped[bool | None] = mapped_column(Boolean)
+    added_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    id_user: Mapped[int | None] = mapped_column(Integer)
 
 
 class UserGroupPurchase(Base):
@@ -174,6 +177,24 @@ class FeedbackPhoto(Base):
     id_feedback: Mapped[int] = mapped_column(Integer, nullable=False)
     content: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     content_type: Mapped[str] = mapped_column(String(64), nullable=False)
+
+
+class News(Base):
+    __tablename__ = "news"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    date_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class NewsRead(Base):
+    __tablename__ = "news_read"
+    __table_args__ = {"schema": SCHEMA}
+
+    id_user: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id_news: Mapped[int] = mapped_column(Integer, primary_key=True)
 
 
 class UserGroupProductWaste(Base):

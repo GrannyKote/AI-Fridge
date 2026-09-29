@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { pantryApi, shoppingApi } from '../api/client.js'
+import { useAuth } from '../auth/useAuth.js'
 import { formatNumber } from '../lib/pantry.js'
 import { DateField } from './DateField.jsx'
 import { FormAlert } from './FormAlert.jsx'
@@ -41,6 +42,7 @@ function toRows(items, places) {
 }
 
 export function CheckoutDialog({ groupId, items, onClose, onDone }) {
+  const { user } = useAuth()
   const [places, setPlaces] = useState([])
   const [rows, setRows] = useState(() => toRows(items, []))
   const [formError, setFormError] = useState('')
@@ -144,6 +146,7 @@ export function CheckoutDialog({ groupId, items, onClose, onDone }) {
             best_before: row.bestBefore,
             storage_place_id: Number(row.placeId),
           })),
+        user?.id,
       )
       onDone(rows.filter((row) => row.checked).length)
     } catch (error) {

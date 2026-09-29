@@ -9,11 +9,14 @@ const PRESETS = [
   { key: 'all', label: 'Всё', ratio: 1 },
 ]
 
-function shareOf(available, ratio) {
+export function shareOf(available, ratio) {
   const value = available * ratio
 
   if (Number.isInteger(available)) {
-    return Math.round(value)
+    const rounded = Math.round(value)
+    if (rounded > 0) {
+      return rounded
+    }
   }
 
   return Number(value.toFixed(2))

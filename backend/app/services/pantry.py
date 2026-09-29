@@ -1,8 +1,8 @@
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import date, datetime, timezone
 from decimal import Decimal
 
-from sqlalchemy import func, select, text
+from sqlalchemy import func, select, text, update
 from sqlalchemy.orm import Session
 
 from ..models import (
@@ -172,6 +172,7 @@ def _products_statement():
             UserGroupProduct.product_name,
             UserGroupProduct.quantity,
             UserGroupProduct.best_before,
+            UserGroupProduct.purchased_on,
             UserGroupProduct.id_product_category,
             UserGroupProduct.id_storage_place,
             UserGroupProduct.is_consumed,
@@ -198,7 +199,53 @@ def _products_statement():
     )
 
 
+def collapse_same_batches(session: Session, group_id: int) -> None:
+    """Складывает открытые строки с одним названием, сроком, единицей, местом и днём покупки.
+
+    Пустой день покупки у старых строк считается одним и тем же: такие строки тоже сходятся.
+    """
+    rows = session.scalars(
+        select(UserGroupProduct).where(
+            UserGroupProduct.id_user_group == group_id,
+            UserGroupProduct.is_deleted.is_not(True),
+            UserGroupProduct.is_over.is_not(True),
+        )
+    ).all()
+    batches: dict[tuple, list[UserGroupProduct]] = {}
+    for row in rows:
+        key = (
+            row.product_name,
+            row.id_unit_of_measurement,
+            row.id_storage_place,
+            row.best_before,
+            row.purchased_on,
+        )
+        batches.setdefault(key, []).append(row)
+
+    changed = False
+    for batch in batches.values():
+        if len(batch) < 2:
+            continue
+        batch.sort(key=lambda item: item.id)
+        keep = batch[0]
+        for extra in batch[1:]:
+            keep.quantity = keep.quantity + extra.quantity
+            for model in (UserGroupProductConsumption, UserGroupProductWaste):
+                session.execute(
+                    update(model)
+                    .where(model.id_user_group_product == extra.id)
+                    .values(id_user_group_product=keep.id)
+                )
+            session.delete(extra)
+        session.flush()
+        _update_flags(session, keep.id)
+        changed = True
+    if changed:
+        session.commit()
+
+
 def list_products(session: Session, group_id: int):
+    collapse_same_batches(session, group_id)
     statement = (
         _products_statement()
         .where(
@@ -221,11 +268,29 @@ def get_product(session: Session, group_id: int, item_id: int):
 
 
 def stored_name(name: str) -> str:
-    """Имя в кладовой с большой первой буквы."""
-    text = name.strip()
+    """Один вид написания. «мясО» становится «Мясо», «Сыр Гауда» остаётся «Сыр Гауда»."""
+    text = " ".join(name.split())
     if not text:
         return text
-    return text[0].upper() + text[1:]
+    chars = []
+    for index, char in enumerate(text):
+        if index == 0:
+            chars.append(char.upper())
+        elif char.isupper() and text[index - 1].isalpha():
+            chars.append(char.lower())
+        else:
+            chars.append(char)
+    return "".join(chars)
+
+
+def product_name_for_pantry(name: str, catalog_names: Sequence[str]) -> str:
+    """«мясо» и «мясО» становятся «Мясо». «Молоко 2.5%» и «Молоко 3.5%» остаются разными."""
+    snapped = snap_to_catalog(name, catalog_names)
+    raw_fold = name.strip().lower().replace("ё", "е")
+    snap_fold = snapped.lower().replace("ё", "е")
+    if snap_fold != raw_fold and any(ch.isdigit() for ch in name):
+        return stored_name(name)
+    return stored_name(snapped)
 
 
 def snap_to_catalog(name: str, catalog_names: Sequence[str]) -> str:
@@ -258,6 +323,69 @@ def _has_term(folded: str, candidate: str) -> bool:
         start = at + 1
 
 
+def add_or_sum_pantry_item(
+    session: Session,
+    group_id: int,
+    *,
+    name: str,
+    product_id: int,
+    category_id: int,
+    unit_id: int,
+    quantity: Decimal,
+    best_before: date,
+    storage_place_id: int | None,
+    purchased_on: date,
+    user_id: int | None,
+) -> int:
+    """Складывает покупку с такой же строкой: имя, срок, единица и место.
+
+    День покупки совпадает, либо у уже лежащей строки он ещё не записан.
+    """
+    collapse_same_batches(session, group_id)
+    match = (
+        UserGroupProduct.id_user_group == group_id,
+        UserGroupProduct.product_name == name,
+        UserGroupProduct.id_unit_of_measurement == unit_id,
+        UserGroupProduct.best_before == best_before,
+        UserGroupProduct.id_storage_place == storage_place_id,
+        UserGroupProduct.is_deleted.is_not(True),
+        UserGroupProduct.is_over.is_not(True),
+    )
+    existing = session.scalars(
+        select(UserGroupProduct).where(*match, UserGroupProduct.purchased_on == purchased_on)
+    ).first()
+    if existing is None:
+        existing = session.scalars(
+            select(UserGroupProduct)
+            .where(*match, UserGroupProduct.purchased_on.is_(None))
+            .order_by(UserGroupProduct.id)
+        ).first()
+        if existing is not None:
+            existing.purchased_on = purchased_on
+    if existing is not None:
+        existing.quantity = existing.quantity + quantity
+        session.flush()
+        _update_flags(session, existing.id)
+        return existing.id
+
+    item = UserGroupProduct(
+        id_user_group=group_id,
+        id_product=product_id,
+        product_name=name,
+        id_unit_of_measurement=unit_id,
+        quantity=quantity,
+        best_before=best_before,
+        purchased_on=purchased_on,
+        id_product_category=category_id,
+        id_storage_place=storage_place_id,
+        added_at=datetime.now(timezone.utc),
+        id_user=user_id,
+    )
+    session.add(item)
+    session.flush()
+    return item.id
+
+
 def create_pantry_item(session: Session, group_id: int, payload: PantryItemCreate) -> dict:
     """Кладёт продукт в кладовую, заводя справочники, если их ещё нет."""
     unit = session.get(UnitOfMeasurement, payload.unit_id)
@@ -265,24 +393,59 @@ def create_pantry_item(session: Session, group_id: int, payload: PantryItemCreat
         raise ValueError("Единица измерения не найдена")
 
     catalog_names = session.execute(text("SELECT name FROM ml.base_product")).scalars().all()
-    name = snap_to_catalog(payload.name, catalog_names)
+    name = product_name_for_pantry(payload.name, catalog_names)
     product, category = catalog.ensure_product(session, name, payload.category, None)
-
-    item = UserGroupProduct(
-        id_user_group=group_id,
-        id_product=product.id,
-        product_name=stored_name(name),
-        id_unit_of_measurement=unit.id,
+    place_id = payload.storage_place_id or storage.place_id_for(session, name, category.name)
+    item_id = add_or_sum_pantry_item(
+        session,
+        group_id,
+        name=name,
+        product_id=product.id,
+        category_id=category.id,
+        unit_id=unit.id,
         quantity=Decimal(str(payload.quantity)),
         best_before=payload.best_before,
-        id_product_category=category.id,
-        id_storage_place=payload.storage_place_id
-        or storage.place_id_for(session, name, category.name),
+        storage_place_id=place_id,
+        purchased_on=payload.purchased_on or date.today(),
+        user_id=payload.user_id,
     )
-    session.add(item)
     session.commit()
 
-    return get_product(session, group_id, item.id)
+    return get_product(session, group_id, item_id)
+
+
+def update_pantry_item(session: Session, group_id: int, item_id: int, payload) -> dict | None:
+    """Меняет строку кладовой. quantity — сколько осталось видно в списке."""
+    row = get_product(session, group_id, item_id)
+    if row is None:
+        return None
+
+    unit = session.get(UnitOfMeasurement, payload.unit_id)
+    if unit is None:
+        raise ValueError("Единица измерения не найдена")
+    place = session.get(StoragePlace, payload.storage_place_id)
+    if place is None:
+        raise ValueError("Место хранения не найдено")
+
+    catalog_names = session.execute(text("SELECT name FROM ml.base_product")).scalars().all()
+    name = product_name_for_pantry(payload.name, catalog_names)
+    product, category = catalog.ensure_product(session, name, payload.category, None)
+    consumed = _total_of(session, UserGroupProductConsumption, item_id)
+    wasted = _total_of(session, UserGroupProductWaste, item_id)
+
+    item = session.get(UserGroupProduct, item_id)
+    item.product_name = name
+    item.id_product = product.id
+    item.id_product_category = category.id
+    item.id_unit_of_measurement = unit.id
+    item.id_storage_place = place.id
+    item.quantity = consumed + wasted + Decimal(str(payload.quantity))
+    item.best_before = payload.best_before
+    item.purchased_on = payload.purchased_on
+    _update_flags(session, item_id)
+    session.commit()
+
+    return get_product(session, group_id, item_id)
 
 
 def _total_of(session: Session, model, item_id: int) -> Decimal:
@@ -298,14 +461,9 @@ def _update_flags(session: Session, item_id: int) -> None:
     consumed = _total_of(session, UserGroupProductConsumption, item_id)
     wasted = _total_of(session, UserGroupProductWaste, item_id)
 
-    if consumed + wasted >= item.quantity:
-        item.is_over = True
-
-    if consumed >= item.quantity:
-        item.is_consumed = True
-
-    if wasted >= item.quantity:
-        item.is_wasted = True
+    item.is_over = consumed + wasted >= item.quantity
+    item.is_consumed = consumed >= item.quantity
+    item.is_wasted = wasted >= item.quantity
 
 
 def _checked_amount(row, quantity: float | None) -> Decimal:

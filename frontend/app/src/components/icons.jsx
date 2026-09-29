@@ -216,6 +216,16 @@ export function BagIcon() {
   )
 }
 
+export function NewsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 4.5h9.5A2.5 2.5 0 0 1 18 7v12.5H8.5A2.5 2.5 0 0 1 6 17V4.5Z" />
+      <path d="M6 17a2.5 2.5 0 0 1 2.5-2.5H18" />
+      <path d="M9 8.5h6M9 12h6" />
+    </svg>
+  )
+}
+
 export function UserIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

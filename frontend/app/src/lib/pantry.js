@@ -1,6 +1,26 @@
 export const SOON_THRESHOLD_DAYS = 4
 
+export function localDate(value = new Date()) {
+  const month = String(value.getMonth() + 1).padStart(2, '0')
+  const day = String(value.getDate()).padStart(2, '0')
+  return `${value.getFullYear()}-${month}-${day}`
+}
+
+export function quantityForUnit(name) {
+  if (name === 'шт') return '1'
+  if (name === 'г' || name === 'мл') return '1000'
+  return null
+}
+
 const MS_IN_DAY = 24 * 60 * 60 * 1000
+
+export function dateFromIso(iso) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso ?? ''))
+  if (!match) {
+    return new Date()
+  }
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+}
 
 export function expiryDate(days, from = new Date()) {
   const date = new Date(from.getFullYear(), from.getMonth(), from.getDate())

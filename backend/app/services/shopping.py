@@ -10,13 +10,12 @@ from ..models import (
     ProductCategory,
     StoragePlace,
     UnitOfMeasurement,
-    UserGroupProduct,
     UserGroupPurchase,
     UserGroupPurchaseProduct,
 )
 from ..schemas import PurchaseCheckout, PurchaseCreate
 from . import catalog
-from .pantry import stored_name
+from .pantry import add_or_sum_pantry_item, stored_name
 
 
 def _product_statement():
@@ -190,17 +189,18 @@ def checkout_purchase(session: Session, group_id: int, payload: PurchaseCheckout
         if place is None:
             raise ValueError("Место хранения не найдено")
 
-        session.add(
-            UserGroupProduct(
-                id_user_group=group_id,
-                id_product=row.id_product,
-                product_name=stored_name(row.product_name),
-                id_unit_of_measurement=row.id_unit_of_measurement,
-                quantity=Decimal(str(item.quantity)),
-                best_before=item.best_before,
-                id_product_category=row.id_product_category,
-                id_storage_place=place.id,
-            )
+        add_or_sum_pantry_item(
+            session,
+            group_id,
+            name=stored_name(row.product_name),
+            product_id=row.id_product,
+            category_id=row.id_product_category,
+            unit_id=row.id_unit_of_measurement,
+            quantity=Decimal(str(item.quantity)),
+            best_before=item.best_before,
+            storage_place_id=place.id,
+            purchased_on=payload.purchased_on or date.today(),
+            user_id=payload.user_id,
         )
         row.is_purchased = True
 

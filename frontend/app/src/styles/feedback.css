@@ -97,6 +97,17 @@
   font-size: 12px;
 }
 
+.admin-mail__delete {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--red);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .admin-mail__photos {
   display: flex;
   flex-wrap: wrap;
@@ -108,4 +119,32 @@
   height: 88px;
   object-fit: cover;
   border-radius: 8px;
+}
+
+.admin-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-stats h3,
+.admin-stats p {
+  margin: 0;
+}
+
+.admin-stats h3 {
+  font-size: 15px;
+}
+
+.admin-stats ul {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-stats li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
 }

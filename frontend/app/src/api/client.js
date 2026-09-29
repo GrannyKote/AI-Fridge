@@ -1,3 +1,5 @@
+import { localDate } from '../lib/pantry.js'
+
 const BASE_URL = import.meta.env.VITE_API_URL ?? '/api'
 
 function extractMessage(payload, fallback) {
@@ -89,6 +91,8 @@ export const pantryApi = {
   usage: (groupId, period) => request(`/groups/${groupId}/usage?period=${period}`),
   addProduct: (groupId, payload) =>
     request(`/groups/${groupId}/products`, { method: 'POST', body: payload }),
+  updateProduct: (groupId, itemId, payload) =>
+    request(`/groups/${groupId}/products/${itemId}`, { method: 'PATCH', body: payload }),
   consumeProduct: (groupId, itemId, quantity) =>
     request(`/groups/${groupId}/products/${itemId}/consumption`, {
       method: 'POST',
@@ -127,8 +131,24 @@ export const shoppingApi = {
       method: 'PATCH',
       body: { plan_date: planDate },
     }),
-  checkout: (groupId, items) =>
-    request(`/groups/${groupId}/purchase/checkout`, { method: 'POST', body: { items } }),
+  checkout: (groupId, items, userId) =>
+    request(`/groups/${groupId}/purchase/checkout`, {
+      method: 'POST',
+      body: { items, user_id: userId, purchased_on: localDate() },
+    }),
+}
+
+export const newsApi = {
+  list: () => request('/news'),
+  unread: (userId) => request(`/news/unread?user_id=${userId}`),
+  publish: (userId, title, body) =>
+    request('/news', { method: 'POST', body: { user_id: userId, title, body } }),
+  remove: (userId, newsId) => request(`/news/${newsId}?user_id=${userId}`, { method: 'DELETE' }),
+  markRead: (userId) => request(`/news/read?user_id=${userId}`, { method: 'POST' }),
+}
+
+export const adminApi = {
+  stats: (userId) => request(`/admin/stats?user_id=${userId}`),
 }
 
 async function recognize(groupId, file, kind) {

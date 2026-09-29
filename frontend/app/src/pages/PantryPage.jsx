@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { pantryApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { AddProductDialog } from '../components/AddProductDialog.jsx'
+import { EditProductDialog } from '../components/EditProductDialog.jsx'
 import { AppHeader } from '../components/AppHeader.jsx'
 import { ConsumeDialog } from '../components/ConsumeDialog.jsx'
 import { PantryDock } from '../components/PantryDock.jsx'
@@ -35,6 +36,7 @@ export default function PantryPage() {
   const [activePlace, setActivePlace] = useState('all')
   const [menuOpen, setMenuOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
+  const [editTarget, setEditTarget] = useState(null)
   const [consumeTarget, setConsumeTarget] = useState(null)
   const [wasteTarget, setWasteTarget] = useState(null)
   const [selecting, setSelecting] = useState(false)
@@ -167,8 +169,16 @@ export default function PantryPage() {
 
   async function handleCreated(item) {
     setAddOpen(false)
-    setProducts((current) => [...current, item])
-    setToast(`«${item.name}» добавлен`)
+    let merged = false
+    setProducts((current) => {
+      const index = current.findIndex((product) => product.id === item.id)
+      if (index === -1) {
+        return [...current, item]
+      }
+      merged = true
+      return current.map((product) => (product.id === item.id ? item : product))
+    })
+    setToast(merged ? `«${item.name}» добавлено к такой же покупке` : `«${item.name}» добавлен`)
     notifyPurchaseChanged()
 
     try {
@@ -244,6 +254,13 @@ export default function PantryPage() {
     if (done.length === queue.length) {
       stopSelecting()
     }
+  }
+
+  function handleEdited(item) {
+    setEditTarget(null)
+    replaceProduct(item)
+    setToast(`«${item.name}» сохранён`)
+    pantryApi.categories().then(setCategories).catch(() => {})
   }
 
   function handleCardAction(product, action) {
@@ -434,6 +451,7 @@ export default function PantryPage() {
                             key={product.id}
                             product={product}
                             onAction={handleCardAction}
+                            onEdit={setEditTarget}
                             selecting={selecting}
                             selected={selectedIds.has(product.id)}
                             onToggle={toggleSelected}
@@ -475,6 +493,17 @@ export default function PantryPage() {
           onClose={() => setAddOpen(false)}
           onCreated={handleCreated}
           onBatchSaved={handleBatchSaved}
+        />
+      )}
+
+      {editTarget && (
+        <EditProductDialog
+          groupId={groupId}
+          product={editTarget}
+          categories={categories}
+          places={places}
+          onClose={() => setEditTarget(null)}
+          onSaved={handleEdited}
         />
       )}
 

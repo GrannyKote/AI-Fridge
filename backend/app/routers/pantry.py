@@ -9,6 +9,7 @@ from ..schemas import (
     ConsumptionCreate,
     PantryItemCreate,
     PantryItemOut,
+    PantryItemUpdate,
     PlaceOut,
     ProductSuggestionOut,
     ShelfLifeIn,
@@ -34,6 +35,7 @@ def _to_item(row) -> PantryItemOut:
         storage_place_id=row["id_storage_place"],
         storage_place=row["storage_place"],
         best_before=row["best_before"],
+        purchased_on=row["purchased_on"],
         is_consumed=bool(row["is_consumed"]),
         is_wasted=bool(row["is_wasted"]),
         is_deleted=bool(row["is_deleted"]),
@@ -108,6 +110,24 @@ def add_product(
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
 
     return _to_item(created)
+
+
+@router.patch("/groups/{group_id}/products/{item_id}", response_model=PantryItemOut)
+def update_product(
+    group_id: int,
+    item_id: int,
+    payload: PantryItemUpdate,
+    session: Session = Depends(get_session),
+) -> PantryItemOut:
+    try:
+        updated = pantry.update_pantry_item(session, group_id, item_id, payload)
+    except ValueError as error:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
+
+    if updated is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Продукт не найден")
+
+    return _to_item(updated)
 
 
 @router.post(

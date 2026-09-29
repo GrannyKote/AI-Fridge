@@ -366,6 +366,7 @@
 }
 
 .card {
+  cursor: pointer;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
@@ -681,7 +682,7 @@
 
 .tabbar {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   height: var(--tabbar-h);
   padding-bottom: env(safe-area-inset-bottom);
 }
