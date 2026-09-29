@@ -4,11 +4,12 @@ import { pantryApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { AppHeader } from '../components/AppHeader.jsx'
 import { ConsumptionView } from '../components/ConsumptionView.jsx'
+import { EditProductDialog } from '../components/EditProductDialog.jsx'
 import { ForecastCard } from '../components/ForecastCard.jsx'
 import { PantryDock } from '../components/PantryDock.jsx'
 import { BarsIcon, ClockIcon, WarningIcon } from '../components/icons.jsx'
 import { statusOf } from '../lib/pantry.js'
-import { usePurchaseChanged } from '../lib/purchaseEvents.js'
+import { notifyPurchaseChanged, usePurchaseChanged } from '../lib/purchaseEvents.js'
 import { useToast } from '../lib/useToast.js'
 import '../styles/pantry.css'
 import '../styles/forecast.css'
@@ -23,6 +24,9 @@ export default function ForecastPage() {
   const groupId = user.groups?.[0]?.id
 
   const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
+  const [places, setPlaces] = useState([])
+  const [editTarget, setEditTarget] = useState(null)
   const [state, setState] = useState('loading')
   const [error, setError] = useState('')
   const [tab, setTab] = useState('dates')
@@ -43,7 +47,14 @@ export default function ForecastPage() {
       }
 
       try {
-        setProducts(await pantryApi.products(groupId))
+        const [categoryList, placeList, productList] = await Promise.all([
+          pantryApi.categories(),
+          pantryApi.places(),
+          pantryApi.products(groupId),
+        ])
+        setCategories(categoryList)
+        setPlaces(placeList)
+        setProducts(productList)
         setState('ready')
       } catch (loadError) {
         setError(loadError.message)
@@ -141,7 +152,7 @@ export default function ForecastPage() {
                       </h2>
                       <div className="group__list">
                         {section.items.map((product) => (
-                          <ForecastCard key={product.id} product={product} />
+                          <ForecastCard key={product.id} product={product} onEdit={setEditTarget} />
                         ))}
                       </div>
                     </section>
@@ -172,6 +183,24 @@ export default function ForecastPage() {
         onSignOut={signOut}
         onSelectTab={(title) => setToast(`Раздел «${title}» в разработке`)}
       />
+
+      {editTarget && (
+        <EditProductDialog
+          groupId={groupId}
+          product={editTarget}
+          categories={categories}
+          places={places}
+          onClose={() => setEditTarget(null)}
+          onSaved={(item) => {
+            setEditTarget(null)
+            setProducts((current) =>
+              current.map((product) => (product.id === item.id ? item : product)),
+            )
+            setToast(`«${item.name}» сохранён`)
+            notifyPurchaseChanged()
+          }}
+        />
+      )}
 
       <div className={`toast${toast ? ' is-visible' : ''}`} role="status" aria-live="polite">
         {toast}

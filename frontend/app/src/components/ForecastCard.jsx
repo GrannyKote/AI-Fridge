@@ -8,13 +8,16 @@ import {
   statusOf,
 } from '../lib/pantry.js'
 
-export function ForecastCard({ product }) {
+export function ForecastCard({ product, onEdit }) {
   const status = statusOf(product)
   const { emoji, tone } = categoryView(product.category, product.category_id ?? 0)
   const counter = deadlineCounter(product)
 
   return (
-    <article className={`fcard${status === 'expired' ? ' fcard--expired' : ''}`}>
+    <article
+      className={`fcard${status === 'expired' ? ' fcard--expired' : ''}`}
+      onClick={() => onEdit(product)}
+    >
       <div className={`card__thumb card__thumb--${tone}`} aria-hidden="true">
         {emoji}
       </div>

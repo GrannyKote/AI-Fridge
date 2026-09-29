@@ -143,7 +143,8 @@ INSERT INTO diplom_all.storage_place (name) VALUES
     ('Холодильник'),
     ('Шкаф'),
     ('Бакалея'),
-    ('Специи');
+    ('Специи'),
+    ('Консервы');
 
 INSERT INTO diplom_all.product_category (name) VALUES
     ('Молочные'),

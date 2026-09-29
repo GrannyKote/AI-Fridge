@@ -687,7 +687,15 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated, onBa
   }
 
   return (
-    <div className="dialog dialog--page" role="dialog" aria-modal="true" aria-labelledby="add-title">
+    <div
+      className="dialog dialog--page"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="add-title"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose()
+      }}
+    >
       <div className="add">
         <header className="add__head">
           <button className="icon-btn icon-btn--round" type="button" onClick={onClose} aria-label="Назад">

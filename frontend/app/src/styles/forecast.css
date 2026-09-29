@@ -230,6 +230,7 @@
 
 .fcard {
   display: grid;
+  cursor: pointer;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 12px;

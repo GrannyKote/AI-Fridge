@@ -113,7 +113,15 @@ export function PlanPurchaseDialog({ groupId, onClose, onPlanned }) {
   }
 
   return (
-    <div className="dialog dialog--page" role="dialog" aria-modal="true" aria-labelledby="plan-title">
+    <div
+      className="dialog dialog--page"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="plan-title"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose()
+      }}
+    >
       <div className="add planner">
         <header className="planner__top">
           <button className="icon-btn icon-btn--round" type="button" onClick={onClose} aria-label="Назад">
