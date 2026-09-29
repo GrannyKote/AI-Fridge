@@ -1,6 +1,7 @@
 import unittest
+from unittest.mock import patch
 
-from receipts.normalize import Item, normalize_lines
+from receipts.normalize import Item, normalize_lines, read_products
 from receipts.payload import MISSING, to_payload
 from receipts.voice import split_phrases
 
@@ -23,6 +24,7 @@ class PayloadTest(unittest.TestCase):
         payload = to_payload([Item(name="молоко", quantity=2000, unit="мл", raw_line="молоко два литра")])
 
         self.assertEqual(payload["missing"], MISSING)
+        self.assertEqual(payload["skipped"], [])
         self.assertEqual(
             payload["items"],
             [
@@ -31,14 +33,38 @@ class PayloadTest(unittest.TestCase):
                     "quantity": 2000,
                     "unit": "мл",
                     "storage": "Холодильник",
-                    "category": None,
+                    "category": "Молочные",
                     "unit_id": None,
+                    "shelf_life_days": None,
                     "best_before": None,
                     "storage_place_id": None,
                 }
             ],
         )
         self.assertNotIn("id_user_group", payload["items"][0])
+
+    def test_milk_response_has_shelf_life_and_skipped_line_does_not(self):
+        items, skipped = read_products(["молоко 1 л", "МОЛОКО 2.5% 89.90", "прмт 12.00"])
+        payload = to_payload(items, skipped)
+
+        self.assertEqual(
+            [(item["name"], item["shelf_life_days"]) for item in payload["items"]],
+            [("молоко", 5), ("молоко 2.5%", 5)],
+        )
+        self.assertEqual(payload["skipped"], [
+            {"line": "прмт 12.00", "reason": "не сопоставилось с продуктом"},
+        ])
+        self.assertNotIn("shelf_life_days", payload["skipped"][0])
+        self.assertEqual(payload["items"][0]["storage"], "Холодильник")
+
+    @patch("receipts.store.base_products", return_value=[("молоко", 5, "Морозилка")])
+    def test_storage_comes_from_the_catalog_row(self, _loaded):
+        items, _skipped = read_products(["молоко 1 л"])
+        payload = to_payload(items, [])
+
+        self.assertEqual(payload["items"][0]["name"], "молоко")
+        self.assertEqual(payload["items"][0]["storage"], "Морозилка")
+        self.assertEqual(payload["items"][0]["shelf_life_days"], 5)
 
 
 if __name__ == "__main__":

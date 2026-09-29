@@ -1,7 +1,7 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 LOGIN_PATTERN = r"^[a-zA-Z0-9._-]+$"
 
@@ -30,6 +30,7 @@ class UserOut(BaseModel):
 
     id: int
     login: str
+    role: str = "user"
     groups: list[GroupOut] = []
 
 
@@ -59,6 +60,47 @@ class ProductSuggestionOut(BaseModel):
     name: str
     category_id: int | None = None
     category: str | None = None
+
+
+class ShelfLifeOut(BaseModel):
+    name: str
+    shelf_life_days: int
+
+
+class FeedbackIn(BaseModel):
+    user_id: int = Field(gt=0)
+    message: str = Field(min_length=1, max_length=2000)
+
+    @field_validator("message")
+    @classmethod
+    def not_blank(cls, value: str) -> str:
+        text = value.strip()
+        if not text:
+            raise ValueError("Напишите сообщение")
+        return text
+
+
+class FeedbackOut(BaseModel):
+    status: str
+
+
+class FeedbackPhotoOut(BaseModel):
+    id: int
+
+
+class FeedbackEntryOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    login: str
+    message: str
+    date_time: datetime
+    photos: list[FeedbackPhotoOut]
+
+
+class ShelfLifeIn(BaseModel):
+    name: str = Field(min_length=1, max_length=512)
+    shelf_life_days: int = Field(gt=0, le=3650)
 
 
 class PantryItemOut(BaseModel):

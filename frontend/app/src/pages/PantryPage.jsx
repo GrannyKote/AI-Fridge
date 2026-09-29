@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { pantryApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { AddProductDialog } from '../components/AddProductDialog.jsx'
@@ -36,9 +37,18 @@ export default function PantryPage() {
   const [addOpen, setAddOpen] = useState(false)
   const [consumeTarget, setConsumeTarget] = useState(null)
   const [wasteTarget, setWasteTarget] = useState(null)
+  const [selecting, setSelecting] = useState(false)
+  const [selectedIds, setSelectedIds] = useState(() => new Set())
+  const [bulkAction, setBulkAction] = useState(null)
+  const [bulkPending, setBulkPending] = useState(false)
+  const [bulkError, setBulkError] = useState('')
   const [toast, setToast] = useToast()
   const categoryChipsRef = useHorizontalScroll()
   const placeChipsRef = useHorizontalScroll()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [attentionTick, setAttentionTick] = useState(0)
+  const scrolledAttention = useRef(0)
 
   const load = useCallback(
     async (silent = false) => {
@@ -89,6 +99,49 @@ export default function PantryPage() {
     return counters
   }, [products])
 
+  const filtersActive =
+    query.trim() !== '' || activeCategory !== 'all' || activePlace !== 'all'
+
+  function resetFilters() {
+    setQuery('')
+    setActiveCategory('all')
+    setActivePlace('all')
+  }
+
+  function showAttention() {
+    if (stats.expired + stats.soon === 0) {
+      setToast('Всё в порядке, сроки не горят')
+      return
+    }
+
+    resetFilters()
+    setAttentionTick((tick) => tick + 1)
+  }
+
+  useEffect(() => {
+    if (!location.state?.attention || state !== 'ready') {
+      return
+    }
+
+    navigate('.', { replace: true, state: null })
+    showAttention()
+  }, [location.state, state])
+
+  useEffect(() => {
+    if (attentionTick === 0 || scrolledAttention.current === attentionTick || state !== 'ready') {
+      return
+    }
+
+    const id = stats.expired > 0 ? 'group-expired' : 'group-soon'
+    const node = document.getElementById(id)
+    if (!node) {
+      return
+    }
+
+    node.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    scrolledAttention.current = attentionTick
+  }, [attentionTick, state, stats.expired, stats.soon])
+
   const visible = useMemo(() => {
     const normalized = query.trim().toLowerCase()
 
@@ -103,6 +156,15 @@ export default function PantryPage() {
     })
   }, [products, query, activeCategory, activePlace])
 
+  function handleBatchSaved(items, close) {
+    const count = items.length
+    setToast(count === 1 ? `«${items[0].name}» добавлен` : `Добавлено ${count}`)
+    notifyPurchaseChanged()
+    if (close) {
+      setAddOpen(false)
+    }
+  }
+
   async function handleCreated(item) {
     setAddOpen(false)
     setProducts((current) => [...current, item])
@@ -114,6 +176,73 @@ export default function PantryPage() {
       setCategories(await pantryApi.categories())
     } catch {
       // не критично: список категорий обновится при следующей загрузке
+    }
+  }
+
+  function stopSelecting() {
+    setSelecting(false)
+    setSelectedIds(new Set())
+    setBulkAction(null)
+    setBulkError('')
+  }
+
+  function toggleSelected(product) {
+    setSelectedIds((current) => {
+      const next = new Set(current)
+      if (next.has(product.id)) {
+        next.delete(product.id)
+      } else {
+        next.add(product.id)
+      }
+      return next
+    })
+  }
+
+  const selectedProducts = products.filter((product) => selectedIds.has(product.id))
+
+  async function confirmBulk() {
+    const reason = bulkAction
+    const queue = selectedProducts
+    setBulkPending(true)
+    setBulkError('')
+    const done = []
+
+    try {
+      for (const product of queue) {
+        const updated = await pantryApi.wasteProduct(groupId, product.id, {
+          reason,
+          quantity: reason === 'mistake' ? null : Number(product.remaining ?? product.quantity),
+        })
+        done.push(updated.id)
+      }
+    } catch (bulkFailure) {
+      setBulkError(bulkFailure.message)
+    } finally {
+      setBulkPending(false)
+    }
+
+    if (done.length === 0) {
+      return
+    }
+
+    const finished = new Set(done)
+    setProducts((current) => current.filter((product) => !finished.has(product.id)))
+    setSelectedIds((current) => {
+      const next = new Set(current)
+      for (const id of finished) {
+        next.delete(id)
+      }
+      return next
+    })
+    notifyPurchaseChanged()
+    setToast(
+      reason === 'mistake'
+        ? `Убрано как ошибка: ${done.length}`
+        : `Списано: ${done.length}`,
+    )
+
+    if (done.length === queue.length) {
+      stopSelecting()
     }
   }
 
@@ -179,13 +308,7 @@ export default function PantryPage() {
           menuOpen={menuOpen}
           onToggleMenu={() => setMenuOpen((open) => !open)}
           alerts={stats.expired + stats.soon}
-          onBell={() =>
-            setToast(
-              stats.expired + stats.soon > 0
-                ? `Требуют внимания: ${stats.expired + stats.soon}`
-                : 'Всё в порядке, сроки не горят',
-            )
-          }
+          onBell={showAttention}
           onToast={setToast}
         />
 
@@ -219,6 +342,24 @@ export default function PantryPage() {
           </form>
 
           <div className="filters">
+            {(products.length > 0 || filtersActive) && (
+              <div className="filters__tools">
+                {products.length > 0 && (
+                  <button
+                    className={`filters__reset${selecting ? ' is-active' : ''}`}
+                    type="button"
+                    onClick={() => (selecting ? stopSelecting() : setSelecting(true))}
+                  >
+                    {selecting ? 'Готово' : 'Выбрать'}
+                  </button>
+                )}
+                {filtersActive && (
+                  <button className="filters__reset" type="button" onClick={resetFilters}>
+                    Сбросить
+                  </button>
+                )}
+              </div>
+            )}
             <nav className="chips" aria-label="Категории" ref={categoryChipsRef}>
               <button
                 className={`chip${activeCategory === 'all' ? ' is-active' : ''}`}
@@ -282,7 +423,7 @@ export default function PantryPage() {
                   }
 
                   return (
-                    <section className={`group group--${group.key}`} key={group.key}>
+                    <section className={`group group--${group.key}`} id={`group-${group.key}`} key={group.key}>
                       <h2 className="group__head">
                         {group.icon}
                         {group.title} · {items.length}
@@ -293,6 +434,9 @@ export default function PantryPage() {
                             key={product.id}
                             product={product}
                             onAction={handleCardAction}
+                            selecting={selecting}
+                            selected={selectedIds.has(product.id)}
+                            onToggle={toggleSelected}
                           />
                         ))}
                       </div>
@@ -330,6 +474,7 @@ export default function PantryPage() {
           categories={categories}
           onClose={() => setAddOpen(false)}
           onCreated={handleCreated}
+          onBatchSaved={handleBatchSaved}
         />
       )}
 
@@ -349,6 +494,54 @@ export default function PantryPage() {
           onClose={() => setWasteTarget(null)}
           onWasted={handleWasted}
         />
+      )}
+
+      {selecting && selectedProducts.length > 0 && (
+        <div className="pickbar">
+          <p className="pickbar__count">Выбрано {selectedProducts.length}</p>
+          <button className="pickbar__btn" type="button" onClick={() => setBulkAction('spoiled')}>
+            Списать
+          </button>
+          <button
+            className="pickbar__btn pickbar__btn--danger"
+            type="button"
+            onClick={() => setBulkAction('mistake')}
+          >
+            Удалить как ошибку
+          </button>
+        </div>
+      )}
+
+      {bulkAction && (
+        <div className="pickconfirm" role="dialog" aria-modal="true" aria-label="Подтверждение">
+          <button
+            className="pickconfirm__backdrop"
+            type="button"
+            aria-label="Закрыть"
+            onClick={() => {
+              if (!bulkPending) {
+                setBulkAction(null)
+                setBulkError('')
+              }
+            }}
+          />
+          <div className="pickconfirm__sheet">
+            <p>
+              {bulkAction === 'mistake'
+                ? `Удалить ${selectedProducts.length} как ошибку? Записи исчезнут из кладовой.`
+                : `Списать ${selectedProducts.length}? У каждого спишется весь остаток.`}
+            </p>
+            {bulkError && <p className="pickconfirm__error">{bulkError}</p>}
+            <div className="pickconfirm__actions">
+              <button className="btn btn--ghost" type="button" onClick={() => setBulkAction(null)} disabled={bulkPending}>
+                Отмена
+              </button>
+              <button className="btn btn--primary" type="button" onClick={confirmBulk} disabled={bulkPending}>
+                {bulkPending ? 'Записываем...' : bulkAction === 'mistake' ? 'Удалить' : 'Списать'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className={`toast${toast ? ' is-visible' : ''}`} role="status" aria-live="polite">

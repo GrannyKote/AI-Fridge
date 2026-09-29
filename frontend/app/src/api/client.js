@@ -41,6 +41,24 @@ async function request(path, { method = 'GET', body } = {}) {
   return payload
 }
 
+async function requestForm(path, body) {
+  let response
+
+  try {
+    response = await fetch(`${BASE_URL}${path}`, { method: 'POST', body })
+  } catch {
+    throw new Error('Сервер недоступен. Проверьте, что бэкенд запущен')
+  }
+
+  const payload = await response.json().catch(() => null)
+
+  if (!response.ok) {
+    throw new Error(extractMessage(payload, 'Не удалось выполнить запрос'))
+  }
+
+  return payload
+}
+
 export const authApi = {
   register: (login, password) =>
     request('/auth/register', {
@@ -60,6 +78,13 @@ export const pantryApi = {
   units: () => request('/units'),
   searchProducts: (query) =>
     request(`/products/search?query=${encodeURIComponent(query)}&limit=5`),
+  shelfLife: (name) =>
+    request(`/products/shelf-life?name=${encodeURIComponent(name)}`),
+  rememberShelfLife: (name, days) =>
+    request('/products/shelf-life', {
+      method: 'PUT',
+      body: { name, shelf_life_days: days },
+    }),
   products: (groupId) => request(`/groups/${groupId}/products`),
   usage: (groupId, period) => request(`/groups/${groupId}/usage?period=${period}`),
   addProduct: (groupId, payload) =>
@@ -74,6 +99,20 @@ export const pantryApi = {
       method: 'POST',
       body: payload,
     }),
+}
+
+export const feedbackApi = {
+  send: (userId, message, photos) => {
+    const body = new FormData()
+    body.append('user_id', String(userId))
+    body.append('message', message)
+    for (const photo of photos) {
+      body.append('photos', photo)
+    }
+    return requestForm('/feedback', body)
+  },
+  list: (userId) => request(`/feedback?user_id=${userId}`),
+  photoUrl: (feedbackId, photoId) => `${BASE_URL}/feedback/${feedbackId}/photos/${photoId}`,
 }
 
 export const shoppingApi = {

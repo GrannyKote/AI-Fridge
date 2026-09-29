@@ -1,8 +1,10 @@
 import unittest
 
-from receipts.analyze import analyze
+from receipts.analyze import analyze, bind_names
+from receipts.products import BASE_PRODUCTS
 from receipts.category import to_category
 from receipts.drop import drop_extra
+from receipts.normalize import read_products
 from receipts.photo import read_lines
 
 
@@ -54,6 +56,18 @@ class AnalyzeStepTest(unittest.TestCase):
         )
         self.assertGreater(found[0].score, 0.45)
 
+    def test_unmatched_purchase_is_listed_and_total_is_not(self):
+        items, skipped = read_products([
+            "КАССОВЫЙ ЧЕК",
+            "ИТОГО 89.90",
+            "прмт 12.00",
+            "сок",
+        ])
+
+        self.assertEqual([item.name for item in items], ["сок"])
+        self.assertEqual(skipped, ["прмт 12.00"])
+        self.assertEqual(drop_extra(["НАЛИЧНЫМИ 25000.00", "ИТОГО 89.90"]), [])
+
 
 class CategoryStepTest(unittest.TestCase):
     def test_units_become_grams_and_name_stays_canonical(self):
@@ -68,6 +82,20 @@ class CategoryStepTest(unittest.TestCase):
                 ("молоко 2.5%", 1, "шт"),
             ],
         )
+
+
+class CatalogStepTest(unittest.TestCase):
+    def tearDown(self):
+        bind_names(None)
+
+    def test_name_added_outside_the_file_is_recognized(self):
+        self.assertNotIn("кедровый орех", BASE_PRODUCTS)
+        bind_names(("кедровый орех",))
+
+        found = analyze(["кедровый орех 90.00"])
+
+        self.assertEqual([match.category for match in found], ["кедровый орех"])
+        self.assertEqual(analyze(["молоко"]), [])
 
 
 if __name__ == "__main__":

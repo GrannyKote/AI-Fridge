@@ -1,0 +1,111 @@
+.feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.feedback__text {
+  height: auto;
+  min-height: 140px;
+  padding: 12px 16px;
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.feedback__sent {
+  margin: 0;
+  color: var(--green);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.dock__feedback {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dock__feedback.is-active {
+  color: var(--green);
+}
+
+.feedback__photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.feedback__photo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 72px;
+}
+
+.feedback__photo img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.feedback__photo-remove {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.feedback__file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.feedback__attach {
+  display: grid;
+  place-items: center;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.admin-mail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-mail__who {
+  margin: 0;
+  font-weight: 700;
+}
+
+.admin-mail__when,
+.admin-mail__text {
+  margin: 0;
+}
+
+.admin-mail__when {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.admin-mail__photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-mail__photos img {
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 8px;
+}

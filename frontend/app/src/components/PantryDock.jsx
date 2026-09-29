@@ -61,13 +61,22 @@ export function PantryDock({ open, onClose, onSignOut, onAdd, onSelectTab }) {
             </button>
           )}
 
-          <div className="dock__panel" hidden={!open}>
-            <div className="dock__account">
-              <button className="dock__logout" type="button" onClick={onSignOut}>
-                <LogoutIcon />
-                Выйти
-              </button>
-            </div>
+          <div className="dock__bar">
+            {open && (
+              <div className="dock__account">
+                <button
+                  className={`dock__feedback${pathname === '/feedback' ? ' is-active' : ''}`}
+                  type="button"
+                  onClick={() => selectTab({ path: '/feedback', title: 'Обратная связь' })}
+                >
+                  Обратная связь
+                </button>
+                <button className="dock__logout" type="button" onClick={onSignOut}>
+                  <LogoutIcon />
+                  Выйти
+                </button>
+              </div>
+            )}
 
             <nav className="tabbar" aria-label="Основная навигация">
               {TABS.map((tab) => {

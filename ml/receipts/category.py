@@ -5,8 +5,6 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from receipts.products import BASE_PRODUCTS as CATEGORIES
-
 _WORDS = {
     "один": 1, "одна": 1, "одно": 1,
     "два": 2, "две": 2,
@@ -64,10 +62,14 @@ class Item:
     quantity: int | float
     unit: str
     raw_line: str
+    shelf_life_days: int | None = None
+    storage: str | None = None
 
 
 def to_category(found: list) -> list[Item]:
-    """Ближайшая категория становится именем. Килограммы и литры переводятся в г и мл."""
+    """Ближайшая категория становится именем. Килограммы и литры переводятся в г и мл.
+    Срок и место берутся у базового имени, до процента в названии."""
+    catalog = _catalog()
     items: list[Item] = []
     for match in found:
         quantity, unit = _measure(match.phrase)
@@ -75,13 +77,36 @@ def to_category(found: list) -> list[Item]:
         percent = _PERCENT_RE.search(match.phrase)
         if percent:
             name = f"{name} {re.sub(r'\\s+', '', percent.group(0))}"
+        days, place = _facts(catalog, match.category)
         items.append(Item(
             name=name,
             quantity=quantity,
             unit=unit,
             raw_line=match.raw_line,
+            shelf_life_days=days,
+            storage=place,
         ))
     return items
+
+
+def _catalog() -> dict[str, tuple[int | None, str | None]] | None:
+    from receipts.store import base_products
+
+    loaded = base_products()
+    if not loaded:
+        return None
+    return {name: (days, place) for name, days, place in loaded}
+
+
+def _facts(
+    catalog: dict[str, tuple[int | None, str | None]] | None,
+    name: str,
+) -> tuple[int | None, str | None]:
+    if catalog is not None:
+        return catalog.get(name, (None, None))
+    from receipts.products import SHELF_LIFE
+
+    return SHELF_LIFE.get(name), None
 
 
 def _measure(phrase: str) -> tuple[int | float, str]:

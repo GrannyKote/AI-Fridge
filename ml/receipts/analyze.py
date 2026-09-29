@@ -7,7 +7,6 @@ import math
 import re
 from dataclasses import dataclass
 
-from receipts.category import CATEGORIES
 from receipts.drop import fold
 from receipts.llm import enabled, generate
 
@@ -17,6 +16,8 @@ _MIN_SCORE = 0.45
 _PRICE_RE = re.compile(r"\b\d+[.,]\d{2}\b(?!\s*%)")
 _WORD_RE = re.compile(r"[а-яё]{3,}")
 
+_override: tuple[str, ...] | None = None
+_catalog: tuple[str, ...] = ()
 _bases: list[tuple[str, dict[str, float]]] | None = None
 _exact_names: dict[str, str] | None = None
 
@@ -34,6 +35,7 @@ def analyze(lines: list[str], complete=None) -> list[Match]:
     """Модель называет продукт по сырой строке. Имя сверяется со списком базовых продуктов.
     Строку, которую модель пропустила, всё равно сверяем по буквам.
     Если модели нет или ответ не JSON, остаётся сравнение по буквам."""
+    _prepare(_names())
     lines = [part for line in lines for part in _split_glued(line)]
     reader = complete if complete is not None else (generate if enabled() else None)
     if reader is not None:
@@ -73,7 +75,7 @@ def _split_glued(line: str) -> list[str]:
     folded = fold(line)
     occupied: list[tuple[int, int]] = []
     hits: list[tuple[int, int]] = []
-    for name in sorted(CATEGORIES, key=len, reverse=True):
+    for name in sorted(_catalog, key=len, reverse=True):
         start = 0
         while True:
             at = folded.find(name, start)
@@ -152,10 +154,39 @@ def _match(line: str, named: str | None = None) -> Match | None:
     return Match(raw_line=line.strip(), phrase=phrase, category=category, score=score)
 
 
+def bind_names(names: tuple[str, ...] | None) -> None:
+    """Подмена списка. None снова читает базу, а без неё — файл."""
+    global _override, _catalog, _bases, _exact_names
+    _override = names
+    _catalog = ()
+    _bases = None
+    _exact_names = None
+
+
+def _names() -> tuple[str, ...]:
+    if _override is not None:
+        return _override
+    from receipts.products import BASE_PRODUCTS
+    from receipts.store import base_product_names
+
+    loaded = base_product_names()
+    if loaded:
+        return tuple(loaded)
+    return BASE_PRODUCTS
+
+
+def _prepare(names: tuple[str, ...]) -> None:
+    global _catalog, _bases, _exact_names
+    if _bases is not None and names == _catalog:
+        return
+    _catalog = names
+    _exact_names = {fold(name): name for name in names}
+    _bases = [(name, embed(name)) for name in names]
+
+
 def _exact(text: str) -> str | None:
-    global _exact_names
     if _exact_names is None:
-        _exact_names = {fold(name): name for name in CATEGORIES}
+        _prepare(_names())
     return _exact_names.get(fold(text.strip()))
 
 
@@ -192,9 +223,8 @@ def _nearest(vector: dict[str, float]) -> tuple[str, float]:
 
 
 def _base_vectors() -> list[tuple[str, dict[str, float]]]:
-    global _bases
     if _bases is None:
-        _bases = [(name, embed(name)) for name in CATEGORIES]
+        _prepare(_names())
     return _bases
 
 

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { formatRuDate } from '../lib/pantry.js'
 import { shoppingApi } from '../api/client.js'
 import { FormAlert } from './FormAlert.jsx'
 import { ArrowLeftIcon, ArrowRightIcon } from './icons.jsx'
@@ -20,21 +21,6 @@ const MONTHS = [
   'Ноябрь',
   'Декабрь',
 ]
-const MONTHS_GENITIVE = [
-  'января',
-  'февраля',
-  'марта',
-  'апреля',
-  'мая',
-  'июня',
-  'июля',
-  'августа',
-  'сентября',
-  'октября',
-  'ноября',
-  'декабря',
-]
-
 function toKey(date) {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
@@ -56,8 +42,7 @@ function mondayOffset(date) {
 }
 
 function formatPlanDate(key) {
-  const date = parseKey(key)
-  return `${date.getDate()} ${MONTHS_GENITIVE[date.getMonth()]} ${date.getFullYear()}`
+  return formatRuDate(key)
 }
 
 export function PlanPurchaseDialog({ groupId, onClose, onPlanned }) {

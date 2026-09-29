@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { pantryApi } from '../api/client.js'
 import { FormAlert } from './FormAlert.jsx'
 import { QuantityPicker, ProductHead } from './QuantityPicker.jsx'
-import { actionAmount, amountError, parseAmount } from '../lib/pantry.js'
+import { actionAmount, amountError, formatNumber, parseAmount } from '../lib/pantry.js'
 import '../styles/dialog.css'
 
 const REASONS = [
@@ -12,7 +12,9 @@ const REASONS = [
 
 export function WasteDialog({ groupId, product, onClose, onWasted }) {
   const [reason, setReason] = useState('spoiled')
-  const [quantity, setQuantity] = useState('')
+  const [quantity, setQuantity] = useState(() =>
+    formatNumber(Number(product.remaining ?? product.quantity)),
+  )
   const [error, setError] = useState('')
   const [formError, setFormError] = useState('')
   const [pending, setPending] = useState(false)

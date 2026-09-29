@@ -1,33 +1,8 @@
 import { CalendarIcon, CartIcon } from './icons.jsx'
-import { daysUntil, daysWord } from '../lib/pantry.js'
-
-const WEEKDAYS = [
-  'Воскресенье',
-  'Понедельник',
-  'Вторник',
-  'Среда',
-  'Четверг',
-  'Пятница',
-  'Суббота',
-]
-const MONTHS = [
-  'Января',
-  'Февраля',
-  'Марта',
-  'Апреля',
-  'Мая',
-  'Июня',
-  'Июля',
-  'Августа',
-  'Сентября',
-  'Октября',
-  'Ноября',
-  'Декабря',
-]
+import { daysUntil, daysWord, formatRuDate } from '../lib/pantry.js'
 
 function formatPlanHeading(planDate) {
-  const date = new Date(`${planDate}T00:00:00`)
-  return `${WEEKDAYS[date.getDay()]}, ${date.getDate()} ${MONTHS[date.getMonth()]}`
+  return formatRuDate(planDate)
 }
 
 function formatCountdown(planDate) {

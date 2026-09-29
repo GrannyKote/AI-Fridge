@@ -12,6 +12,7 @@ def _to_out(user, groups) -> UserOut:
     return UserOut(
         id=user.id,
         login=user.login,
+        role=user.user_type,
         groups=[GroupOut.model_validate(group) for group in groups],
     )
 

@@ -10,11 +10,11 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from receipts.llm import warm as warm_llm
-from receipts.normalize import normalize_lines
+from receipts.normalize import read_products
 from receipts.payload import to_payload
 from receipts.photo import read_lines as read_photo
 from receipts.photo import warm as warm_photo
-from receipts.store import DatabaseUnavailable, save_receipt
+from receipts.store import DatabaseUnavailable, base_product_names, save_receipt
 from receipts.voice import read_lines as read_voice
 from receipts.voice import warm as warm_voice
 
@@ -24,6 +24,7 @@ async def lifespan(_app: FastAPI):
     warm_photo()
     warm_voice()
     warm_llm()
+    base_product_names()
     yield
 
 
@@ -74,8 +75,8 @@ async def _recognize(group_id: int, source: str, file: UploadFile, suffix: str) 
     finally:
         Path(path).unlink(missing_ok=True)
 
-    items = normalize_lines(lines)
-    payload = to_payload(items)
+    items, skipped = read_products(lines)
+    payload = to_payload(items, skipped)
     try:
         payload["receipt_id"] = save_receipt(group_id, source, "\n".join(lines), items)
     except DatabaseUnavailable:

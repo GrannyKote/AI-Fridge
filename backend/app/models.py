@@ -1,7 +1,7 @@
 from datetime import date, datetime, time
 from decimal import Decimal
 
-from sqlalchemy import Boolean, Date, DateTime, Integer, Numeric, String, Time
+from sqlalchemy import Boolean, Date, DateTime, Integer, LargeBinary, Numeric, String, Text, Time
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .config import settings
@@ -17,6 +17,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     login: Mapped[str] = mapped_column(String(256), nullable=False)
     password: Mapped[str] = mapped_column(String(256), nullable=False)
+    user_type: Mapped[str] = mapped_column(String(16), nullable=False, default="user", server_default="user")
 
 
 class CreatedUser(Base):
@@ -153,6 +154,26 @@ class UserGroupProductConsumption(Base):
     id_user_group_product: Mapped[int] = mapped_column(Integer, nullable=False)
     quantity: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     date_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class Feedback(Base):
+    __tablename__ = "feedback"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id_user: Mapped[int] = mapped_column(Integer, nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    date_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class FeedbackPhoto(Base):
+    __tablename__ = "feedback_photo"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id_feedback: Mapped[int] = mapped_column(Integer, nullable=False)
+    content: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+    content_type: Mapped[str] = mapped_column(String(64), nullable=False)
 
 
 class UserGroupProductWaste(Base):

@@ -2,7 +2,7 @@
   --gutter: 16px;
   --app-max: 430px;
   --tabbar-h: 62px;
-  --dock-h: 0px;
+  --dock-h: var(--tabbar-h);
 
   min-height: 100dvh;
 }
@@ -267,6 +267,34 @@
   gap: 8px;
 }
 
+.filters__tools {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.filters__reset {
+  align-self: auto;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.filters__reset.is-active {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.group {
+  scroll-margin-top: 120px;
+}
+
 .chip {
   flex: 0 0 auto;
   display: inline-flex;
@@ -448,6 +476,103 @@
   gap: 6px;
 }
 
+.card--picked {
+  border-color: var(--green);
+}
+
+.card__mark {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+}
+
+.card__mark.is-on {
+  border-color: var(--green);
+  background: var(--green);
+  box-shadow: inset 0 0 0 4px var(--surface);
+}
+
+.pickbar {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--dock-h) + 16px + env(safe-area-inset-bottom));
+  z-index: 28;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: calc(var(--app-max) - 88px);
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  transform: translateX(calc(-50% - 28px));
+}
+
+.pickbar__count {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pickbar__btn {
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--green);
+  color: #06210f;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pickbar__btn--danger {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.pickconfirm {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: grid;
+  place-items: end center;
+}
+
+.pickconfirm__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.pickconfirm__sheet {
+  position: relative;
+  width: min(var(--app-max), 100%);
+  margin-bottom: calc(var(--dock-h) + 16px);
+  padding: 16px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--surface);
+}
+
+.pickconfirm__sheet p {
+  margin: 0 0 14px;
+}
+
+.pickconfirm__error {
+  color: var(--red);
+  font-size: 13px;
+}
+
+.pickconfirm__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
 .pantry__message {
   display: flex;
   flex-direction: column;
@@ -514,11 +639,10 @@
   transform: scale(0.92);
 }
 
-.dock__panel {
+.dock__bar {
   border-top: 1px solid var(--border);
   background: color-mix(in srgb, var(--bg) 94%, transparent);
   backdrop-filter: blur(12px);
-  animation: dock-in 0.18s ease;
 }
 
 @keyframes dock-in {
@@ -533,10 +657,11 @@
 .dock__account {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   height: 44px;
   padding: 0 var(--gutter);
   border-bottom: 1px solid var(--border);
+  animation: dock-in 0.18s ease;
 }
 
 .dock__logout {

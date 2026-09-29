@@ -16,6 +16,7 @@ from ..models import (
 )
 from ..schemas import PurchaseCheckout, PurchaseCreate
 from . import catalog
+from .pantry import stored_name
 
 
 def _product_statement():
@@ -193,7 +194,7 @@ def checkout_purchase(session: Session, group_id: int, payload: PurchaseCheckout
             UserGroupProduct(
                 id_user_group=group_id,
                 id_product=row.id_product,
-                product_name=row.product_name,
+                product_name=stored_name(row.product_name),
                 id_unit_of_measurement=row.id_unit_of_measurement,
                 quantity=Decimal(str(item.quantity)),
                 best_before=item.best_before,

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { pantryApi, receiptApi } from '../api/client.js'
+import { daysUntil, expiryDate } from '../lib/pantry.js'
+import { DateField } from './DateField.jsx'
 import { FormAlert } from './FormAlert.jsx'
 import { SuggestInput } from './SuggestInput.jsx'
 import {
@@ -28,8 +30,8 @@ const EMPTY_FORM = {
 }
 
 const METHODS = [
-  { key: 'manual', title: 'Вручную', icon: <PencilIcon /> },
   { key: 'receipt', title: 'Чек', icon: <CameraIcon /> },
+  { key: 'manual', title: 'Вручную', icon: <PencilIcon /> },
   { key: 'voice', title: 'Голос', icon: <MicIcon /> },
 ]
 
@@ -60,22 +62,50 @@ function today() {
   return new Date().toISOString().slice(0, 10)
 }
 
+function placeChoices(places, storage) {
+  if (places.some((place) => place.name === storage)) {
+    return places
+  }
+  return [{ id: storage, name: storage }, ...places]
+}
+
 function placeIdOf(places, name, category) {
   const wanted = PLACE_BY_NAME[name] || PLACE_BY_CATEGORY[category] || 'Шкаф'
   return String(places.find((place) => place.name === wanted)?.id ?? places[0]?.id ?? '')
 }
 
-export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
+function draftDate(item) {
+  if (item.best_before) {
+    return item.best_before
+  }
+  if (Number.isInteger(item.shelf_life_days) && item.shelf_life_days > 0) {
+    return expiryDate(item.shelf_life_days)
+  }
+  return ''
+}
+
+export function AddProductDialog({ groupId, categories, onClose, onCreated, onBatchSaved }) {
   const [form, setForm] = useState(EMPTY_FORM)
-  const [method, setMethod] = useState('manual')
+  const [method, setMethod] = useState('receipt')
   const [units, setUnits] = useState([])
   const [places, setPlaces] = useState([])
   const [nameSuggestions, setNameSuggestions] = useState([])
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
   const [pending, setPending] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [placeTouched, setPlaceTouched] = useState(false)
-  const [drafts, setDrafts] = useState([])
+  const [receiptDrafts, setReceiptDrafts] = useState([])
+  const [voiceDrafts, setVoiceDrafts] = useState([])
+  const [receiptSkipped, setReceiptSkipped] = useState([])
+  const [voiceSkipped, setVoiceSkipped] = useState([])
+  const captureKey = method === 'voice' ? 'voice' : 'receipt'
+  const drafts = captureKey === 'voice' ? voiceDrafts : receiptDrafts
+  const skipped = captureKey === 'voice' ? voiceSkipped : receiptSkipped
+  const setDrafts = captureKey === 'voice' ? setVoiceDrafts : setReceiptDrafts
+  const [extraCategories, setExtraCategories] = useState([])
+  const [categoryOffer, setCategoryOffer] = useState(false)
+  const [newCategory, setNewCategory] = useState('')
   const [recording, setRecording] = useState(false)
   const cameraRef = useRef(null)
   const libraryRef = useRef(null)
@@ -85,6 +115,8 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
   const streamRef = useRef(null)
   const chunksRef = useRef([])
   const discardRef = useRef(false)
+  const suggestedBefore = useRef('')
+  const categoryTouched = useRef(false)
 
   useEffect(() => {
     let cancelled = false
@@ -146,6 +178,112 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
     }, 250)
 
     return () => clearTimeout(timer)
+  }, [form.name, method])
+
+  useEffect(() => {
+    if (method !== 'manual') {
+      return undefined
+    }
+
+    const query = form.name.trim()
+    if (!query) {
+      setForm((current) => {
+        if (current.bestBefore && current.bestBefore !== suggestedBefore.current) {
+          return current
+        }
+        suggestedBefore.current = ''
+        return current.bestBefore ? { ...current, bestBefore: '' } : current
+      })
+      return undefined
+    }
+
+    let cancelled = false
+    const timer = setTimeout(async () => {
+      let nextDate = ''
+      try {
+        const found = await pantryApi.shelfLife(query)
+        nextDate = expiryDate(found.shelf_life_days)
+      } catch {
+        nextDate = ''
+      }
+      if (cancelled) {
+        return
+      }
+      setForm((current) => {
+        if (current.name.trim().toLowerCase() !== query.toLowerCase()) {
+          return current
+        }
+        if (current.bestBefore && current.bestBefore !== suggestedBefore.current) {
+          return current
+        }
+        suggestedBefore.current = nextDate
+        if (current.bestBefore === nextDate) {
+          return current
+        }
+        return { ...current, bestBefore: nextDate }
+      })
+      if (nextDate) {
+        clearError('bestBefore')
+      }
+    }, 250)
+
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+    }
+  }, [form.name, method])
+
+  useEffect(() => {
+    if (method !== 'manual') {
+      return undefined
+    }
+
+    const query = form.name.trim()
+    if (!query) {
+      setCategoryOffer(false)
+      return undefined
+    }
+
+    let cancelled = false
+    const timer = setTimeout(async () => {
+      try {
+        const found = await pantryApi.searchProducts(query)
+        if (cancelled) {
+          return
+        }
+        const exact = found.find((product) => product.name.toLowerCase() === query.toLowerCase())
+        if (exact?.category) {
+          setCategoryOffer(false)
+          if (!categoryTouched.current) {
+            setForm((current) => {
+              if (current.name.trim().toLowerCase() !== query.toLowerCase() || current.category === exact.category) {
+                return current
+              }
+              return { ...current, category: exact.category }
+            })
+            clearError('category')
+          }
+          return
+        }
+        if (!categoryTouched.current) {
+          setForm((current) =>
+            current.category && current.name.trim().toLowerCase() === query.toLowerCase()
+              ? { ...current, category: '' }
+              : current,
+          )
+          setCategoryOffer(true)
+        }
+      } catch {
+        if (!cancelled) {
+          setCategoryOffer(false)
+        }
+      }
+    }, 250)
+
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+    }
   }, [form.name, method])
 
   function update(patch) {
@@ -271,16 +409,179 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
     try {
       const result = await receiptApi.recognize(groupId, file, kind)
       const items = result.items ?? []
-      setDrafts(items)
-      if (items.length === 0) {
+      const missed = result.skipped ?? []
+      const writeDrafts = kind === 'voice' ? setVoiceDrafts : setReceiptDrafts
+      const writeSkipped = kind === 'voice' ? setVoiceSkipped : setReceiptSkipped
+      writeDrafts(
+        items.map((item) => ({
+          ...item,
+          originName: item.name,
+          originDays: item.shelf_life_days,
+        })),
+      )
+      writeSkipped(missed)
+      if (items.length === 0 && missed.length === 0) {
         setFormError('На записи не нашлось продуктов')
       }
     } catch (error) {
-      setDrafts([])
+      const writeDrafts = kind === 'voice' ? setVoiceDrafts : setReceiptDrafts
+      const writeSkipped = kind === 'voice' ? setVoiceSkipped : setReceiptSkipped
+      writeDrafts([])
+      writeSkipped([])
       setFormError(error.message)
     } finally {
       setPending(false)
     }
+  }
+
+  function openManual(next) {
+    suggestedBefore.current = ''
+    setPlaceTouched(true)
+    setMethod('manual')
+    setFormError('')
+    setErrors({})
+    setForm({
+      ...EMPTY_FORM,
+      purchasedAt: today(),
+      ...next,
+    })
+  }
+
+  function draftJob(item) {
+    const name = String(item.name ?? '').trim()
+    const unit = units.find((entry) => entry.name === item.unit)
+    const place = places.find((entry) => entry.name === (item.storage || 'Шкаф'))
+    const quantity = Number(String(item.quantity ?? '').replace(',', '.'))
+    const bestBefore = draftDate(item)
+    if (!name || !item.category || !unit || !place || !(quantity > 0) || !bestBefore) {
+      return null
+    }
+    return { item: { ...item, name }, unit, place, quantity, bestBefore }
+  }
+
+  async function writeDraft(job) {
+    const days = job.item.shelf_life_days
+    if (Number.isInteger(days) && days > 0) {
+      await rememberRow(job.item)
+    }
+    return pantryApi.addProduct(groupId, {
+      name: job.item.name,
+      category: job.item.category,
+      unit_id: Number(job.unit.id),
+      quantity: job.quantity,
+      best_before: job.bestBefore,
+      storage_place_id: Number(job.place.id),
+    })
+  }
+
+  async function addAll() {
+    const stay = []
+    const jobs = []
+
+    for (const item of drafts) {
+      const job = draftJob(item)
+      if (job) {
+        jobs.push(job)
+      } else {
+        stay.push(item)
+      }
+    }
+
+    if (jobs.length === 0) {
+      setFormError('Нет строк со сроком и местом, которые можно записать сразу')
+      return
+    }
+
+    setPending(true)
+    setSaving(true)
+    setFormError('')
+    const saved = []
+    const failed = []
+
+    try {
+      for (const job of jobs) {
+        try {
+          saved.push(await writeDraft(job))
+        } catch (error) {
+          failed.push(job.item)
+          setFormError(error.message)
+          break
+        }
+      }
+    } finally {
+      setSaving(false)
+      setPending(false)
+    }
+
+    const left = [...failed, ...stay]
+    setDrafts(left)
+    if (saved.length > 0) {
+      onBatchSaved(saved, left.length === 0 && skipped.length === 0)
+    }
+  }
+
+  async function rememberRow(item) {
+    const name = item.name.trim()
+    const days = item.shelf_life_days
+    if (!name || !Number.isInteger(days) || days <= 0) {
+      throw new Error('Укажите имя и срок в днях')
+    }
+    if (name === item.originName && days === item.originDays) {
+      return
+    }
+    await pantryApi.rememberShelfLife(name, days)
+  }
+
+  async function saveDraft(index) {
+    const job = draftJob(drafts[index])
+    if (!job) {
+      setFormError('Укажите количество, срок и место')
+      return
+    }
+
+    setPending(true)
+    setSaving(true)
+    setFormError('')
+    try {
+      const created = await writeDraft(job)
+      const left = drafts.filter((_, at) => at !== index)
+      setDrafts(left)
+      onBatchSaved([created], left.length === 0 && skipped.length === 0)
+    } catch (error) {
+      setFormError(error.message)
+    } finally {
+      setSaving(false)
+      setPending(false)
+    }
+  }
+
+  function acceptCategory(name) {
+    const trimmed = name.trim()
+    if (!trimmed) {
+      return
+    }
+    const known = [...categories, ...extraCategories].find(
+      (item) => item.name.toLowerCase() === trimmed.toLowerCase(),
+    )
+    const value = known ? known.name : trimmed
+    if (!known) {
+      setExtraCategories((current) => [...current, { id: value, name: value }])
+    }
+    categoryTouched.current = true
+    setCategoryOffer(false)
+    setNewCategory('')
+    update({ category: value })
+    clearError('category')
+  }
+
+  function takeSkipped(line) {
+    const unit = units.find((entry) => entry.name === 'шт')
+    openManual({
+      name: line,
+      quantity: '1',
+      unitId: unit ? String(unit.id) : '',
+      placeId: placeIdOf(places, '', ''),
+    })
   }
 
   function onCapture(event) {
@@ -368,11 +669,6 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
                 }
                 setMethod(item.key)
                 setFormError('')
-                setDrafts([])
-                setErrors((current) => ({ ...current, name: '' }))
-                if (item.key !== 'manual') {
-                  update({ name: '', productId: null })
-                }
               }}
             >
               {item.icon}
@@ -412,24 +708,138 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
         <input ref={libraryRef} type="file" accept="image/*" hidden onChange={onCapture} />
         <input ref={audioRef} type="file" accept="audio/*" hidden onChange={onCapture} />
 
-        {method !== 'manual' && pending && <p className="drafts__hint">Разбираем запись...</p>}
+        {method !== 'manual' && pending && !saving && <p className="drafts__hint">Разбираем запись...</p>}
 
         {method !== 'manual' && drafts.length > 0 && (
           <div className="drafts">
-            <p className="drafts__hint">Что куплено, сколько и где хранить.</p>
+            <p className="drafts__hint">Что куплено, сколько, где хранить и до какой даты.</p>
+            <button className="drafts__all" type="button" onClick={addAll} disabled={pending}>
+              Добавить всё
+            </button>
             <div className="drafts__head">
               <span>Куплено</span>
               <span>Сколько</span>
               <span>Хранение</span>
+              <span>Срок</span>
             </div>
             {drafts.map((item, index) => (
               <div key={index} className="drafts__item">
-                <span>{item.name}</span>
-                <span>
-                  {item.quantity} {item.unit}
-                </span>
-                <span>{item.storage || 'Шкаф'}</span>
+                <div className="drafts__facts">
+                  <input
+                    className="drafts__name"
+                    aria-label={`Имя для строки ${index + 1}`}
+                    value={item.name}
+                    onChange={(event) => {
+                      const name = event.target.value
+                      setDrafts((current) =>
+                        current.map((row, at) => (at === index ? { ...row, name } : row)),
+                      )
+                    }}
+                  />
+                  <label className="drafts__qty">
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      aria-label={`Количество для ${item.name}`}
+                      value={item.quantity ?? ''}
+                      onChange={(event) => {
+                        const quantity = event.target.value
+                        setDrafts((current) =>
+                          current.map((row, at) => (at === index ? { ...row, quantity } : row)),
+                        )
+                      }}
+                    />
+                    <span>{item.unit}</span>
+                  </label>
+                  <div className="drafts__place">
+                    <select
+                      className="drafts__place-select"
+                      aria-label={`Место для ${item.name}`}
+                      value={item.storage || 'Шкаф'}
+                      onChange={(event) => {
+                        const storage = event.target.value
+                        setDrafts((current) =>
+                          current.map((row, at) => (at === index ? { ...row, storage } : row)),
+                        )
+                      }}
+                    >
+                      {placeChoices(places, item.storage || 'Шкаф').map((place) => (
+                        <option key={place.id} value={place.name}>
+                          {place.name}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="drafts__place-icon" aria-hidden="true">
+                      {PLACE_ICONS[item.storage || 'Шкаф'] ?? <HouseIcon />}
+                    </span>
+                  </div>
+                  <label className="drafts__days">
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      aria-label={`Срок в днях для ${item.name}`}
+                      value={Number.isInteger(item.shelf_life_days) ? item.shelf_life_days : ''}
+                      onChange={(event) => {
+                        const raw = event.target.value
+                        const parsed = raw === '' ? null : Number(raw)
+                        const shelf_life_days = Number.isInteger(parsed) ? parsed : null
+                        const best_before =
+                          Number.isInteger(shelf_life_days) && shelf_life_days > 0
+                            ? expiryDate(shelf_life_days)
+                            : ''
+                        setDrafts((current) =>
+                          current.map((row, at) =>
+                            at === index ? { ...row, shelf_life_days, best_before } : row,
+                          ),
+                        )
+                      }}
+                    />
+                    <DateField
+                      className="drafts__date"
+                      ariaLabel={`Дата для ${item.name}`}
+                      value={draftDate(item)}
+                      onChange={(best_before) => {
+                        const counted = best_before ? daysUntil(best_before) : null
+                        setDrafts((current) =>
+                          current.map((row, at) =>
+                            at === index
+                              ? { ...row, best_before, shelf_life_days: counted }
+                              : row,
+                          ),
+                        )
+                      }}
+                    />
+                  </label>
+                </div>
+                <div className="drafts__actions">
+                  <button className="drafts__add" type="button" onClick={() => saveDraft(index)} disabled={pending}>
+                    Добавить
+                  </button>
+                  <button
+                    className="drafts__drop"
+                    type="button"
+                    onClick={() => setDrafts((current) => current.filter((_, at) => at !== index))}
+                  >
+                    Убрать
+                  </button>
+                </div>
               </div>
+            ))}
+          </div>
+        )}
+
+        {method !== 'manual' && skipped.length > 0 && (
+          <div className="drafts">
+            <p className="drafts__hint">Не попало в список. Нажмите строку, чтобы добавить её самим.</p>
+            {skipped.map((row) => (
+              <button
+                key={row.line}
+                className="drafts__miss"
+                type="button"
+                onClick={() => takeSkipped(row.line)}
+              >
+                {row.line}
+              </button>
             ))}
           </div>
         )}
@@ -442,10 +852,13 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
               label="Название"
               value={form.name}
               onChange={(value) => {
+                categoryTouched.current = false
                 update({ name: value, productId: null })
                 clearError('name')
               }}
               onPick={({ product }) => {
+                categoryTouched.current = true
+                setCategoryOffer(false)
                 update({
                   name: product.name,
                   productId: product.id,
@@ -470,12 +883,16 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
                 className="field__input field__select"
                 value={form.category}
                 onChange={(event) => {
+                  categoryTouched.current = true
+                  setCategoryOffer(false)
                   update({ category: event.target.value })
                   clearError('category')
                 }}
               >
                 <option value="">Выберите категорию</option>
-                {categories.map((category) => (
+                {[...categories, ...extraCategories.filter(
+                  (extra) => !categories.some((category) => category.name.toLowerCase() === extra.name.toLowerCase()),
+                )].map((category) => (
                   <option key={category.id} value={category.name}>
                     {category.name}
                   </option>
@@ -483,6 +900,20 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
               </select>
             </div>
             {errors.category && <p className="field__error">{errors.category}</p>}
+            {categoryOffer && !form.category && (
+              <div className="category-offer">
+                <p>Такой категории нет. Создать её?</p>
+                <input
+                  className="field__input"
+                  value={newCategory}
+                  placeholder="Название категории"
+                  onChange={(event) => setNewCategory(event.target.value)}
+                />
+                <button className="btn btn--ghost" type="button" onClick={() => acceptCategory(newCategory)}>
+                  Создать
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="dialog__row">
@@ -538,12 +969,12 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
                 Дата покупки
               </label>
               <div className="field__control">
-                <input
+                <DateField
                   id="purchased-at"
                   className="field__input"
-                  type="date"
+                  ariaLabel="Дата покупки"
                   value={form.purchasedAt}
-                  onChange={(event) => update({ purchasedAt: event.target.value })}
+                  onChange={(purchasedAt) => update({ purchasedAt })}
                 />
               </div>
             </div>
@@ -553,13 +984,13 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
                 Срок годности
               </label>
               <div className="field__control">
-                <input
+                <DateField
                   id="best-before"
                   className="field__input"
-                  type="date"
+                  ariaLabel="Срок годности"
                   value={form.bestBefore}
-                  onChange={(event) => {
-                    update({ bestBefore: event.target.value })
+                  onChange={(bestBefore) => {
+                    update({ bestBefore })
                     clearError('bestBefore')
                   }}
                 />

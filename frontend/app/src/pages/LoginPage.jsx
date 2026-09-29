@@ -35,8 +35,8 @@ export default function LoginPage() {
 
     setPending(true)
     try {
-      await signIn(login, password)
-      navigate('/', { replace: true })
+      const account = await signIn(login, password)
+      navigate(account.role === 'admin' ? '/admin' : '/', { replace: true })
     } catch (error) {
       setFormError(error.message)
     } finally {

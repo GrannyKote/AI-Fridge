@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from ..models import (
@@ -28,6 +28,100 @@ def list_units(session: Session) -> Sequence[UnitOfMeasurement]:
 
 def list_places(session: Session) -> Sequence[StoragePlace]:
     return session.scalars(select(StoragePlace).order_by(StoragePlace.id)).all()
+
+
+def shelf_lookup_name(name: str, catalog_names: Sequence[str]) -> str | None:
+    """Точное имя каталога или самое длинное базовое имя внутри строки."""
+    cleaned = name.strip()
+    if not cleaned:
+        return None
+
+    by_fold = {}
+    for item in catalog_names:
+        text_name = item.strip()
+        if text_name:
+            by_fold.setdefault(text_name.lower().replace("ё", "е"), text_name)
+
+    folded = cleaned.lower().replace("ё", "е")
+    if folded in by_fold:
+        return by_fold[folded]
+
+    snapped = snap_to_catalog(cleaned, catalog_names)
+    snapped_fold = snapped.lower().replace("ё", "е")
+    if snapped_fold == folded:
+        return None
+    return by_fold.get(snapped_fold)
+
+
+def shelf_life(session: Session, name: str) -> tuple[str, int] | None:
+    """Срок базового продукта. «Молоко 2.5%» берёт срок у «молоко»."""
+    names = session.execute(
+        text(
+            """
+            SELECT name
+            FROM ml.base_product
+            WHERE shelf_life_days IS NOT NULL
+            """
+        )
+    ).scalars().all()
+    lookup = shelf_lookup_name(name, names)
+    if lookup is None:
+        return None
+
+    row = session.execute(
+        text(
+            """
+            SELECT name, shelf_life_days
+            FROM ml.base_product
+            WHERE lower(name) = lower(:name)
+              AND shelf_life_days IS NOT NULL
+            """
+        ),
+        {"name": lookup},
+    ).first()
+    if row is None:
+        return None
+    return row.name, int(row.shelf_life_days)
+
+
+def remember_shelf_life(session: Session, name: str, days: int) -> tuple[str, int]:
+    """Запоминает имя и срок. То же имя без учёта регистра обновляет дни, новое имя добавляется."""
+    cleaned = name.strip()
+    row = session.execute(
+        text(
+            """
+            SELECT id, name
+            FROM ml.base_product
+            WHERE lower(name) = lower(:name)
+            """
+        ),
+        {"name": cleaned},
+    ).first()
+    if row is None:
+        session.execute(
+            text(
+                """
+                INSERT INTO ml.base_product (name, shelf_life_days)
+                VALUES (:name, :days)
+                """
+            ),
+            {"name": cleaned, "days": days},
+        )
+        saved = cleaned
+    else:
+        session.execute(
+            text(
+                """
+                UPDATE ml.base_product
+                SET shelf_life_days = :days
+                WHERE id = :id
+                """
+            ),
+            {"days": days, "id": row.id},
+        )
+        saved = row.name
+    session.commit()
+    return saved, days
 
 
 def search_products(session: Session, query: str, limit: int = 5):
@@ -126,21 +220,58 @@ def get_product(session: Session, group_id: int, item_id: int):
     return session.execute(statement).mappings().first()
 
 
+def stored_name(name: str) -> str:
+    """Имя в кладовой с большой первой буквы."""
+    text = name.strip()
+    if not text:
+        return text
+    return text[0].upper() + text[1:]
+
+
+def snap_to_catalog(name: str, catalog_names: Sequence[str]) -> str:
+    """Самое длинное базовое имя внутри введённого. Бренд остаётся за пределами имени."""
+    cleaned = name.strip()
+    folded = cleaned.lower().replace("ё", "е")
+    if not folded:
+        return cleaned
+
+    best = ""
+    best_len = 0
+    for item in catalog_names:
+        candidate = item.strip().lower().replace("ё", "е")
+        if candidate and _has_term(folded, candidate) and len(candidate) > best_len:
+            best = item.strip()
+            best_len = len(candidate)
+    return best or cleaned
+
+
+def _has_term(folded: str, candidate: str) -> bool:
+    start = 0
+    while True:
+        at = folded.find(candidate, start)
+        if at < 0:
+            return False
+        before = at == 0 or not folded[at - 1].isalnum()
+        after = at + len(candidate)
+        if before and (after == len(folded) or not folded[after].isalnum()):
+            return True
+        start = at + 1
+
+
 def create_pantry_item(session: Session, group_id: int, payload: PantryItemCreate) -> dict:
     """Кладёт продукт в кладовую, заводя справочники, если их ещё нет."""
     unit = session.get(UnitOfMeasurement, payload.unit_id)
     if unit is None:
         raise ValueError("Единица измерения не найдена")
 
-    name = payload.name.strip()
-    product, category = catalog.ensure_product(
-        session, name, payload.category, payload.product_id
-    )
+    catalog_names = session.execute(text("SELECT name FROM ml.base_product")).scalars().all()
+    name = snap_to_catalog(payload.name, catalog_names)
+    product, category = catalog.ensure_product(session, name, payload.category, None)
 
     item = UserGroupProduct(
         id_user_group=group_id,
         id_product=product.id,
-        product_name=name,
+        product_name=stored_name(name),
         id_unit_of_measurement=unit.id,
         quantity=Decimal(str(payload.quantity)),
         best_before=payload.best_before,

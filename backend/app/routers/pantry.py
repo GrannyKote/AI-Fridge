@@ -11,6 +11,8 @@ from ..schemas import (
     PantryItemOut,
     PlaceOut,
     ProductSuggestionOut,
+    ShelfLifeIn,
+    ShelfLifeOut,
     UnitOut,
     UsageStatsOut,
     WasteCreate,
@@ -52,6 +54,26 @@ def units(session: Session = Depends(get_session)) -> list[UnitOut]:
 @router.get("/places", response_model=list[PlaceOut])
 def places(session: Session = Depends(get_session)) -> list[PlaceOut]:
     return [PlaceOut.model_validate(item) for item in pantry.list_places(session)]
+
+
+@router.put("/products/shelf-life", response_model=ShelfLifeOut)
+def remember_product_shelf_life(
+    payload: ShelfLifeIn,
+    session: Session = Depends(get_session),
+) -> ShelfLifeOut:
+    name, days = pantry.remember_shelf_life(session, payload.name, payload.shelf_life_days)
+    return ShelfLifeOut(name=name, shelf_life_days=days)
+
+
+@router.get("/products/shelf-life", response_model=ShelfLifeOut)
+def product_shelf_life(
+    name: str = Query(min_length=1, max_length=512),
+    session: Session = Depends(get_session),
+) -> ShelfLifeOut:
+    found = pantry.shelf_life(session, name)
+    if found is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "В каталоге нет такого имени")
+    return ShelfLifeOut(name=found[0], shelf_life_days=found[1])
 
 
 @router.get("/products/search", response_model=list[ProductSuggestionOut])

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { pantryApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { AppHeader } from '../components/AppHeader.jsx'
@@ -27,6 +28,7 @@ export default function ForecastPage() {
   const [tab, setTab] = useState('dates')
   const [menuOpen, setMenuOpen] = useState(false)
   const [toast, setToast] = useToast()
+  const navigate = useNavigate()
 
   const load = useCallback(
     async (silent = false) => {
@@ -87,11 +89,13 @@ export default function ForecastPage() {
           menuOpen={menuOpen}
           onToggleMenu={() => setMenuOpen((open) => !open)}
           alerts={alerts}
-          onBell={() =>
-            setToast(
-              alerts > 0 ? `Требуют внимания: ${alerts}` : 'Всё в порядке, сроки не горят',
-            )
-          }
+          onBell={() => {
+            if (alerts > 0) {
+              navigate('/', { state: { attention: true } })
+              return
+            }
+            setToast('Всё в порядке, сроки не горят')
+          }}
           onToast={setToast}
         />
 

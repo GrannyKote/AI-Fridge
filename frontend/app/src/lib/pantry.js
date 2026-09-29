@@ -2,6 +2,14 @@ export const SOON_THRESHOLD_DAYS = 4
 
 const MS_IN_DAY = 24 * 60 * 60 * 1000
 
+export function expiryDate(days, from = new Date()) {
+  const date = new Date(from.getFullYear(), from.getMonth(), from.getDate())
+  date.setDate(date.getDate() + days)
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${date.getFullYear()}-${month}-${day}`
+}
+
 export function daysUntil(bestBefore) {
   const target = new Date(`${bestBefore}T00:00:00`)
   const today = new Date()
@@ -74,25 +82,49 @@ export function actionAmount(raw, unit) {
   return unit ? `${formatNumber(amount)} ${unit}` : formatNumber(amount)
 }
 
-const MONTHS = [
-  'янв.',
-  'фев.',
-  'мар.',
-  'апр.',
-  'мая',
-  'июн.',
-  'июл.',
-  'авг.',
-  'сен.',
-  'окт.',
-  'ноя.',
-  'дек.',
-]
+export function formatRuDate(iso) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso ?? ''))
+  if (!match) {
+    return ''
+  }
+  return `${match[3]}.${match[2]}.${match[1]}`
+}
+
+export function maskRuDate(raw) {
+  const digits = String(raw ?? '').replace(/\D/g, '').slice(0, 8)
+  if (digits.length <= 2) {
+    return digits
+  }
+  if (digits.length <= 4) {
+    return `${digits.slice(0, 2)}.${digits.slice(2)}`
+  }
+  return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`
+}
+
+export function parseRuDate(text) {
+  const match = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(String(text ?? '').trim())
+  if (!match) {
+    return ''
+  }
+  const day = Number(match[1])
+  const month = Number(match[2])
+  const year = Number(match[3])
+  const date = new Date(year, month - 1, day)
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+    return ''
+  }
+  return `${match[3]}-${match[2]}-${match[1]}`
+}
+
+export function draftExpiryLabel(days, from = new Date()) {
+  if (!Number.isInteger(days) || days <= 0) {
+    return ''
+  }
+  return formatRuDate(expiryDate(days, from))
+}
 
 export function formatShortDate(bestBefore) {
-  const date = new Date(`${bestBefore}T00:00:00`)
-
-  return `${date.getDate()} ${MONTHS[date.getMonth()]}`
+  return formatRuDate(bestBefore)
 }
 
 // Срок годности хранится датой, поэтому продукт считается годным до её конца.

@@ -408,11 +408,11 @@
 }
 
 .drafts__head,
-.drafts__item {
+.drafts__facts {
   display: grid;
-  grid-template-columns: 1.4fr 0.8fr 1fr;
+  grid-template-columns: 0.85fr 0.5fr 1.1fr 1.15fr;
   gap: 8px;
-  align-items: center;
+  align-items: start;
 }
 
 .drafts__head {
@@ -424,14 +424,153 @@
 }
 
 .drafts__item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface);
 }
 
-.drafts__item span:last-child {
+.drafts__facts span:nth-child(n + 3) {
   color: var(--muted);
+}
+
+.drafts__name,
+.drafts__qty input,
+.drafts__days input {
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.drafts__days {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.drafts__qty,
+.drafts__place {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+}
+
+.drafts__qty span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.drafts__date {
+  font-size: 11px;
+  letter-spacing: -0.02em;
+}
+
+.drafts__place-select {
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 11px;
+}
+
+.drafts__place-icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: var(--muted);
+}
+
+.drafts__place-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.category-offer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.category-offer p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.drafts__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.drafts__add,
+.drafts__drop,
+.drafts__miss,
+.drafts__all {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.drafts__add,
+.drafts__drop {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+}
+
+.drafts__add,
+.drafts__all {
+  border: 0;
+  background: var(--green);
+  color: #06210f;
+}
+
+.drafts__all {
+  height: 36px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.drafts__all:disabled {
+  opacity: 0.6;
+}
+
+.drafts__drop,
+.drafts__miss {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+}
+
+.drafts__miss {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  text-align: left;
 }
 
 .add__form .field__label {

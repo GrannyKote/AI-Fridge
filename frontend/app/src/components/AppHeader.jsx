@@ -12,7 +12,7 @@ export function AppHeader({ menuOpen, onToggleMenu, alerts = 0, onBell, onToast 
   const { user } = useAuth()
   const { pathname } = useLocation()
   const groupId = user.groups?.[0]?.id
-  const showPlan = pathname !== '/settings'
+  const showPlan = pathname !== '/settings' && pathname !== '/feedback'
 
   const [planDate, setPlanDate] = useState(null)
   const [items, setItems] = useState([])
