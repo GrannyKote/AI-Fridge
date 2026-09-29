@@ -13,7 +13,7 @@ import '../styles/pantry.css'
 import '../styles/shopping.css'
 
 export default function ShoppingPage() {
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
   const groupId = user.groups?.[0]?.id
 
   const [items, setItems] = useState([])
@@ -22,7 +22,6 @@ export default function ShoppingPage() {
   const [error, setError] = useState('')
   const [addOpen, setAddOpen] = useState(false)
   const [planOpen, setPlanOpen] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
   const [deletingId, setDeletingId] = useState(null)
   const [toast, setToast] = useToast()
 
@@ -86,13 +85,9 @@ export default function ShoppingPage() {
   }
 
   return (
-    <div className={`pantry pantry--shop${menuOpen ? ' pantry--menu-open' : ''}`}>
+    <div className="pantry pantry--shop">
       <div className="pantry__app">
-        <AppHeader
-          menuOpen={menuOpen}
-          onToggleMenu={() => setMenuOpen((open) => !open)}
-          onToast={setToast}
-        />
+        <AppHeader onToast={setToast} />
 
         <main className="content">
           <div className="shop__toolbar">
@@ -179,12 +174,7 @@ export default function ShoppingPage() {
         </div>
       </div>
 
-      <PantryDock
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        onSignOut={signOut}
-        onSelectTab={(title) => setToast(`Раздел «${title}» в разработке`)}
-      />
+      <PantryDock />
 
       {addOpen && (
         <AddPurchaseDialog

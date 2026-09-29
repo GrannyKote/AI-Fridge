@@ -7,9 +7,9 @@ import { CheckoutDialog } from './CheckoutDialog.jsx'
 import { NotificationsDialog } from './NotificationsDialog.jsx'
 import { PlanPurchaseDialog } from './PlanPurchaseDialog.jsx'
 import { PlannedPurchaseBanner } from './PlannedPurchaseBanner.jsx'
-import { BellIcon, MenuIcon } from './icons.jsx'
+import { BellIcon } from './icons.jsx'
 
-export function AppHeader({ menuOpen, onToggleMenu, alerts = 0, onToast }) {
+export function AppHeader({ alerts = 0, onToast }) {
   const { user } = useAuth()
   const { pathname } = useLocation()
   const groupId = user.groups?.[0]?.id
@@ -54,16 +54,6 @@ export function AppHeader({ menuOpen, onToggleMenu, alerts = 0, onToast }) {
           <h1 className="topbar__name">{user.login}</h1>
 
           <div className="topbar__actions">
-            <button
-              className="icon-btn icon-btn--round"
-              type="button"
-              onClick={onToggleMenu}
-              aria-label={menuOpen ? 'Скрыть меню' : 'Показать меню'}
-              aria-expanded={menuOpen}
-            >
-              <MenuIcon />
-            </button>
-
             <button
               className="icon-btn icon-btn--round"
               type="button"

@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { CartIcon, ChartIcon, FridgeIcon, LogoutIcon, PlusIcon, UserIcon } from './icons.jsx'
+import { APP_VERSION } from '../lib/appVersion.js'
+import { CartIcon, ChartIcon, FridgeIcon, PlusIcon, UserIcon } from './icons.jsx'
 
 const TABS = [
   { key: 'pantry', title: 'Кладовая', icon: <FridgeIcon />, path: '/' },
@@ -9,87 +9,42 @@ const TABS = [
   { key: 'settings', title: 'Настройки', icon: <UserIcon />, path: '/settings' },
 ]
 
-export function PantryDock({ open, onClose, onSignOut, onAdd, onSelectTab }) {
+export function PantryDock({ onAdd }) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
-  useEffect(() => {
-    if (!open) {
-      return undefined
-    }
-
-    function handleKeyDown(event) {
-      if (event.key === 'Escape') {
-        onClose()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [open, onClose])
-
-  function selectTab(tab) {
-    if (!tab.path) {
-      onSelectTab(tab.title)
-      return
-    }
-
-    if (tab.path === pathname) {
-      onClose()
-      return
-    }
-
-    navigate(tab.path)
-  }
-
   return (
-    <>
-      {open && (
-        <button
-          className="dock__backdrop"
-          type="button"
-          onClick={onClose}
-          aria-label="Закрыть меню"
-        />
-      )}
+    <div className="dock">
+      <div className="dock__inner">
+        {onAdd && (
+          <button className="fab" type="button" onClick={onAdd} aria-label="Добавить продукт">
+            <PlusIcon />
+          </button>
+        )}
 
-      <div className={`dock${open ? ' dock--open' : ''}`}>
-        <div className="dock__inner">
-          {onAdd && (
-            <button className="fab" type="button" onClick={onAdd} aria-label="Добавить продукт">
-              <PlusIcon />
-            </button>
-          )}
+        <div className="dock__panel">
+          <nav className="tabbar" aria-label="Основная навигация">
+            {TABS.map((tab) => {
+              const active = tab.path === pathname
 
-          <div className="dock__panel" hidden={!open}>
-            <div className="dock__account">
-              <button className="dock__logout" type="button" onClick={onSignOut}>
-                <LogoutIcon />
-                Выйти
-              </button>
-            </div>
+              return (
+                <button
+                  key={tab.key}
+                  className={`tab${active ? ' is-active' : ''}`}
+                  type="button"
+                  onClick={() => !active && navigate(tab.path)}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  {tab.icon}
+                  <span>{tab.title}</span>
+                </button>
+              )
+            })}
+          </nav>
 
-            <nav className="tabbar" aria-label="Основная навигация">
-              {TABS.map((tab) => {
-                const active = tab.path === pathname
-
-                return (
-                  <button
-                    key={tab.key}
-                    className={`tab${active ? ' is-active' : ''}`}
-                    type="button"
-                    onClick={() => selectTab(tab)}
-                    aria-current={active ? 'page' : undefined}
-                  >
-                    {tab.icon}
-                    <span>{tab.title}</span>
-                  </button>
-                )
-              })}
-            </nav>
-          </div>
+          <p className="dock__version">{APP_VERSION}</p>
         </div>
       </div>
-    </>
+    </div>
   )
 }

@@ -18,14 +18,13 @@ const TABS = [
 ]
 
 export default function ForecastPage() {
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
   const groupId = user.groups?.[0]?.id
 
   const [products, setProducts] = useState([])
   const [state, setState] = useState('loading')
   const [error, setError] = useState('')
   const [tab, setTab] = useState('dates')
-  const [menuOpen, setMenuOpen] = useState(false)
   const [toast, setToast] = useToast()
 
   const load = useCallback(
@@ -81,14 +80,9 @@ export default function ForecastPage() {
   )
 
   return (
-    <div className={`pantry${menuOpen ? ' pantry--menu-open' : ''}`}>
+    <div className="pantry">
       <div className="pantry__app">
-        <AppHeader
-          menuOpen={menuOpen}
-          onToggleMenu={() => setMenuOpen((open) => !open)}
-          alerts={alerts}
-          onToast={setToast}
-        />
+        <AppHeader alerts={alerts} onToast={setToast} />
 
         <main className="content">
           <div className="segmented" role="tablist" aria-label="Тип прогноза">
@@ -157,12 +151,7 @@ export default function ForecastPage() {
         </main>
       </div>
 
-      <PantryDock
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        onSignOut={signOut}
-        onSelectTab={(title) => setToast(`Раздел «${title}» в разработке`)}
-      />
+      <PantryDock />
 
       <div className={`toast${toast ? ' is-visible' : ''}`} role="status" aria-live="polite">
         {toast}

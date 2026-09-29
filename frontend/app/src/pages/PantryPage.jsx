@@ -21,7 +21,7 @@ const GROUPS = [
 ]
 
 export default function PantryPage() {
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
   const groupId = user.groups?.[0]?.id
 
   const [categories, setCategories] = useState([])
@@ -32,7 +32,6 @@ export default function PantryPage() {
   const [query, setQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
   const [activePlace, setActivePlace] = useState('all')
-  const [menuOpen, setMenuOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
   const [consumeTarget, setConsumeTarget] = useState(null)
   const [wasteTarget, setWasteTarget] = useState(null)
@@ -173,14 +172,9 @@ export default function PantryPage() {
   }
 
   return (
-    <div className={`pantry${menuOpen ? ' pantry--menu-open' : ''}`}>
+    <div className="pantry">
       <div className="pantry__app">
-        <AppHeader
-          menuOpen={menuOpen}
-          onToggleMenu={() => setMenuOpen((open) => !open)}
-          alerts={stats.expired + stats.soon}
-          onToast={setToast}
-        />
+        <AppHeader alerts={stats.expired + stats.soon} onToast={setToast} />
 
         <main className="content">
           <section className="stats" aria-label="Сводка по кладовой">
@@ -310,16 +304,7 @@ export default function PantryPage() {
         </main>
       </div>
 
-      <PantryDock
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        onSignOut={signOut}
-        onAdd={() => {
-          setMenuOpen(false)
-          setAddOpen(true)
-        }}
-        onSelectTab={(title) => setToast(`Раздел «${title}» в разработке`)}
-      />
+      <PantryDock onAdd={() => setAddOpen(true)} />
 
       {addOpen && (
         <AddProductDialog
