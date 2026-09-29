@@ -23,7 +23,6 @@ export default function SettingsPage() {
         <AppHeader
           menuOpen={menuOpen}
           onToggleMenu={() => setMenuOpen((open) => !open)}
-          onBell={() => setToast('Уведомления появятся позже')}
           onToast={setToast}
         />
 

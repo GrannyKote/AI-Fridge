@@ -10,6 +10,11 @@ const PRESETS = [
 ]
 
 function shareOf(available, ratio) {
+  // «Всё» — это ровно остаток, без округления дробной части.
+  if (ratio === 1) {
+    return available
+  }
+
   const value = available * ratio
 
   if (Number.isInteger(available)) {

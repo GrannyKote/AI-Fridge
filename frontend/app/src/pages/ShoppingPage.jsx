@@ -91,7 +91,6 @@ export default function ShoppingPage() {
         <AppHeader
           menuOpen={menuOpen}
           onToggleMenu={() => setMenuOpen((open) => !open)}
-          onBell={() => setToast('Уведомления появятся позже')}
           onToast={setToast}
         />
 

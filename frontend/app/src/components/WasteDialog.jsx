@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { pantryApi } from '../api/client.js'
 import { FormAlert } from './FormAlert.jsx'
 import { QuantityPicker, ProductHead } from './QuantityPicker.jsx'
-import { actionAmount, amountError, parseAmount } from '../lib/pantry.js'
+import { actionAmount, amountError, formatNumber, parseAmount } from '../lib/pantry.js'
 import '../styles/dialog.css'
 
 const REASONS = [
@@ -11,13 +11,15 @@ const REASONS = [
 ]
 
 export function WasteDialog({ groupId, product, onClose, onWasted }) {
+  const available = Number(product.remaining ?? product.quantity)
+
   const [reason, setReason] = useState('spoiled')
-  const [quantity, setQuantity] = useState('')
+  // Испорченный продукт обычно выбрасывают целиком, поэтому подставляем весь остаток.
+  const [quantity, setQuantity] = useState(() => formatNumber(available))
   const [error, setError] = useState('')
   const [formError, setFormError] = useState('')
   const [pending, setPending] = useState(false)
 
-  const available = Number(product.remaining ?? product.quantity)
   const spoiled = reason === 'spoiled'
   const summary = actionAmount(quantity, product.unit)
 

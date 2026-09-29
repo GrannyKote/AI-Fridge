@@ -179,13 +179,6 @@ export default function PantryPage() {
           menuOpen={menuOpen}
           onToggleMenu={() => setMenuOpen((open) => !open)}
           alerts={stats.expired + stats.soon}
-          onBell={() =>
-            setToast(
-              stats.expired + stats.soon > 0
-                ? `Требуют внимания: ${stats.expired + stats.soon}`
-                : 'Всё в порядке, сроки не горят',
-            )
-          }
           onToast={setToast}
         />
 

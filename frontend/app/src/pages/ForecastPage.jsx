@@ -87,11 +87,6 @@ export default function ForecastPage() {
           menuOpen={menuOpen}
           onToggleMenu={() => setMenuOpen((open) => !open)}
           alerts={alerts}
-          onBell={() =>
-            setToast(
-              alerts > 0 ? `Требуют внимания: ${alerts}` : 'Всё в порядке, сроки не горят',
-            )
-          }
           onToast={setToast}
         />
 

@@ -4,11 +4,12 @@ import { shoppingApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { notifyPurchaseChanged, usePurchaseChanged } from '../lib/purchaseEvents.js'
 import { CheckoutDialog } from './CheckoutDialog.jsx'
+import { NotificationsDialog } from './NotificationsDialog.jsx'
 import { PlanPurchaseDialog } from './PlanPurchaseDialog.jsx'
 import { PlannedPurchaseBanner } from './PlannedPurchaseBanner.jsx'
 import { BellIcon, MenuIcon } from './icons.jsx'
 
-export function AppHeader({ menuOpen, onToggleMenu, alerts = 0, onBell, onToast }) {
+export function AppHeader({ menuOpen, onToggleMenu, alerts = 0, onToast }) {
   const { user } = useAuth()
   const { pathname } = useLocation()
   const groupId = user.groups?.[0]?.id
@@ -18,6 +19,7 @@ export function AppHeader({ menuOpen, onToggleMenu, alerts = 0, onBell, onToast 
   const [items, setItems] = useState([])
   const [planOpen, setPlanOpen] = useState(false)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
 
   const loadPlan = useCallback(async () => {
     if (!groupId) {
@@ -65,8 +67,9 @@ export function AppHeader({ menuOpen, onToggleMenu, alerts = 0, onBell, onToast 
             <button
               className="icon-btn icon-btn--round"
               type="button"
-              onClick={onBell}
+              onClick={() => setNotificationsOpen(true)}
               aria-label={alerts > 0 ? `Уведомления, ${alerts}` : 'Уведомления'}
+              aria-expanded={notificationsOpen}
             >
               <BellIcon />
               {alerts > 0 && <span className="icon-btn__badge">{alerts}</span>}
@@ -91,6 +94,10 @@ export function AppHeader({ menuOpen, onToggleMenu, alerts = 0, onBell, onToast 
           </div>
         )}
       </header>
+
+      {notificationsOpen && (
+        <NotificationsDialog onClose={() => setNotificationsOpen(false)} />
+      )}
 
       {planOpen && groupId && (
         <PlanPurchaseDialog
