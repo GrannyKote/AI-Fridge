@@ -232,7 +232,9 @@ export default function PantryPage() {
                   key={category.id}
                   className={`chip${activeCategory === category.id ? ' is-active' : ''}`}
                   type="button"
-                  onClick={() => setActiveCategory(category.id)}
+                  onClick={() =>
+                    setActiveCategory((current) => (current === category.id ? 'all' : category.id))
+                  }
                 >
                   {category.name}
                 </button>
@@ -252,7 +254,9 @@ export default function PantryPage() {
                   key={place.id}
                   className={`chip${activePlace === place.id ? ' is-active' : ''}`}
                   type="button"
-                  onClick={() => setActivePlace(place.id)}
+                  onClick={() =>
+                    setActivePlace((current) => (current === place.id ? 'all' : place.id))
+                  }
                 >
                   {place.name}
                 </button>
