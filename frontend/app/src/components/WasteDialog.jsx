@@ -101,6 +101,7 @@ export function WasteDialog({ groupId, product, onClose, onWasted }) {
               }}
               label="Сколько списать?"
               error={error}
+              showTrack={false}
             />
           ) : (
             <p className="writeoff__note">Запись скроется из кладовой, количество списывать не нужно.</p>

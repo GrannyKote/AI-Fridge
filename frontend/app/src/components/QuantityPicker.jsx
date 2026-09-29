@@ -52,7 +52,15 @@ export function ProductHead({ product, available }) {
   )
 }
 
-export function QuantityPicker({ product, available, value, onChange, label, error }) {
+export function QuantityPicker({
+  product,
+  available,
+  value,
+  onChange,
+  label,
+  error,
+  showTrack = true,
+}) {
   const amount = parseAmount(value)
   const safeAmount = Number.isFinite(amount) && amount > 0 ? Math.min(amount, available) : 0
   const step = stepSize(available, product.unit)
@@ -119,9 +127,11 @@ export function QuantityPicker({ product, available, value, onChange, label, err
         {product.unit && <span className="writeoff__unit">{product.unit}</span>}
       </div>
 
-      <div className="writeoff__track" aria-hidden="true">
-        <i className="writeoff__fill" style={{ width: `${ratio}%` }} />
-      </div>
+      {showTrack && (
+        <div className="writeoff__track" aria-hidden="true">
+          <i className="writeoff__fill" style={{ width: `${ratio}%` }} />
+        </div>
+      )}
 
       {error && <p className="field__error">{error}</p>}
     </div>
