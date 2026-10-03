@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { pantryApi, shoppingApi } from '../api/client.js'
+import { newsApi, pantryApi, shoppingApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { mergeMatchingProducts } from '../lib/pantry.js'
 import { notifyPurchaseChanged, usePurchaseChanged } from '../lib/purchaseEvents.js'
@@ -28,7 +28,13 @@ export function AppHeader({ onToast }) {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [newsOpen, setNewsOpen] = useState(false)
+  const [unreadNews, setUnreadNews] = useState(0)
   const [feedbackOpen, setFeedbackOpen] = useState(false)
+
+  const loadNews = useCallback(async () => {
+    const news = await newsApi.list().catch(() => [])
+    setUnreadNews(news.filter((item) => !item.is_seen).length)
+  }, [])
 
   const load = useCallback(async () => {
     if (!groupId) {
@@ -52,6 +58,10 @@ export function AppHeader({ onToast }) {
   useEffect(() => {
     load()
   }, [load])
+
+  useEffect(() => {
+    loadNews()
+  }, [loadNews])
 
   usePurchaseChanged(load)
 
@@ -99,10 +109,11 @@ export function AppHeader({ onToast }) {
               className="icon-btn icon-btn--round"
               type="button"
               onClick={() => setNewsOpen(true)}
-              aria-label="Новости"
+              aria-label={unreadNews > 0 ? `Новости, ${unreadNews}` : 'Новости'}
               aria-expanded={newsOpen}
             >
               <NewsIcon />
+              {unreadNews > 0 && <span className="icon-btn__badge">{unreadNews}</span>}
             </button>
 
             <button
@@ -147,7 +158,12 @@ export function AppHeader({ onToast }) {
         />
       )}
 
-      {newsOpen && <NewsDialog onClose={() => setNewsOpen(false)} />}
+      {newsOpen && (
+        <NewsDialog
+          onClose={() => setNewsOpen(false)}
+          onChanged={loadNews}
+        />
+      )}
 
       {feedbackOpen && (
         <FeedbackDialog

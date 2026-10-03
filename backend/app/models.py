@@ -209,3 +209,26 @@ class FeedbackItem(Base):
     id_feedback: Mapped[int] = mapped_column(Integer, nullable=False)
     # Сама картинка, приложенная к отзыву.
     item: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+
+
+class News(Base):
+    __tablename__ = "news"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id_user_created: Mapped[int] = mapped_column(Integer, nullable=False)
+    datetime_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    header: Mapped[str] = mapped_column(String(1024), nullable=False)
+    body: Mapped[str | None] = mapped_column(Text)
+
+
+# В базе у user_news_seen составной первичный ключ (id, id_news, id_user_seen).
+# Для ORM достаточно колонки id: она заполняется из последовательности.
+class UserNewsSeen(Base):
+    __tablename__ = "user_news_seen"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id_news: Mapped[int] = mapped_column(Integer, nullable=False)
+    id_user_seen: Mapped[int] = mapped_column(Integer, nullable=False)
+    datetime_seen: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)

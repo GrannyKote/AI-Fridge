@@ -195,3 +195,16 @@ class FeedbackOut(BaseModel):
     datetime_created: datetime
     feedback_text: str
     items: list[FeedbackItemOut] = []
+
+
+class NewsListItemOut(BaseModel):
+    id: int
+    header: str
+    is_seen: bool = False
+
+
+class NewsOut(BaseModel):
+    id: int
+    header: str
+    body: str = ""
+    is_seen: bool = False

@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from .config import settings
 from .database import get_session
-from .routers import auth, feedback, pantry, shopping
+from .routers import auth, feedback, news, pantry, shopping
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -28,6 +28,7 @@ app.include_router(auth.router)
 app.include_router(pantry.router)
 app.include_router(shopping.router)
 app.include_router(feedback.router)
+app.include_router(news.router)
 
 
 @app.exception_handler(OperationalError)

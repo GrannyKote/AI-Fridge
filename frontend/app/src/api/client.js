@@ -100,6 +100,11 @@ export const pantryApi = {
     }),
 }
 
+export const newsApi = {
+  list: () => request('/news'),
+  markSeen: (newsId) => request(`/news/${newsId}/seen`, { method: 'POST' }),
+}
+
 export const feedbackApi = {
   create: (text, files = []) => {
     const form = new FormData()
