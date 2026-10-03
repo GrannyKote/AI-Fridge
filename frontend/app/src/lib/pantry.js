@@ -34,9 +34,14 @@ export function statusOf(item) {
   return days <= soonThresholdOf(item) ? 'soon' : 'fresh'
 }
 
-// Дата для <input type="date"> по локальному времени: сегодня плюс сдвиг в днях.
-export function dateAfterDays(days = 0) {
-  const date = new Date()
+// Дата для <input type="date"> по локальному времени: база плюс сдвиг в днях.
+export function dateAfterDays(days = 0, from) {
+  const date = from ? new Date(`${from}T00:00:00`) : new Date()
+
+  if (Number.isNaN(date.getTime())) {
+    return dateAfterDays(days)
+  }
+
   date.setDate(date.getDate() + days)
 
   const month = String(date.getMonth() + 1).padStart(2, '0')

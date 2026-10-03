@@ -291,6 +291,22 @@
   background-repeat: no-repeat;
 }
 
+.field__stepper {
+  display: grid;
+  grid-template-columns: var(--control-h) 1fr var(--control-h);
+  gap: 8px;
+}
+
+.field__stepper .stepper {
+  width: var(--control-h);
+  height: var(--control-h);
+  border-radius: var(--radius);
+}
+
+.field__stepper .field__input {
+  min-width: 0;
+}
+
 .field__input[type='date'] {
   padding-right: 12px;
 }

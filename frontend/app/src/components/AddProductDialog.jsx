@@ -11,7 +11,9 @@ import {
   HouseIcon,
   IceIcon,
   MicIcon,
+  MinusIcon,
   PencilIcon,
+  PlusIcon,
   SnowflakeIcon,
   SpiceIcon,
 } from './icons.jsx'
@@ -394,41 +396,63 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
             {errors.price && <p className="field__error">{errors.price}</p>}
           </div>
 
-          <div className="dialog__row">
-            <div className="field">
-              <label className="field__label" htmlFor="purchased-at">
-                Дата покупки
-              </label>
-              <div className="field__control">
-                <input
-                  id="purchased-at"
-                  className="field__input"
-                  type="date"
-                  value={form.purchasedAt}
-                  onChange={(event) => update({ purchasedAt: event.target.value })}
-                />
-              </div>
+          <div className="field">
+            <label className="field__label" htmlFor="purchased-at">
+              Дата покупки
+            </label>
+            <div className="field__control">
+              <input
+                id="purchased-at"
+                className="field__input"
+                type="date"
+                value={form.purchasedAt}
+                onChange={(event) => update({ purchasedAt: event.target.value })}
+              />
             </div>
+          </div>
 
-            <div className={`field${errors.bestBefore ? ' field--invalid' : ''}`}>
-              <label className="field__label" htmlFor="best-before">
-                Срок годности
-              </label>
-              <div className="field__control">
-                <input
-                  id="best-before"
-                  className="field__input"
-                  type="date"
-                  value={form.bestBefore}
-                  onChange={(event) => {
-                    setBestBeforeTouched(true)
-                    update({ bestBefore: event.target.value })
-                    clearError('bestBefore')
-                  }}
-                />
-              </div>
-              {errors.bestBefore && <p className="field__error">{errors.bestBefore}</p>}
+          <div className={`field${errors.bestBefore ? ' field--invalid' : ''}`}>
+            <label className="field__label" htmlFor="best-before">
+              Срок годности
+            </label>
+            <div className="field__control field__stepper">
+              <button
+                className="stepper"
+                type="button"
+                onClick={() => {
+                  setBestBeforeTouched(true)
+                  update({ bestBefore: dateAfterDays(-1, form.bestBefore) })
+                  clearError('bestBefore')
+                }}
+                aria-label="На день раньше"
+              >
+                <MinusIcon />
+              </button>
+              <input
+                id="best-before"
+                className="field__input"
+                type="date"
+                value={form.bestBefore}
+                onChange={(event) => {
+                  setBestBeforeTouched(true)
+                  update({ bestBefore: event.target.value })
+                  clearError('bestBefore')
+                }}
+              />
+              <button
+                className="stepper"
+                type="button"
+                onClick={() => {
+                  setBestBeforeTouched(true)
+                  update({ bestBefore: dateAfterDays(1, form.bestBefore) })
+                  clearError('bestBefore')
+                }}
+                aria-label="На день позже"
+              >
+                <PlusIcon />
+              </button>
             </div>
+            {errors.bestBefore && <p className="field__error">{errors.bestBefore}</p>}
           </div>
 
           <fieldset className={`places${errors.placeId ? ' field--invalid' : ''}`}>
