@@ -34,9 +34,73 @@ export function statusOf(item) {
   return days <= soonThresholdOf(item) ? 'soon' : 'fresh'
 }
 
-// Дата для <input type="date"> по локальному времени: база плюс сдвиг в днях.
+function pad2(value) {
+  return String(value).padStart(2, '0')
+}
+
+function toIsoFromParts(year, month, day) {
+  const date = new Date(year, month - 1, day)
+
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return ''
+  }
+
+  return `${year}-${pad2(month)}-${pad2(day)}`
+}
+
+export function toIsoDate(value) {
+  if (!value) {
+    return ''
+  }
+
+  const iso = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (iso) {
+    return toIsoFromParts(Number(iso[1]), Number(iso[2]), Number(iso[3]))
+  }
+
+  const display = String(value).match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+  if (display) {
+    return toIsoFromParts(Number(display[3]), Number(display[2]), Number(display[1]))
+  }
+
+  return ''
+}
+
+export function toDisplayDate(iso) {
+  const value = toIsoDate(iso)
+
+  if (!value) {
+    return ''
+  }
+
+  const [year, month, day] = value.split('-')
+  return `${day}/${month}/${year}`
+}
+
+export function maskDateInput(raw) {
+  const digits = String(raw).replace(/\D/g, '').slice(0, 8)
+  const day = digits.slice(0, 2)
+  const month = digits.slice(2, 4)
+  const year = digits.slice(4, 8)
+
+  if (digits.length <= 2) {
+    return day
+  }
+  if (digits.length <= 4) {
+    return `${day}/${month}`
+  }
+
+  return `${day}/${month}/${year}`
+}
+
+// Дата в ISO по локальному времени: база плюс сдвиг в днях.
 export function dateAfterDays(days = 0, from) {
-  const date = from ? new Date(`${from}T00:00:00`) : new Date()
+  const iso = toIsoDate(from)
+  const date = iso ? new Date(`${iso}T00:00:00`) : new Date()
 
   if (Number.isNaN(date.getTime())) {
     return dateAfterDays(days)
@@ -44,10 +108,7 @@ export function dateAfterDays(days = 0, from) {
 
   date.setDate(date.getDate() + days)
 
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-
-  return `${date.getFullYear()}-${month}-${day}`
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`
 }
 
 // Срок годности по умолчанию: сегодня плюс expires_in из справочника.

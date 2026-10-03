@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { pantryApi, shoppingApi } from '../api/client.js'
 import { defaultBestBeforeOf, formatNumber } from '../lib/pantry.js'
+import { DateInput } from './DateInput.jsx'
 import { FormAlert } from './FormAlert.jsx'
 import { ArrowLeftIcon, CheckIcon } from './icons.jsx'
 import '../styles/dialog.css'
@@ -222,15 +223,13 @@ export function CheckoutDialog({ groupId, items, onClose, onDone }) {
                     Срок годности
                   </label>
                   <div className="field__control">
-                    <input
+                    <DateInput
                       id={`bb-${row.id}`}
-                      className="field__input"
-                      type="date"
                       value={row.bestBefore}
                       disabled={!row.checked}
-                      onChange={(event) =>
+                      onChange={(bestBefore) =>
                         patchRow(row.id, {
-                          bestBefore: event.target.value,
+                          bestBefore,
                           errors: { ...row.errors, bestBefore: '' },
                         })
                       }

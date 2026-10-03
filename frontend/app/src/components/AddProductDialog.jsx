@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { pantryApi } from '../api/client.js'
 import { dateAfterDays, defaultBestBeforeOf } from '../lib/pantry.js'
+import { DateInput } from './DateInput.jsx'
 import { FormAlert } from './FormAlert.jsx'
 import { SuggestInput } from './SuggestInput.jsx'
 import {
@@ -401,12 +402,10 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
               Дата покупки
             </label>
             <div className="field__control">
-              <input
+              <DateInput
                 id="purchased-at"
-                className="field__input"
-                type="date"
                 value={form.purchasedAt}
-                onChange={(event) => update({ purchasedAt: event.target.value })}
+                onChange={(purchasedAt) => update({ purchasedAt })}
               />
             </div>
           </div>
@@ -428,14 +427,12 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
               >
                 <MinusIcon />
               </button>
-              <input
+              <DateInput
                 id="best-before"
-                className="field__input"
-                type="date"
                 value={form.bestBefore}
-                onChange={(event) => {
+                onChange={(bestBefore) => {
                   setBestBeforeTouched(true)
-                  update({ bestBefore: event.target.value })
+                  update({ bestBefore })
                   clearError('bestBefore')
                 }}
               />

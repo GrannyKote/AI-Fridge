@@ -303,16 +303,37 @@
   border-radius: var(--radius);
 }
 
-.field__stepper .field__input {
+.field__stepper .field__input,
+.field__stepper .field__date {
   min-width: 0;
 }
 
-.field__input[type='date'] {
-  padding-right: 12px;
+.field__date {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
 }
 
-.field__input[type='date']::-webkit-calendar-picker-indicator {
-  filter: invert(0.7);
+.field__date .field__toggle {
+  pointer-events: none;
+}
+
+.field__date-picker {
+  position: absolute;
+  right: 6px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.field__date-picker::-webkit-calendar-picker-indicator {
+  width: 40px;
+  height: 40px;
   cursor: pointer;
 }
 
