@@ -1,4 +1,4 @@
-import { categoryView, formatAmount, formatNumber, parseAmount } from '../lib/pantry.js'
+import { categoryView, displayProductName, formatAmount, formatNumber, parseAmount } from '../lib/pantry.js'
 import { MinusIcon, PlusIcon } from './icons.jsx'
 import '../styles/pantry.css'
 
@@ -45,7 +45,7 @@ export function ProductHead({ product, available }) {
         {emoji}
       </div>
       <div>
-        <h3 className="writeoff__name">{product.name}</h3>
+        <h3 className="writeoff__name">{displayProductName(product.name)}</h3>
         <p className="writeoff__stock">В наличии: {formatAmount({ ...product, remaining: available })}</p>
       </div>
     </div>

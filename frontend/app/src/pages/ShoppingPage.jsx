@@ -6,7 +6,7 @@ import { AppHeader } from '../components/AppHeader.jsx'
 import { PantryDock } from '../components/PantryDock.jsx'
 import { PlanPurchaseDialog } from '../components/PlanPurchaseDialog.jsx'
 import { BagIcon, CalendarIcon, ShareIcon, SparkIcon, TrashIcon } from '../components/icons.jsx'
-import { formatAmount } from '../lib/pantry.js'
+import { displayProductName, formatAmount } from '../lib/pantry.js'
 import { notifyPurchaseChanged, usePurchaseChanged } from '../lib/purchaseEvents.js'
 import { useToast } from '../lib/useToast.js'
 import '../styles/pantry.css'
@@ -62,7 +62,7 @@ export default function ShoppingPage() {
   function handleCreated(item) {
     setAddOpen(false)
     setItems((current) => [...current, item])
-    setToast(`«${item.name}» добавлен в список`)
+    setToast(`«${displayProductName(item.name)}» добавлен в список`)
     notifyPurchaseChanged()
   }
 
@@ -75,7 +75,7 @@ export default function ShoppingPage() {
     try {
       await shoppingApi.remove(groupId, item.id)
       setItems((current) => current.filter((entry) => entry.id !== item.id))
-      setToast(`«${item.name}» удалён из списка`)
+      setToast(`«${displayProductName(item.name)}» удалён из списка`)
       notifyPurchaseChanged()
     } catch (deleteError) {
       setToast(deleteError.message)
@@ -147,7 +147,7 @@ export default function ShoppingPage() {
               {items.map((item) => (
                 <li className="shop__item" key={item.id}>
                   <span className="shop__body">
-                    <span className="shop__name">{item.name}</span>
+                    <span className="shop__name">{displayProductName(item.name)}</span>
                     <span className="shop__meta">{formatAmount(item)}</span>
                   </span>
                   <button
@@ -155,7 +155,7 @@ export default function ShoppingPage() {
                     type="button"
                     onClick={() => handleDelete(item)}
                     disabled={deletingId === item.id}
-                    aria-label={`Удалить «${item.name}»`}
+                    aria-label={`Удалить «${displayProductName(item.name)}»`}
                   >
                     <TrashIcon />
                   </button>

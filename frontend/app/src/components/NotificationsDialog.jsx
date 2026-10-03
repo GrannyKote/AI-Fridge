@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { statusOf } from '../lib/pantry.js'
+import { displayProductName, statusOf } from '../lib/pantry.js'
 import { ClockIcon, WarningIcon } from './icons.jsx'
 import '../styles/dialog.css'
 
@@ -60,7 +60,7 @@ export function NotificationsDialog({ products = [], onClose, onGo, onViewed }) 
                 <ul className="notifications__list">
                   {group.items.map((product) => (
                     <li className="notifications__item" key={product.id}>
-                      {product.name}
+                      {displayProductName(product.name)}
                     </li>
                   ))}
                 </ul>

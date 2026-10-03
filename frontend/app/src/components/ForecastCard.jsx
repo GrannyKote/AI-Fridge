@@ -3,6 +3,7 @@ import {
   categoryView,
   deadlineCounter,
   deadlineText,
+  displayProductName,
   formatAmount,
   formatShortDate,
   shortPlaceOf,
@@ -22,7 +23,7 @@ export function ForecastCard({ product }) {
       </div>
 
       <div className="fcard__body">
-        <h3 className="card__title">{product.name}</h3>
+        <h3 className="card__title">{displayProductName(product.name)}</h3>
         <p className={`fcard__deadline fcard__deadline--${status}`}>
           <ClockIcon />
           {deadlineText(product)}

@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from .catalog import capitalized_name
 from ..models import (
     ProductCategory,
     UnitOfMeasurement,
@@ -91,7 +92,7 @@ def _series(rows, start: datetime, period_days: int) -> dict[str, dict]:
     series: dict[str, dict] = {}
 
     for row in rows:
-        name = row["product_name"]
+        name = capitalized_name(row["product_name"])
         item = series.get(name)
 
         if item is None:
@@ -121,7 +122,7 @@ def _products(eaten, wasted, start: datetime, period_days: int) -> list[dict]:
 
     for rows in (eaten, wasted):
         for row in rows:
-            name = row["product_name"]
+            name = capitalized_name(row["product_name"])
 
             if name not in view:
                 view[name] = {

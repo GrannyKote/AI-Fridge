@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { pantryApi } from '../api/client.js'
-import { dateAfterDays, defaultBestBeforeOf } from '../lib/pantry.js'
+import { dateAfterDays, defaultBestBeforeOf, displayProductName } from '../lib/pantry.js'
 import { DateInput } from './DateInput.jsx'
 import { FormAlert } from './FormAlert.jsx'
 import { SuggestInput } from './SuggestInput.jsx'
@@ -66,7 +66,48 @@ function placeIdOf(places, name, category) {
   return String(places.find((place) => place.name === wanted)?.id ?? places[0]?.id ?? '')
 }
 
-export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
+function suggestionOf(product, key) {
+  return {
+    key,
+    label: displayProductName(product.name),
+    meta: product.category ?? '',
+    product,
+  }
+}
+
+function localSuggestions(products, query) {
+  const seen = new Set()
+  const items = []
+
+  for (const product of products) {
+    const name = product.name?.trim()
+    const key = name?.toLowerCase()
+
+    if (!name || seen.has(key)) {
+      continue
+    }
+
+    seen.add(key)
+    items.push(
+      suggestionOf(
+        {
+          name,
+          category: product.category ?? '',
+          expires_in: product.expires_in,
+        },
+        `local-${key}`,
+      ),
+    )
+  }
+
+  const prefix = query.trim().toLowerCase()
+  return (prefix ? items.filter((item) => item.label.toLowerCase().startsWith(prefix)) : items).slice(
+    0,
+    12,
+  )
+}
+
+export function AddProductDialog({ groupId, categories, products = [], onClose, onCreated }) {
   const [form, setForm] = useState(EMPTY_FORM)
   const [method, setMethod] = useState('manual')
   const [units, setUnits] = useState([])
@@ -132,29 +173,26 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
   useEffect(() => {
     const query = form.name.trim()
 
-    if (query.length < 1) {
+    if (!query) {
       setNameSuggestions([])
       return undefined
     }
 
+    setNameSuggestions(localSuggestions(products, query))
+
     const timer = setTimeout(async () => {
       try {
         const found = await pantryApi.searchProducts(query)
-        setNameSuggestions(
-          found.map((product) => ({
-            key: product.id,
-            label: product.name,
-            meta: product.category ?? '',
-            product,
-          })),
-        )
+        if (found.length > 0) {
+          setNameSuggestions(found.map((product) => suggestionOf(product, product.id)))
+        }
       } catch {
-        setNameSuggestions([])
+        setNameSuggestions(localSuggestions(products, query))
       }
     }, 250)
 
     return () => clearTimeout(timer)
-  }, [form.name])
+  }, [form.name, products])
 
   useEffect(() => {
     if (bestBeforeTouched) {
@@ -167,13 +205,13 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
     )
     const next = defaultBestBeforeOf(match?.product)
 
-    if (!next || (form.bestBefore === next && form.productId === match.product.id)) {
+    if (!next || (form.bestBefore === next && form.productId === (match.product.id ?? null))) {
       return
     }
 
     update({
       bestBefore: next,
-      productId: match.product.id,
+      productId: match.product.id ?? null,
       category: match.product.category ?? form.category,
     })
     clearError('bestBefore')
@@ -218,7 +256,7 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
     setPending(true)
     try {
       const created = await pantryApi.addProduct(groupId, {
-        name: form.name.trim(),
+        name: displayProductName(form.name),
         category: form.category,
         unit_id: Number(form.unitId),
         quantity: Number(form.quantity.replace(',', '.')),
@@ -281,8 +319,8 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
             }}
             onPick={({ product }) => {
               const patch = {
-                name: product.name,
-                productId: product.id,
+                name: displayProductName(product.name),
+                productId: product.id ?? null,
                 category: product.category ?? '',
               }
 

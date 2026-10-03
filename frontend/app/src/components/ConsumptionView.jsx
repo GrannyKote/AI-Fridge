@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { pantryApi } from '../api/client.js'
-import { categoryView, formatNumber } from '../lib/pantry.js'
+import { categoryView, displayProductName, formatNumber } from '../lib/pantry.js'
 import { useHorizontalScroll } from '../lib/useHorizontalScroll.js'
 import { SparkIcon } from './icons.jsx'
 
@@ -238,7 +238,7 @@ export function ConsumptionView({ groupId, refreshKey }) {
                       <span className="usage__emoji" aria-hidden="true">
                         {categoryView(product.category, product.category_id ?? 0).emoji}
                       </span>
-                      <h3 className="ucard__title">{product.name}</h3>
+                      <h3 className="ucard__title">{displayProductName(product.name)}</h3>
                       <span className={`ucard__badge${onlyWaste ? ' ucard__badge--waste' : ''}`}>
                         {entries} изм.
                       </span>

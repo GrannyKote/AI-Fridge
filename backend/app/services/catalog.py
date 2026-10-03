@@ -13,6 +13,11 @@ def _find_by_name(session: Session, model, name: str):
     return session.scalars(statement).first()
 
 
+def capitalized_name(name: str) -> str:
+    name = name.strip()
+    return name[:1].upper() + name[1:]
+
+
 def ensure_product(
     session: Session,
     name: str,
@@ -32,7 +37,7 @@ def ensure_product(
         product = _find_by_name(session, Product, name)
     if product is None:
         product = Product(
-            name=name.strip(),
+            name=capitalized_name(name),
             id_product_category=category.id,
             id_user_created=user_id,
             datetime_created=datetime.now().astimezone(),

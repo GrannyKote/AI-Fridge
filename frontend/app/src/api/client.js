@@ -79,8 +79,8 @@ export const pantryApi = {
   categories: () => request('/categories'),
   places: () => request('/places'),
   units: () => request('/units'),
-  searchProducts: (query) =>
-    request(`/products/search?query=${encodeURIComponent(query)}&limit=5`),
+  searchProducts: (query, limit = 12) =>
+    request(`/products/search?query=${encodeURIComponent(query)}&limit=${limit}`),
   products: (groupId) => request(`/groups/${groupId}/products`),
   reminders: (groupId) => request(`/groups/${groupId}/reminders`),
   markRemindersSeen: (groupId) =>

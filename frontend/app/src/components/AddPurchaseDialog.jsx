@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { pantryApi, shoppingApi } from '../api/client.js'
+import { displayProductName } from '../lib/pantry.js'
 import { FormAlert } from './FormAlert.jsx'
 import { SuggestInput } from './SuggestInput.jsx'
 import { ArrowLeftIcon } from './icons.jsx'
@@ -69,7 +70,7 @@ export function AddPurchaseDialog({ groupId, categories, onClose, onCreated }) {
         setNameSuggestions(
           found.map((product) => ({
             key: product.id,
-            label: product.name,
+            label: displayProductName(product.name),
             meta: product.category ?? '',
             product,
           })),
@@ -120,7 +121,7 @@ export function AddPurchaseDialog({ groupId, categories, onClose, onCreated }) {
     setPending(true)
     try {
       const created = await shoppingApi.add(groupId, {
-        name: form.name.trim(),
+        name: displayProductName(form.name),
         category: form.category,
         unit_id: Number(form.unitId),
         quantity: Number(form.quantity.replace(',', '.')),
@@ -156,7 +157,7 @@ export function AddPurchaseDialog({ groupId, categories, onClose, onCreated }) {
             }}
             onPick={({ product }) => {
               update({
-                name: product.name,
+                name: displayProductName(product.name),
                 productId: product.id,
                 category: product.category ?? '',
               })

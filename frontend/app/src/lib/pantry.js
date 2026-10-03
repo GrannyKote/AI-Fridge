@@ -148,6 +148,11 @@ export function badgeTextOf(item) {
   return pluralDays(days)
 }
 
+export function displayProductName(name) {
+  const value = String(name ?? '').trim()
+  return value ? value[0].toLocaleUpperCase('ru') + value.slice(1) : ''
+}
+
 export function formatNumber(value) {
   const number = Number(value)
 

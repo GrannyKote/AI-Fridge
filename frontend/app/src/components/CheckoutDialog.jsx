@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { pantryApi, shoppingApi } from '../api/client.js'
-import { defaultBestBeforeOf, formatNumber } from '../lib/pantry.js'
+import { defaultBestBeforeOf, displayProductName, formatNumber } from '../lib/pantry.js'
 import { DateInput } from './DateInput.jsx'
 import { FormAlert } from './FormAlert.jsx'
 import { ArrowLeftIcon, CheckIcon } from './icons.jsx'
@@ -186,11 +186,15 @@ export function CheckoutDialog({ groupId, items, onClose, onDone }) {
                   type="button"
                   onClick={() => patchRow(row.id, { checked: !row.checked, errors: {} })}
                   aria-pressed={row.checked}
-                  aria-label={row.checked ? `Снять «${row.name}»` : `Отметить «${row.name}»`}
+                  aria-label={
+                    row.checked
+                      ? `Снять «${displayProductName(row.name)}»`
+                      : `Отметить «${displayProductName(row.name)}»`
+                  }
                 >
                   {row.checked && <CheckIcon />}
                 </button>
-                <h3 className="checkout-card__name">{row.name}</h3>
+                <h3 className="checkout-card__name">{displayProductName(row.name)}</h3>
               </div>
 
               <div className="dialog__row">

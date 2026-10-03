@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from ..database import get_session
 from ..dependencies import current_user_id
 from ..schemas import PlanDateUpdate, PurchaseCheckout, PurchaseCreate, PurchaseHeaderOut, PurchaseOut
-from ..services import shopping
+from ..services import catalog, shopping
 
 router = APIRouter(prefix="/api", tags=["shopping"])
 
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/api", tags=["shopping"])
 def _to_item(row) -> PurchaseOut:
     return PurchaseOut(
         id=row["id"],
-        name=row["product_name"],
+        name=catalog.capitalized_name(row["product_name"]),
         quantity=float(row["quantity"]),
         unit=row["unit"],
         category_id=row["id_product_category"],

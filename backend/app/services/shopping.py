@@ -110,7 +110,7 @@ def create_purchase(
     if unit is None:
         raise ValueError("Единица измерения не найдена")
 
-    name = payload.name.strip()
+    name = catalog.capitalized_name(payload.name)
     product, category = catalog.ensure_product(
         session, name, payload.category, payload.product_id, user_id=user_id
     )
@@ -200,7 +200,7 @@ def checkout_purchase(session: Session, group_id: int, payload: PurchaseCheckout
             UserGroupProduct(
                 id_user_group=group_id,
                 id_product=row.id_product,
-                product_name=row.product_name,
+                product_name=catalog.capitalized_name(row.product_name),
                 id_unit_of_measurement=row.id_unit_of_measurement,
                 quantity=Decimal(str(item.quantity)),
                 price=money(item.price),

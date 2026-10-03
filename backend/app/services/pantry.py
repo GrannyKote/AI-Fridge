@@ -32,14 +32,6 @@ def list_places(session: Session) -> Sequence[StoragePlace]:
 
 def search_products(session: Session, query: str, limit: int = 5):
     prefix = query.strip().lower()
-
-    if not prefix:
-        return []
-
-    # Экранируем спецсимволы LIKE, чтобы они искались буквально.
-    for symbol in ("\\", "%", "_"):
-        prefix = prefix.replace(symbol, f"\\{symbol}")
-
     statement = (
         select(
             Product.id,
@@ -49,10 +41,15 @@ def search_products(session: Session, query: str, limit: int = 5):
             Product.expires_in,
         )
         .outerjoin(ProductCategory, ProductCategory.id == Product.id_product_category)
-        .where(func.lower(Product.name).like(f"{prefix}%", escape="\\"))
         .order_by(Product.name)
         .limit(limit)
     )
+
+    if prefix:
+        # Экранируем спецсимволы LIKE, чтобы они искались буквально.
+        for symbol in ("\\", "%", "_"):
+            prefix = prefix.replace(symbol, f"\\{symbol}")
+        statement = statement.where(func.lower(Product.name).like(f"{prefix}%", escape="\\"))
 
     return session.execute(statement).mappings().all()
 
@@ -149,7 +146,7 @@ def create_pantry_item(
     if unit is None:
         raise ValueError("Единица измерения не найдена")
 
-    name = payload.name.strip()
+    name = catalog.capitalized_name(payload.name)
     product, category = catalog.ensure_product(
         session, name, payload.category, payload.product_id, user_id=user_id
     )

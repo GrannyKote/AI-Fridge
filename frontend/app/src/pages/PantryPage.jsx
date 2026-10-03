@@ -8,7 +8,7 @@ import { PantryDock } from '../components/PantryDock.jsx'
 import { ProductCard } from '../components/ProductCard.jsx'
 import { WasteDialog } from '../components/WasteDialog.jsx'
 import { CheckIcon, ClockIcon, SearchIcon, WarningIcon } from '../components/icons.jsx'
-import { formatAmount, statusOf } from '../lib/pantry.js'
+import { displayProductName, formatAmount, statusOf } from '../lib/pantry.js'
 import { notifyPurchaseChanged, usePurchaseChanged } from '../lib/purchaseEvents.js'
 import { useHorizontalScroll } from '../lib/useHorizontalScroll.js'
 import { useToast } from '../lib/useToast.js'
@@ -105,7 +105,7 @@ export default function PantryPage() {
   async function handleCreated(item) {
     setAddOpen(false)
     setProducts((current) => [...current, item])
-    setToast(`«${item.name}» добавлен`)
+    setToast(`«${displayProductName(item.name)}» добавлен`)
     notifyPurchaseChanged()
 
     try {
@@ -142,13 +142,15 @@ export default function PantryPage() {
     if (item.is_over) {
       dropProduct(item)
       setToast(
-        item.is_consumed ? `«${item.name}» употреблён полностью` : `«${item.name}» закончился`,
+        item.is_consumed
+          ? `«${displayProductName(item.name)}» употреблён полностью`
+          : `«${displayProductName(item.name)}» закончился`,
       )
       return
     }
 
     replaceProduct(item)
-    setToast(`Осталось ${formatAmount(item)} «${item.name}»`)
+    setToast(`Осталось ${formatAmount(item)} «${displayProductName(item.name)}»`)
   }
 
   function handleWasted(item, reason) {
@@ -157,18 +159,18 @@ export default function PantryPage() {
 
     if (reason === 'mistake') {
       dropProduct(item)
-      setToast(`«${item.name}» убран как ошибочная запись`)
+      setToast(`«${displayProductName(item.name)}» убран как ошибочная запись`)
       return
     }
 
     if (item.is_over) {
       dropProduct(item)
-      setToast(`«${item.name}» списан полностью`)
+      setToast(`«${displayProductName(item.name)}» списан полностью`)
       return
     }
 
     replaceProduct(item)
-    setToast(`Осталось ${formatAmount(item)} «${item.name}»`)
+    setToast(`Осталось ${formatAmount(item)} «${displayProductName(item.name)}»`)
   }
 
   return (
@@ -310,10 +312,13 @@ export default function PantryPage() {
         <AddProductDialog
           groupId={groupId}
           categories={categories}
+          products={products}
           onClose={() => setAddOpen(false)}
           onCreated={handleCreated}
         />
       )}
+
+
 
       {consumeTarget && (
         <ConsumeDialog

@@ -1,8 +1,16 @@
 import { TrashIcon, UtensilsIcon } from './icons.jsx'
-import { badgeTextOf, categoryView, formatAmount, formatPrice, statusOf } from '../lib/pantry.js'
+import {
+  badgeTextOf,
+  categoryView,
+  displayProductName,
+  formatAmount,
+  formatPrice,
+  statusOf,
+} from '../lib/pantry.js'
 
 export function ProductCard({ product, onAction }) {
   const status = statusOf(product)
+  const name = displayProductName(product.name)
   const { emoji, tone } = categoryView(product.category, product.category_id ?? 0)
   const subtitle = [product.storage_place, formatPrice(product.price)].filter(Boolean).join(' · ')
 
@@ -13,7 +21,7 @@ export function ProductCard({ product, onAction }) {
       </div>
 
       <div className="card__body">
-        <h3 className="card__title">{product.name}</h3>
+        <h3 className="card__title">{name}</h3>
         {subtitle && <p className="card__place">{subtitle}</p>}
         <p className="card__meta">
           <span>{formatAmount(product)}</span>
@@ -29,7 +37,7 @@ export function ProductCard({ product, onAction }) {
           className="icon-btn"
           type="button"
           onClick={() => onAction(product, 'use')}
-          aria-label={`Использовать «${product.name}»`}
+          aria-label={`Использовать «${name}»`}
         >
           <UtensilsIcon />
         </button>
@@ -37,7 +45,7 @@ export function ProductCard({ product, onAction }) {
           className="icon-btn icon-btn--danger"
           type="button"
           onClick={() => onAction(product, 'delete')}
-          aria-label={`Удалить «${product.name}»`}
+          aria-label={`Удалить «${name}»`}
         >
           <TrashIcon />
         </button>

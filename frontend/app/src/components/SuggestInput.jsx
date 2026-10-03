@@ -58,7 +58,11 @@ export function SuggestInput({
             onChange(event.target.value)
             setOpen(true)
           }}
-          onFocus={() => setOpen(true)}
+          onFocus={() => {
+            if (value.trim()) {
+              setOpen(true)
+            }
+          }}
           onBlur={() => setOpen(false)}
           onKeyDown={handleKeyDown}
           autoComplete="off"

@@ -16,7 +16,7 @@ from ..schemas import (
     UsageStatsOut,
     WasteCreate,
 )
-from ..services import pantry, stats
+from ..services import catalog, pantry, stats
 
 router = APIRouter(prefix="/api", tags=["pantry"])
 
@@ -24,7 +24,7 @@ router = APIRouter(prefix="/api", tags=["pantry"])
 def _to_item(row) -> PantryItemOut:
     return PantryItemOut(
         id=row["id"],
-        name=row["product_name"],
+        name=catalog.capitalized_name(row["product_name"]),
         quantity=float(row["quantity"]),
         remaining=float(row["remaining"]),
         price=None if row["price"] is None else float(row["price"]),
@@ -69,7 +69,8 @@ def search_products(
     session: Session = Depends(get_session),
 ) -> list[ProductSuggestionOut]:
     return [
-        ProductSuggestionOut(**row) for row in pantry.search_products(session, query, limit)
+        ProductSuggestionOut(**{**row, "name": catalog.capitalized_name(row["name"])})
+        for row in pantry.search_products(session, query, limit)
     ]
 
 
