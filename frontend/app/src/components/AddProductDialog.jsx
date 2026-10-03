@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { pantryApi } from '../api/client.js'
-import { dateAfterDays, defaultBestBeforeOf, displayProductName } from '../lib/pantry.js'
+import { dateAfterDays, defaultBestBeforeOf, defaultQuantityForUnit, displayProductName } from '../lib/pantry.js'
 import { DateInput } from './DateInput.jsx'
 import { FormAlert } from './FormAlert.jsx'
 import { SuggestInput } from './SuggestInput.jsx'
@@ -397,8 +397,14 @@ export function AddProductDialog({ groupId, categories, products = [], onClose, 
                   className="field__input field__select"
                   value={form.unitId}
                   onChange={(event) => {
-                    update({ unitId: event.target.value })
+                    const unitId = event.target.value
+                    const unit = units.find((item) => String(item.id) === unitId)
+                    update({
+                      unitId,
+                      quantity: defaultQuantityForUnit(unit?.name),
+                    })
                     clearError('unitId')
+                    clearError('quantity')
                   }}
                 >
                   <option value="">Выберите</option>

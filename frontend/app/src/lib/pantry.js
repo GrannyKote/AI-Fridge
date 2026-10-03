@@ -174,6 +174,16 @@ export function formatPrice(value) {
   return `${Number.isInteger(number) ? number : number.toFixed(2)} ₽`
 }
 
+const DEFAULT_QUANTITY_BY_UNIT = {
+  шт: '1',
+  г: '900',
+  мл: '900',
+}
+
+export function defaultQuantityForUnit(unitName) {
+  return DEFAULT_QUANTITY_BY_UNIT[unitName] ?? '1'
+}
+
 // В карточке показываем остаток: часть продукта могли уже употребить или списать.
 export function formatAmount(item) {
   const value = formatNumber(item.remaining ?? item.quantity)
