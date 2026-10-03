@@ -143,7 +143,24 @@ const MONTHS = [
 export function formatShortDate(bestBefore) {
   const date = new Date(`${bestBefore}T00:00:00`)
 
-  return `${date.getDate()} ${MONTHS[date.getMonth()]}`
+  return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`
+}
+
+const PLACE_SHORT = {
+  Холодильник: 'Холод.',
+  Морозилка: 'Мороз.',
+  Шкаф: 'Шкаф',
+  Бакалея: 'Бакалея',
+  Специи: 'Специи',
+  Консервы: 'Консервы',
+}
+
+export function shortPlaceOf(name) {
+  if (!name) {
+    return ''
+  }
+
+  return PLACE_SHORT[name] ?? name.split(/\s+/)[0]
 }
 
 // Срок годности хранится датой, поэтому продукт считается годным до её конца.

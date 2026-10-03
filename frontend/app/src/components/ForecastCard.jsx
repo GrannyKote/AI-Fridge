@@ -5,6 +5,7 @@ import {
   deadlineText,
   formatAmount,
   formatShortDate,
+  shortPlaceOf,
   statusOf,
 } from '../lib/pantry.js'
 
@@ -12,6 +13,7 @@ export function ForecastCard({ product }) {
   const status = statusOf(product)
   const { emoji, tone } = categoryView(product.category, product.category_id ?? 0)
   const counter = deadlineCounter(product)
+  const place = shortPlaceOf(product.storage_place)
 
   return (
     <article className={`fcard${status === 'expired' ? ' fcard--expired' : ''}`}>
@@ -26,7 +28,13 @@ export function ForecastCard({ product }) {
           {deadlineText(product)}
         </p>
         <p className="fcard__meta">
-          {formatAmount(product)} · Годен до {formatShortDate(product.best_before)}
+          {[
+            formatAmount(product),
+            place,
+            `Годен до ${formatShortDate(product.best_before)}`,
+          ]
+            .filter(Boolean)
+            .join(' · ')}
         </p>
       </div>
 
