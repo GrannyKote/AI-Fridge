@@ -9,7 +9,7 @@ const TABS = [
   { key: 'settings', title: 'Настройки', icon: <UserIcon />, path: '/settings' },
 ]
 
-export function PantryDock({ onAdd }) {
+export function PantryDock({ onAdd, tabs = TABS, addLabel = 'Добавить продукт' }) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
@@ -17,14 +17,18 @@ export function PantryDock({ onAdd }) {
     <div className="dock">
       <div className="dock__inner">
         {onAdd && (
-          <button className="fab" type="button" onClick={onAdd} aria-label="Добавить продукт">
+          <button className="fab" type="button" onClick={onAdd} aria-label={addLabel}>
             <PlusIcon />
           </button>
         )}
 
         <div className="dock__panel">
-          <nav className="tabbar" aria-label="Основная навигация">
-            {TABS.map((tab) => {
+          <nav
+            className="tabbar"
+            style={{ '--tabbar-cols': tabs.length }}
+            aria-label="Основная навигация"
+          >
+            {tabs.map((tab) => {
               const active = tab.path === pathname
 
               return (

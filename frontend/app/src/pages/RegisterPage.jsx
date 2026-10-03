@@ -44,8 +44,8 @@ export default function RegisterPage() {
 
     setPending(true)
     try {
-      await signUp(login, password)
-      navigate('/', { replace: true })
+      const account = await signUp(login, password)
+      navigate(account.is_admin ? '/admin/news' : '/', { replace: true })
     } catch (error) {
       setFormError(error.message)
     } finally {

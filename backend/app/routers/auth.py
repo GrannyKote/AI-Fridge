@@ -13,6 +13,7 @@ def _to_out(user, groups) -> UserOut:
         id=user.id,
         login=user.login,
         token=tokens.create_access_token(user),
+        is_admin=bool(user.is_admin),
         groups=[GroupOut.model_validate(group) for group in groups],
     )
 

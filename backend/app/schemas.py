@@ -32,6 +32,7 @@ class UserOut(BaseModel):
     login: str
     # JWT: клиент отдаёт его обратно в заголовке Authorization.
     token: str
+    is_admin: bool = False
     groups: list[GroupOut] = []
 
 
@@ -208,3 +209,24 @@ class NewsOut(BaseModel):
     header: str
     body: str = ""
     is_seen: bool = False
+
+
+class AdminNewsListItemOut(BaseModel):
+    id: int
+    header: str
+
+
+class AdminNewsOut(BaseModel):
+    id: int
+    header: str
+    body: str = ""
+
+
+class AdminNewsUpdate(BaseModel):
+    header: str = Field(min_length=1, max_length=1024)
+    body: str = Field(default="", max_length=20000)
+
+
+class AdminNewsViewerOut(BaseModel):
+    login: str
+    datetime_seen: datetime

@@ -105,6 +105,16 @@ export const newsApi = {
   markSeen: (newsId) => request(`/news/${newsId}/seen`, { method: 'POST' }),
 }
 
+export const adminNewsApi = {
+  list: () => request('/admin/news'),
+  create: (payload) => request('/admin/news', { method: 'POST', body: payload }),
+  get: (newsId) => request(`/admin/news/${newsId}`),
+  viewers: (newsId) => request(`/admin/news/${newsId}/seen`),
+  update: (newsId, payload) =>
+    request(`/admin/news/${newsId}`, { method: 'PATCH', body: payload }),
+  remove: (newsId) => request(`/admin/news/${newsId}`, { method: 'DELETE' }),
+}
+
 export const feedbackApi = {
   create: (text, files = []) => {
     const form = new FormData()

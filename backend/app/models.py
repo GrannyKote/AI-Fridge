@@ -28,6 +28,8 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     login: Mapped[str] = mapped_column(String(256), nullable=False)
     password: Mapped[str] = mapped_column(String(256), nullable=False)
+    # True — панель администратора; у обычных пользователей False.
+    is_admin: Mapped[bool | None] = mapped_column(Boolean)
 
 
 class CreatedUser(Base):
@@ -220,6 +222,18 @@ class News(Base):
     datetime_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     header: Mapped[str] = mapped_column(String(1024), nullable=False)
     body: Mapped[str | None] = mapped_column(Text)
+    is_deleted: Mapped[bool | None] = mapped_column(Boolean)
+
+
+# В базе у news_update составной первичный ключ
+# (id, id_user_updated, datetime_updated). Для ORM достаточно колонки id.
+class NewsUpdate(Base):
+    __tablename__ = "news_update"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id_user_updated: Mapped[int] = mapped_column(Integer, nullable=False)
+    datetime_updated: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
 
 # В базе у user_news_seen составной первичный ключ (id, id_news, id_user_seen).

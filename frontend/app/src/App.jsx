@@ -2,6 +2,8 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthProvider.jsx'
 import { useAuth } from './auth/useAuth.js'
 import { ThemeProvider } from './theme/ThemeProvider.jsx'
+import AdminFeedbackPage from './pages/AdminFeedbackPage.jsx'
+import AdminNewsPage from './pages/AdminNewsPage.jsx'
 import ForecastPage from './pages/ForecastPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import PantryPage from './pages/PantryPage.jsx'
@@ -9,14 +11,41 @@ import RegisterPage from './pages/RegisterPage.jsx'
 import SettingsPage from './pages/SettingsPage.jsx'
 import ShoppingPage from './pages/ShoppingPage.jsx'
 
-function RequireAuth({ children }) {
-  const { isAuthenticated } = useAuth()
-  return isAuthenticated ? children : <Navigate to="/login" replace />
+function homePath(isAdmin) {
+  return isAdmin ? '/admin/news' : '/'
+}
+
+function RequireUser({ children }) {
+  const { isAuthenticated, isAdmin } = useAuth()
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (isAdmin) {
+    return <Navigate to="/admin/news" replace />
+  }
+
+  return children
+}
+
+function RequireAdmin({ children }) {
+  const { isAuthenticated, isAdmin } = useAuth()
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/" replace />
+  }
+
+  return children
 }
 
 function RequireGuest({ children }) {
-  const { isAuthenticated } = useAuth()
-  return isAuthenticated ? <Navigate to="/" replace /> : children
+  const { isAuthenticated, isAdmin } = useAuth()
+  return isAuthenticated ? <Navigate to={homePath(isAdmin)} replace /> : children
 }
 
 export default function App() {
@@ -28,33 +57,49 @@ export default function App() {
             <Route
               path="/"
               element={
-                <RequireAuth>
+                <RequireUser>
                   <PantryPage />
-                </RequireAuth>
+                </RequireUser>
               }
             />
             <Route
               path="/forecast"
               element={
-                <RequireAuth>
+                <RequireUser>
                   <ForecastPage />
-                </RequireAuth>
+                </RequireUser>
               }
             />
             <Route
               path="/shopping"
               element={
-                <RequireAuth>
+                <RequireUser>
                   <ShoppingPage />
-                </RequireAuth>
+                </RequireUser>
               }
             />
             <Route
               path="/settings"
               element={
-                <RequireAuth>
+                <RequireUser>
                   <SettingsPage />
-                </RequireAuth>
+                </RequireUser>
+              }
+            />
+            <Route
+              path="/admin/news"
+              element={
+                <RequireAdmin>
+                  <AdminNewsPage />
+                </RequireAdmin>
+              }
+            />
+            <Route
+              path="/admin/feedback"
+              element={
+                <RequireAdmin>
+                  <AdminFeedbackPage />
+                </RequireAdmin>
               }
             />
             <Route

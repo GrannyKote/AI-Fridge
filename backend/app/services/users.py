@@ -31,7 +31,7 @@ def create_with_group(
     ip: str = "",
 ) -> tuple[User, UserGroup]:
     """Создаёт пользователя и сразу его личную группу — одной транзакцией."""
-    user = User(login=login.strip(), password=password)
+    user = User(login=login.strip(), password=password, is_admin=False)
     session.add(user)
     session.flush()
 

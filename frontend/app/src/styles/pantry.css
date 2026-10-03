@@ -513,7 +513,7 @@
 
 .tabbar {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(var(--tabbar-cols, 4), 1fr);
   height: var(--tabbar-h);
 }
 
@@ -523,8 +523,14 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
+  padding: 0 6px;
   color: var(--muted);
   font-size: 10px;
+}
+
+.tab span {
+  text-align: center;
+  line-height: 1.15;
 }
 
 .tab svg {
