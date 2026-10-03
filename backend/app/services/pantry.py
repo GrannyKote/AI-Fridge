@@ -73,11 +73,13 @@ def _products_statement():
     return (
         select(
             UserGroupProduct.id,
+            UserGroupProduct.id_product,
             UserGroupProduct.product_name,
             UserGroupProduct.quantity,
             UserGroupProduct.price,
             UserGroupProduct.best_before,
             UserGroupProduct.id_product_category,
+            UserGroupProduct.id_unit_of_measurement,
             UserGroupProduct.id_storage_place,
             UserGroupProduct.is_consumed,
             UserGroupProduct.is_wasted,
@@ -131,6 +133,54 @@ def get_product(session: Session, group_id: int, item_id: int):
         UserGroupProduct.id_user_group == group_id,
     )
     return session.execute(statement).mappings().first()
+
+
+def _lot_key(row) -> tuple:
+    """Одинаковые для UI позиции: имя, продукт, срок, единица и место."""
+    return (
+        row["id_product"],
+        str(row["product_name"] or "").strip().lower(),
+        row["best_before"],
+        row["id_unit_of_measurement"],
+        row["id_storage_place"],
+    )
+
+
+def _merge_lot(rows: list[dict]) -> dict:
+    rows = sorted(rows, key=lambda row: row["id"])
+    first = dict(rows[0])
+    first["quantity"] = sum((row["quantity"] for row in rows), Decimal(0))
+    first["remaining"] = sum((row["remaining"] for row in rows), Decimal(0))
+    prices = [row["price"] for row in rows if row["price"] is not None]
+    first["price"] = sum(prices, Decimal(0)) if prices else None
+    first["is_over"] = all(row["is_over"] for row in rows)
+    first["is_consumed"] = all(row["is_consumed"] for row in rows)
+    first["is_wasted"] = all(row["is_wasted"] for row in rows)
+    first["is_deleted"] = all(bool(row["is_deleted"]) for row in rows)
+    return first
+
+
+def merge_lots(rows) -> list[dict]:
+    groups: dict[tuple, list[dict]] = {}
+    for row in rows:
+        item = dict(row)
+        groups.setdefault(_lot_key(item), []).append(item)
+    return [_merge_lot(items) for items in groups.values()]
+
+
+def _open_lot(session: Session, group_id: int, seed) -> list[dict]:
+    key = _lot_key(seed)
+    return sorted(
+        (dict(row) for row in list_products(session, group_id) if _lot_key(row) == key),
+        key=lambda row: row["id"],
+    )
+
+
+def _lot_result(session: Session, group_id: int, seed):
+    remaining = _open_lot(session, group_id, seed)
+    if remaining:
+        return _merge_lot(remaining)
+    return get_product(session, group_id, seed["id"])
 
 
 def money(value: float | None) -> Decimal | None:
@@ -329,12 +379,12 @@ def _update_flags(session: Session, item_id: int) -> None:
         item.is_wasted = True
 
 
-def _checked_amount(row, quantity: float | None) -> Decimal:
+def _checked_amount(available, quantity: float | None) -> Decimal:
     if quantity is None:
         raise ValueError("Укажите количество")
 
     amount = Decimal(str(quantity))
-    remaining = Decimal(row["remaining"])
+    remaining = Decimal(available)
 
     if amount > remaining:
         # :f — иначе Decimal печатает круглые числа как 1.5E+2.
@@ -343,25 +393,49 @@ def _checked_amount(row, quantity: float | None) -> Decimal:
     return amount
 
 
-def consume_product(session: Session, group_id: int, item_id: int, quantity: float):
-    """Записывает потребление и закрывает строку, если продукт закончился."""
-    row = get_product(session, group_id, item_id)
+def _write_off_lot(session: Session, group_id: int, item_id: int, quantity: float, model):
+    """Списывает количество с первой строки лота, затем со следующих."""
+    seed = get_product(session, group_id, item_id)
 
-    if row is None:
+    if seed is None:
         return None
 
-    session.add(
-        UserGroupProductConsumption(
-            id_user_group_product=item_id,
-            quantity=_checked_amount(row, quantity),
-            date_time=datetime.now(),
-        )
+    lot = _open_lot(session, group_id, seed)
+    amount = _checked_amount(
+        sum((Decimal(row["remaining"]) for row in lot), Decimal(0)),
+        quantity,
     )
-    session.flush()
-    _update_flags(session, item_id)
-    session.commit()
 
-    return get_product(session, group_id, item_id)
+    left = amount
+    now = datetime.now()
+    for row in lot:
+        if left <= 0:
+            break
+
+        take = min(left, Decimal(row["remaining"]))
+        if take <= 0:
+            continue
+
+        session.add(
+            model(
+                id_user_group_product=row["id"],
+                quantity=take,
+                date_time=now,
+            )
+        )
+        session.flush()
+        _update_flags(session, row["id"])
+        left -= take
+
+    session.commit()
+    return _lot_result(session, group_id, seed)
+
+
+def consume_product(session: Session, group_id: int, item_id: int, quantity: float):
+    """Записывает потребление и закрывает строку, если продукт закончился."""
+    return _write_off_lot(
+        session, group_id, item_id, quantity, UserGroupProductConsumption
+    )
 
 
 def waste_product(
@@ -378,19 +452,12 @@ def waste_product(
         return None
 
     if reason == "mistake":
-        item = session.get(UserGroupProduct, item_id)
-        item.is_deleted = True
-    else:
-        session.add(
-            UserGroupProductWaste(
-                id_user_group_product=item_id,
-                quantity=_checked_amount(row, quantity),
-                date_time=datetime.now(),
-            )
-        )
-        session.flush()
-        _update_flags(session, item_id)
+        lot = _open_lot(session, group_id, row)
+        for item in lot or [{"id": item_id}]:
+            record = session.get(UserGroupProduct, item["id"])
+            if record is not None and record.id_user_group == group_id:
+                record.is_deleted = True
+        session.commit()
+        return get_product(session, group_id, item_id)
 
-    session.commit()
-
-    return get_product(session, group_id, item_id)
+    return _write_off_lot(session, group_id, item_id, quantity, UserGroupProductWaste)

@@ -67,11 +67,13 @@ class ProductSuggestionOut(BaseModel):
 
 class PantryItemOut(BaseModel):
     id: int
+    product_id: int | None = None
     name: str
     quantity: float
     remaining: float
     price: float | None = None
     unit: str | None = None
+    unit_id: int | None = None
     category_id: int | None = None
     category: str | None = None
     storage_place_id: int | None = None

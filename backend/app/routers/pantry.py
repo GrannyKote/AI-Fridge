@@ -24,11 +24,13 @@ router = APIRouter(prefix="/api", tags=["pantry"])
 def _to_item(row) -> PantryItemOut:
     return PantryItemOut(
         id=row["id"],
+        product_id=row["id_product"],
         name=catalog.capitalized_name(row["product_name"]),
         quantity=float(row["quantity"]),
         remaining=float(row["remaining"]),
         price=None if row["price"] is None else float(row["price"]),
         unit=row["unit"],
+        unit_id=row["id_unit_of_measurement"],
         category_id=row["id_product_category"],
         category=row["category_name"],
         storage_place_id=row["id_storage_place"],
@@ -76,12 +78,12 @@ def search_products(
 
 @router.get("/groups/{group_id}/products", response_model=list[PantryItemOut])
 def products(group_id: int, session: Session = Depends(get_session)) -> list[PantryItemOut]:
-    return [_to_item(row) for row in pantry.list_products(session, group_id)]
+    return [_to_item(row) for row in pantry.merge_lots(pantry.list_products(session, group_id))]
 
 
 @router.get("/groups/{group_id}/reminders", response_model=list[PantryItemOut])
 def reminders(group_id: int, session: Session = Depends(get_session)) -> list[PantryItemOut]:
-    return [_to_item(row) for row in pantry.list_reminders(session, group_id)]
+    return [_to_item(row) for row in pantry.merge_lots(pantry.list_reminders(session, group_id))]
 
 
 @router.post("/groups/{group_id}/reminders/seen", status_code=status.HTTP_204_NO_CONTENT)

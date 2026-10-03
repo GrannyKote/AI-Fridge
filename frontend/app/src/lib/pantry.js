@@ -174,6 +174,13 @@ export function formatPrice(value) {
   return `${Number.isInteger(number) ? number : number.toFixed(2)} ₽`
 }
 
+// Совпадает с посевом unit_of_measurement: шт, г, мл.
+export const FALLBACK_UNITS = [
+  { id: 1, name: 'шт' },
+  { id: 2, name: 'г' },
+  { id: 3, name: 'мл' },
+]
+
 const DEFAULT_QUANTITY_BY_UNIT = {
   шт: '1',
   г: '900',
@@ -306,4 +313,88 @@ const TONES = ['dairy', 'meat', 'grocery', 'sauce', 'eggs', 'bread']
 
 export function categoryView(name, id = 0) {
   return CATEGORY_VIEW[name] ?? { emoji: '🍽️', tone: TONES[id % TONES.length] }
+}
+
+function lotKey(item) {
+  return [
+    item.product_id ?? '',
+    String(item.name ?? '').trim().toLowerCase(),
+    item.best_before ?? '',
+    item.unit_id ?? item.unit ?? '',
+    item.storage_place_id ?? '',
+  ].join('\u0001')
+}
+
+function sumPrices(items) {
+  let total = 0
+  let hasPrice = false
+
+  for (const item of items) {
+    if (item.price === null || item.price === undefined || item.price === '') {
+      continue
+    }
+
+    const value = Number(item.price)
+    if (!Number.isFinite(value)) {
+      continue
+    }
+
+    total += value
+    hasPrice = true
+  }
+
+  return hasPrice ? total : null
+}
+
+// Одинаковые позиции в кладовой показываем одной карточкой.
+export function mergeMatchingProducts(items) {
+  const groups = new Map()
+
+  for (const item of items) {
+    const key = lotKey(item)
+    const group = groups.get(key)
+
+    if (group) {
+      group.push(item)
+    } else {
+      groups.set(key, [item])
+    }
+  }
+
+  return [...groups.values()].map((group) => {
+    if (group.length === 1) {
+      return group[0]
+    }
+
+    const sorted = [...group].sort((a, b) => a.id - b.id)
+
+    return {
+      ...sorted[0],
+      quantity: sorted.reduce((sum, item) => sum + Number(item.quantity), 0),
+      remaining: sorted.reduce((sum, item) => sum + Number(item.remaining ?? item.quantity), 0),
+      price: sumPrices(sorted),
+      is_over: sorted.every((item) => item.is_over),
+      is_consumed: sorted.every((item) => item.is_consumed),
+      is_wasted: sorted.every((item) => item.is_wasted),
+      is_deleted: sorted.every((item) => item.is_deleted),
+    }
+  })
+}
+
+export function addPantryItem(list, item) {
+  return mergeMatchingProducts([...list, item])
+}
+
+export function replacePantryLot(list, item) {
+  const next = list.filter((product) => lotKey(product) !== lotKey(item))
+
+  if (item.is_over || item.is_deleted) {
+    return next
+  }
+
+  return [...next, item]
+}
+
+export function removePantryLot(list, item) {
+  return list.filter((product) => lotKey(product) !== lotKey(item))
 }

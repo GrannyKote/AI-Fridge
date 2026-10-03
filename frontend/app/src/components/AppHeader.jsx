@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { pantryApi, shoppingApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
+import { mergeMatchingProducts } from '../lib/pantry.js'
 import { notifyPurchaseChanged, usePurchaseChanged } from '../lib/purchaseEvents.js'
 import { CheckoutDialog } from './CheckoutDialog.jsx'
 import { FeedbackDialog } from './FeedbackDialog.jsx'
@@ -45,7 +46,7 @@ export function AppHeader({ onToast }) {
 
     setPlanDate(header?.plan_date ?? null)
     setItems(purchaseList)
-    setAttention(reminders)
+    setAttention(mergeMatchingProducts(reminders))
   }, [groupId])
 
   useEffect(() => {

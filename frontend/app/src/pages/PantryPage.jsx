@@ -8,7 +8,15 @@ import { PantryDock } from '../components/PantryDock.jsx'
 import { ProductCard } from '../components/ProductCard.jsx'
 import { WasteDialog } from '../components/WasteDialog.jsx'
 import { CheckIcon, ClockIcon, SearchIcon, WarningIcon } from '../components/icons.jsx'
-import { displayProductName, formatAmount, statusOf } from '../lib/pantry.js'
+import {
+  addPantryItem,
+  displayProductName,
+  formatAmount,
+  mergeMatchingProducts,
+  removePantryLot,
+  replacePantryLot,
+  statusOf,
+} from '../lib/pantry.js'
 import { notifyPurchaseChanged, usePurchaseChanged } from '../lib/purchaseEvents.js'
 import { useHorizontalScroll } from '../lib/useHorizontalScroll.js'
 import { useToast } from '../lib/useToast.js'
@@ -26,6 +34,7 @@ export default function PantryPage() {
 
   const [categories, setCategories] = useState([])
   const [places, setPlaces] = useState([])
+  const [units, setUnits] = useState([])
   const [products, setProducts] = useState([])
   const [state, setState] = useState('loading')
   const [error, setError] = useState('')
@@ -52,14 +61,16 @@ export default function PantryPage() {
       }
 
       try {
-        const [categoryList, placeList, productList] = await Promise.all([
+        const [categoryList, placeList, unitList, productList] = await Promise.all([
           pantryApi.categories(),
           pantryApi.places(),
+          pantryApi.units(),
           pantryApi.products(groupId),
         ])
         setCategories(categoryList)
         setPlaces(placeList)
-        setProducts(productList)
+        setUnits(unitList)
+        setProducts(mergeMatchingProducts(productList))
         setState('ready')
       } catch (loadError) {
         setError(loadError.message)
@@ -104,7 +115,7 @@ export default function PantryPage() {
 
   async function handleCreated(item) {
     setAddOpen(false)
-    setProducts((current) => [...current, item])
+    setProducts((current) => addPantryItem(current, item))
     setToast(`«${displayProductName(item.name)}» добавлен`)
     notifyPurchaseChanged()
 
@@ -125,13 +136,11 @@ export default function PantryPage() {
   }
 
   function replaceProduct(item) {
-    setProducts((current) =>
-      current.map((product) => (product.id === item.id ? item : product)),
-    )
+    setProducts((current) => replacePantryLot(current, item))
   }
 
   function dropProduct(item) {
-    setProducts((current) => current.filter((product) => product.id !== item.id))
+    setProducts((current) => removePantryLot(current, item))
   }
 
   function handleConsumed(item) {
@@ -313,6 +322,8 @@ export default function PantryPage() {
           groupId={groupId}
           categories={categories}
           products={products}
+          units={units}
+          places={places}
           onClose={() => setAddOpen(false)}
           onCreated={handleCreated}
         />

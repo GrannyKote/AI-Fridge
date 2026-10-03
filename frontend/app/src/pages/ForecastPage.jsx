@@ -6,7 +6,7 @@ import { ConsumptionView } from '../components/ConsumptionView.jsx'
 import { ForecastCard } from '../components/ForecastCard.jsx'
 import { PantryDock } from '../components/PantryDock.jsx'
 import { BarsIcon, ClockIcon, WarningIcon } from '../components/icons.jsx'
-import { statusOf } from '../lib/pantry.js'
+import { mergeMatchingProducts, statusOf } from '../lib/pantry.js'
 import { usePurchaseChanged } from '../lib/purchaseEvents.js'
 import { useToast } from '../lib/useToast.js'
 import '../styles/pantry.css'
@@ -40,7 +40,7 @@ export default function ForecastPage() {
       }
 
       try {
-        setProducts(await pantryApi.products(groupId))
+        setProducts(mergeMatchingProducts(await pantryApi.products(groupId)))
         setState('ready')
       } catch (loadError) {
         setError(loadError.message)
@@ -57,20 +57,20 @@ export default function ForecastPage() {
   usePurchaseChanged(useCallback(() => load(true), [load]))
 
   const sections = useMemo(() => {
-    const soon = []
-    const later = []
+    const groups = {
+      expired: [],
+      soon: [],
+      fresh: [],
+    }
 
     for (const product of products) {
-      if (statusOf(product) === 'fresh') {
-        later.push(product)
-      } else {
-        soon.push(product)
-      }
+      groups[statusOf(product)].push(product)
     }
 
     return [
-      { key: 'soon', title: 'Скоро испортится', icon: <WarningIcon />, items: soon },
-      { key: 'fresh', title: 'Позже', icon: <ClockIcon />, items: later },
+      { key: 'expired', title: 'Просрочено', icon: <WarningIcon />, items: groups.expired },
+      { key: 'soon', title: 'Скоро испортится', icon: <ClockIcon />, items: groups.soon },
+      { key: 'fresh', title: 'Позже', icon: <ClockIcon />, items: groups.fresh },
     ]
   }, [products])
 

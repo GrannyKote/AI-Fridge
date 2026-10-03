@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { pantryApi } from '../api/client.js'
-import { dateAfterDays, defaultBestBeforeOf, defaultQuantityForUnit, displayProductName } from '../lib/pantry.js'
+import {
+  FALLBACK_UNITS,
+  dateAfterDays,
+  defaultBestBeforeOf,
+  defaultQuantityForUnit,
+  displayProductName,
+} from '../lib/pantry.js'
 import { DateInput } from './DateInput.jsx'
 import { FormAlert } from './FormAlert.jsx'
 import { SuggestInput } from './SuggestInput.jsx'
@@ -66,6 +72,14 @@ function placeIdOf(places, name, category) {
   return String(places.find((place) => place.name === wanted)?.id ?? places[0]?.id ?? '')
 }
 
+function unitIdOf(units) {
+  return String(units.find((unit) => unit.name === 'шт')?.id ?? units[0]?.id ?? '')
+}
+
+function catalogUnitsOf(units) {
+  return units.length > 0 ? units : FALLBACK_UNITS
+}
+
 function suggestionOf(product, key) {
   return {
     key,
@@ -107,11 +121,24 @@ function localSuggestions(products, query) {
   )
 }
 
-export function AddProductDialog({ groupId, categories, products = [], onClose, onCreated }) {
-  const [form, setForm] = useState(EMPTY_FORM)
+export function AddProductDialog({
+  groupId,
+  categories,
+  products = [],
+  units: unitsProp = [],
+  places: placesProp = [],
+  onClose,
+  onCreated,
+}) {
+  const initialUnits = catalogUnitsOf(unitsProp)
+  const [form, setForm] = useState(() => ({
+    ...EMPTY_FORM,
+    unitId: unitIdOf(initialUnits),
+    placeId: placesProp.length > 0 ? placeIdOf(placesProp, '', '') : '',
+  }))
   const [method, setMethod] = useState('manual')
-  const [units, setUnits] = useState([])
-  const [places, setPlaces] = useState([])
+  const [units, setUnits] = useState(initialUnits)
+  const [places, setPlaces] = useState(placesProp)
   const [nameSuggestions, setNameSuggestions] = useState([])
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
@@ -121,18 +148,28 @@ export function AddProductDialog({ groupId, categories, products = [], onClose, 
 
   useEffect(() => {
     let cancelled = false
+    const unitsReady = unitsProp.length > 0
+    const placesReady = placesProp.length > 0
 
-    Promise.all([pantryApi.units(), pantryApi.places()])
+    if (unitsReady && placesReady) {
+      return undefined
+    }
+
+    Promise.all([
+      unitsReady ? Promise.resolve(unitsProp) : pantryApi.units().catch(() => FALLBACK_UNITS),
+      placesReady ? Promise.resolve(placesProp) : pantryApi.places(),
+    ])
       .then(([unitList, placeList]) => {
         if (cancelled) {
           return
         }
 
-        setUnits(unitList)
+        const nextUnits = catalogUnitsOf(unitList)
+        setUnits(nextUnits)
         setPlaces(placeList)
         setForm((current) => ({
           ...current,
-          unitId: current.unitId || String(unitList.find((unit) => unit.name === 'шт')?.id ?? ''),
+          unitId: current.unitId || unitIdOf(nextUnits),
           placeId: current.placeId || placeIdOf(placeList, current.name, current.category),
         }))
       })
@@ -141,7 +178,7 @@ export function AddProductDialog({ groupId, categories, products = [], onClose, 
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [unitsProp, placesProp])
 
   useEffect(() => {
     function handleKeyDown(event) {
