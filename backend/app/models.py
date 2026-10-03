@@ -201,6 +201,8 @@ class Feedback(Base):
     id_user: Mapped[int] = mapped_column(Integer, nullable=False)
     datetime_created: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     feedback_text: Mapped[str | None] = mapped_column(Text)
+    is_seen: Mapped[bool | None] = mapped_column(Boolean)
+    datetime_seen: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class FeedbackItem(Base):

@@ -1,12 +1,63 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from ..database import get_session
 from ..dependencies import current_admin_id
-from ..schemas import AdminNewsListItemOut, AdminNewsOut, AdminNewsUpdate, AdminNewsViewerOut
+from ..schemas import (
+    AdminFeedbackDetailOut,
+    AdminFeedbackListItemOut,
+    AdminNewsListItemOut,
+    AdminNewsOut,
+    AdminNewsUpdate,
+    AdminNewsViewerOut,
+)
+from ..services import feedback as feedback_service
 from ..services import news as news_service
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
+
+
+@router.get("/feedback", response_model=list[AdminFeedbackListItemOut])
+def list_feedback(
+    session: Session = Depends(get_session),
+    _: int = Depends(current_admin_id),
+) -> list[AdminFeedbackListItemOut]:
+    return [AdminFeedbackListItemOut(**row) for row in feedback_service.list_for_admin(session)]
+
+
+@router.get("/feedback/{feedback_id}", response_model=AdminFeedbackDetailOut)
+def get_feedback(
+    feedback_id: int,
+    session: Session = Depends(get_session),
+    _: int = Depends(current_admin_id),
+) -> AdminFeedbackDetailOut:
+    row = feedback_service.get_for_admin(session, feedback_id)
+    if row is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Отзыв не найден")
+    return AdminFeedbackDetailOut(**row)
+
+
+@router.get("/feedback/{feedback_id}/items/{item_id}")
+def get_feedback_item(
+    feedback_id: int,
+    item_id: int,
+    session: Session = Depends(get_session),
+    _: int = Depends(current_admin_id),
+    download: bool = Query(default=False),
+) -> Response:
+    row = feedback_service.get_item_for_admin(session, feedback_id, item_id)
+    if row is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Изображение не найдено")
+
+    data, media_type, extension = row
+    disposition = "attachment" if download else "inline"
+    filename = f"feedback-{feedback_id}-{item_id}.{extension}"
+    return Response(
+        content=data,
+        media_type=media_type,
+        headers={"Content-Disposition": f'{disposition}; filename="{filename}"'},
+    )
 
 
 def _to_out(item) -> AdminNewsOut:

@@ -62,6 +62,38 @@ async function request(path, { method = 'GET', body, form } = {}) {
   return payload
 }
 
+async function fetchBlob(path) {
+  const token = readSession()?.token
+  let response
+
+  try {
+    response = await fetch(`${BASE_URL}${path}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    })
+  } catch {
+    throw new Error('Сервер недоступен. Проверьте, что бэкенд запущен')
+  }
+
+  if (response.status === 401 && token) {
+    unauthorizedHandler?.()
+  }
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null)
+    throw new Error(extractMessage(payload, 'Не удалось выполнить запрос'))
+  }
+
+  return response.blob()
+}
+
+function filenameFromDisposition(header) {
+  if (!header) {
+    return null
+  }
+  const match = /filename="([^"]+)"/.exec(header)
+  return match?.[1] ?? null
+}
+
 export const authApi = {
   register: (login, password) =>
     request('/auth/register', {
@@ -113,6 +145,37 @@ export const adminNewsApi = {
   update: (newsId, payload) =>
     request(`/admin/news/${newsId}`, { method: 'PATCH', body: payload }),
   remove: (newsId) => request(`/admin/news/${newsId}`, { method: 'DELETE' }),
+}
+
+export const adminFeedbackApi = {
+  list: () => request('/admin/feedback'),
+  get: (feedbackId) => request(`/admin/feedback/${feedbackId}`),
+  itemUrl: (feedbackId, itemId, { download = false } = {}) =>
+    `${BASE_URL}/admin/feedback/${feedbackId}/items/${itemId}${download ? '?download=1' : ''}`,
+  fetchItem: (feedbackId, itemId, options) =>
+    fetchBlob(
+      `/admin/feedback/${feedbackId}/items/${itemId}${options?.download ? '?download=1' : ''}`,
+    ),
+  async downloadItem(feedbackId, itemId) {
+    const token = readSession()?.token
+    const response = await fetch(this.itemUrl(feedbackId, itemId, { download: true }), {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    })
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null)
+      throw new Error(extractMessage(payload, 'Не удалось скачать изображение'))
+    }
+    const blob = await response.blob()
+    const filename =
+      filenameFromDisposition(response.headers.get('Content-Disposition')) ??
+      `feedback-${feedbackId}-${itemId}.jpg`
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    URL.revokeObjectURL(url)
+  },
 }
 
 export const feedbackApi = {

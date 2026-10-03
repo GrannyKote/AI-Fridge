@@ -230,3 +230,21 @@ class AdminNewsUpdate(BaseModel):
 class AdminNewsViewerOut(BaseModel):
     login: str
     datetime_seen: datetime
+
+
+class AdminFeedbackListItemOut(BaseModel):
+    id: int
+    login: str
+    datetime_created: datetime
+    text_preview: str
+    is_seen: bool = False
+
+
+class AdminFeedbackDetailOut(BaseModel):
+    id: int
+    login: str
+    datetime_created: datetime
+    feedback_text: str
+    is_seen: bool = False
+    datetime_seen: datetime | None = None
+    items: list[FeedbackItemOut] = []

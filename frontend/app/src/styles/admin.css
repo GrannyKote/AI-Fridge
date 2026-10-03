@@ -98,3 +98,127 @@
   background: var(--red-soft);
   color: var(--red);
 }
+
+.admin-feedback__list {
+  margin-bottom: 8px;
+}
+
+.admin-feedback__item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-feedback__item--unread {
+  border-color: rgba(39, 221, 109, 0.28);
+}
+
+.admin-feedback__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.admin-feedback__item .news__dot {
+  flex-shrink: 0;
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--border);
+}
+
+.admin-feedback__item--unread .news__dot {
+  background: var(--green);
+  box-shadow: none;
+}
+
+.admin-feedback__login {
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-feedback__time {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.admin-feedback__preview {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.admin-feedback__item--unread .admin-feedback__login,
+.admin-feedback__item--unread .admin-feedback__preview {
+  color: var(--text);
+}
+
+.admin-feedback__item--unread .admin-feedback__preview {
+  font-weight: 500;
+}
+
+.admin-feedback__detail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-feedback__detail-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.admin-feedback__text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.admin-feedback__photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-feedback__photo-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.admin-feedback__photo-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.admin-feedback__photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
