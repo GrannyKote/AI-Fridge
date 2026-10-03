@@ -108,6 +108,11 @@ class ConsumptionCreate(BaseModel):
     quantity: float = Field(gt=0)
 
 
+class PantryMoveCreate(BaseModel):
+    item_ids: list[int] = Field(min_length=1)
+    storage_place_id: int
+
+
 class CategoryUsageOut(BaseModel):
     id: int | None = None
     name: str

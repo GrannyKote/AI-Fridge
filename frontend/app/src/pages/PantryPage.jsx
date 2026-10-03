@@ -3,9 +3,11 @@ import { pantryApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { AddProductDialog } from '../components/AddProductDialog.jsx'
 import { AppHeader } from '../components/AppHeader.jsx'
+import { BulkConsumeDialog } from '../components/BulkConsumeDialog.jsx'
 import { ConsumeDialog } from '../components/ConsumeDialog.jsx'
 import { PantryDock } from '../components/PantryDock.jsx'
 import { ProductCard } from '../components/ProductCard.jsx'
+import { BulkWasteDialog } from '../components/BulkWasteDialog.jsx'
 import { WasteDialog } from '../components/WasteDialog.jsx'
 import { CheckIcon, ClockIcon, SearchIcon, WarningIcon } from '../components/icons.jsx'
 import {
@@ -44,7 +46,13 @@ export default function PantryPage() {
   const [addOpen, setAddOpen] = useState(false)
   const [consumeTarget, setConsumeTarget] = useState(null)
   const [wasteTarget, setWasteTarget] = useState(null)
+  const [selectedIds, setSelectedIds] = useState(() => new Set())
+  const [moving, setMoving] = useState(false)
+  const [bulkConsumeOpen, setBulkConsumeOpen] = useState(false)
+  const [bulkWasteOpen, setBulkWasteOpen] = useState(false)
   const [toast, setToast] = useToast()
+
+  const multiSelected = selectedIds.size >= 2
   const categoryChipsRef = useHorizontalScroll()
   const placeChipsRef = useHorizontalScroll()
 
@@ -127,7 +135,110 @@ export default function PantryPage() {
     }
   }
 
+  function toggleSelected(product) {
+    setSelectedIds((current) => {
+      const next = new Set(current)
+      if (next.has(product.id)) {
+        next.delete(product.id)
+      } else {
+        next.add(product.id)
+      }
+      return next
+    })
+  }
+
+  function clearSelection() {
+    setSelectedIds(new Set())
+  }
+
+  async function moveSelectedToPlace(placeId) {
+    if (selectedIds.size === 0 || moving) {
+      return
+    }
+
+    const place = places.find((entry) => entry.id === placeId)
+    const count = selectedIds.size
+    setMoving(true)
+
+    try {
+      await pantryApi.moveProducts(groupId, {
+        item_ids: [...selectedIds],
+        storage_place_id: placeId,
+      })
+      clearSelection()
+      await load(true)
+      setToast(
+        place
+          ? `Перенесено в «${place.name}»: ${count}`
+          : `Перенесено продуктов: ${count}`,
+      )
+    } catch (moveError) {
+      setToast(moveError.message)
+    } finally {
+      setMoving(false)
+    }
+  }
+
+  function handlePlaceFilter(placeId) {
+    if (selectedIds.size > 0) {
+      moveSelectedToPlace(placeId)
+      return
+    }
+
+    setActivePlace((current) => (current === placeId ? 'all' : placeId))
+  }
+
+  function selectedProducts() {
+    return products.filter((product) => selectedIds.has(product.id))
+  }
+
+  function startBulkConsume() {
+    if (selectedProducts().length < 2) {
+      return
+    }
+
+    setBulkConsumeOpen(true)
+  }
+
+  function startBulkWaste() {
+    if (selectedProducts().length < 2) {
+      return
+    }
+
+    setBulkWasteOpen(true)
+  }
+
+  async function handleBulkConsumed(count) {
+    setBulkConsumeOpen(false)
+    clearSelection()
+    notifyPurchaseChanged()
+    await load(true)
+    setToast(count === 1 ? 'Продукт употреблён полностью' : `Употреблено продуктов: ${count}`)
+  }
+
+  async function handleBulkWasted(count, reason) {
+    setBulkWasteOpen(false)
+    clearSelection()
+    notifyPurchaseChanged()
+    await load(true)
+
+    if (reason === 'mistake') {
+      setToast(
+        count === 1
+          ? 'Ошибочная запись убрана из кладовой'
+          : `Убрано ошибочных записей: ${count}`,
+      )
+      return
+    }
+
+    setToast(count === 1 ? 'Продукт списан полностью' : `Списано продуктов: ${count}`)
+  }
+
   function handleCardAction(product, action) {
+    if (multiSelected) {
+      return
+    }
+
     if (action === 'use') {
       setConsumeTarget(product)
     } else {
@@ -141,6 +252,14 @@ export default function PantryPage() {
 
   function dropProduct(item) {
     setProducts((current) => removePantryLot(current, item))
+    setSelectedIds((current) => {
+      if (!current.has(item.id)) {
+        return current
+      }
+      const next = new Set(current)
+      next.delete(item.id)
+      return next
+    })
   }
 
   function handleConsumed(item) {
@@ -180,6 +299,14 @@ export default function PantryPage() {
 
     replaceProduct(item)
     setToast(`Осталось ${formatAmount(item)} «${displayProductName(item.name)}»`)
+  }
+
+  function closeConsumeDialog() {
+    setConsumeTarget(null)
+  }
+
+  function closeWasteDialog() {
+    setWasteTarget(null)
   }
 
   return (
@@ -241,26 +368,39 @@ export default function PantryPage() {
 
             <nav className="chips" aria-label="Места хранения" ref={placeChipsRef}>
               <button
-                className={`chip${activePlace === 'all' ? ' is-active' : ''}`}
+                className={`chip${activePlace === 'all' && selectedIds.size === 0 ? ' is-active' : ''}`}
                 type="button"
-                onClick={() => setActivePlace('all')}
+                onClick={() => {
+                  if (selectedIds.size > 0) {
+                    clearSelection()
+                    return
+                  }
+                  setActivePlace('all')
+                }}
               >
-                Все
+                {selectedIds.size > 0 ? 'Снять выбор' : 'Все'}
               </button>
               {places.map((place) => (
                 <button
                   key={place.id}
-                  className={`chip${activePlace === place.id ? ' is-active' : ''}`}
+                  className={`chip${
+                    selectedIds.size === 0 && activePlace === place.id ? ' is-active' : ''
+                  }${selectedIds.size > 0 ? ' chip--move' : ''}`}
                   type="button"
-                  onClick={() =>
-                    setActivePlace((current) => (current === place.id ? 'all' : place.id))
-                  }
+                  disabled={moving}
+                  onClick={() => handlePlaceFilter(place.id)}
                 >
                   {place.name}
                 </button>
               ))}
             </nav>
           </div>
+
+          {selectedIds.size > 0 && (
+            <p className="selection-hint" role="status">
+              Выбрано: {selectedIds.size}. Нажмите место хранения, чтобы перенести.
+            </p>
+          )}
 
           {state === 'loading' && <p className="pantry__message">Загружаем кладовую...</p>}
 
@@ -294,6 +434,9 @@ export default function PantryPage() {
                           <ProductCard
                             key={product.id}
                             product={product}
+                            selected={selectedIds.has(product.id)}
+                            actionsDisabled={multiSelected}
+                            onToggleSelect={toggleSelected}
                             onAction={handleCardAction}
                           />
                         ))}
@@ -315,7 +458,18 @@ export default function PantryPage() {
         </main>
       </div>
 
-      <PantryDock onAdd={() => setAddOpen(true)} />
+      <PantryDock
+        onAdd={() => setAddOpen(true)}
+        bulkActions={
+          multiSelected
+            ? {
+                count: selectedIds.size,
+                onConsume: startBulkConsume,
+                onWaste: startBulkWaste,
+              }
+            : null
+        }
+      />
 
       {addOpen && (
         <AddProductDialog
@@ -331,12 +485,30 @@ export default function PantryPage() {
 
 
 
+      {bulkConsumeOpen && (
+        <BulkConsumeDialog
+          groupId={groupId}
+          products={selectedProducts()}
+          onClose={() => setBulkConsumeOpen(false)}
+          onDone={handleBulkConsumed}
+        />
+      )}
+
       {consumeTarget && (
         <ConsumeDialog
           groupId={groupId}
           product={consumeTarget}
-          onClose={() => setConsumeTarget(null)}
+          onClose={closeConsumeDialog}
           onConsumed={handleConsumed}
+        />
+      )}
+
+      {bulkWasteOpen && (
+        <BulkWasteDialog
+          groupId={groupId}
+          products={selectedProducts()}
+          onClose={() => setBulkWasteOpen(false)}
+          onDone={handleBulkWasted}
         />
       )}
 
@@ -344,7 +516,7 @@ export default function PantryPage() {
         <WasteDialog
           groupId={groupId}
           product={wasteTarget}
-          onClose={() => setWasteTarget(null)}
+          onClose={closeWasteDialog}
           onWasted={handleWasted}
         />
       )}

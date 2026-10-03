@@ -3,12 +3,8 @@ import { pantryApi } from '../api/client.js'
 import { FormAlert } from './FormAlert.jsx'
 import { QuantityPicker, ProductHead } from './QuantityPicker.jsx'
 import { actionAmount, amountError, formatNumber, parseAmount } from '../lib/pantry.js'
+import { WASTE_REASONS } from '../lib/wasteReasons.js'
 import '../styles/dialog.css'
-
-const REASONS = [
-  { value: 'spoiled', title: 'Продукт испортился' },
-  { value: 'mistake', title: 'Продукт добавлен ошибочно' },
-]
 
 export function WasteDialog({ groupId, product, onClose, onWasted }) {
   const available = Number(product.remaining ?? product.quantity)
@@ -72,7 +68,7 @@ export function WasteDialog({ groupId, product, onClose, onWasted }) {
           <fieldset className="radios">
             <legend className="writeoff__label">Причина списания</legend>
 
-            {REASONS.map((option) => (
+            {WASTE_REASONS.map((option) => (
               <label className="radio__option" key={option.value}>
                 <input
                   className="radio__input"

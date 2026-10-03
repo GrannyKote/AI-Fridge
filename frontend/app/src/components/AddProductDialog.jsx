@@ -10,19 +10,15 @@ import {
 import { DateInput } from './DateInput.jsx'
 import { FormAlert } from './FormAlert.jsx'
 import { SuggestInput } from './SuggestInput.jsx'
+import { PLACE_ICONS } from '../lib/placeIcons.jsx'
 import {
   ArrowLeftIcon,
-  CabinetIcon,
   CameraIcon,
-  CanIcon,
   HouseIcon,
-  IceIcon,
   MicIcon,
   MinusIcon,
   PencilIcon,
   PlusIcon,
-  SnowflakeIcon,
-  SpiceIcon,
 } from './icons.jsx'
 import '../styles/dialog.css'
 
@@ -43,15 +39,6 @@ const METHODS = [
   { key: 'receipt', title: 'Чек', icon: <CameraIcon /> },
   { key: 'voice', title: 'Голос', icon: <MicIcon /> },
 ]
-
-const PLACE_ICONS = {
-  Холодильник: <SnowflakeIcon />,
-  Морозилка: <IceIcon />,
-  Бакалея: <HouseIcon />,
-  Шкаф: <CabinetIcon />,
-  Специи: <SpiceIcon />,
-  Консервы: <CanIcon />,
-}
 
 const PLACE_BY_NAME = {
   'Фарш говяжий': 'Морозилка',

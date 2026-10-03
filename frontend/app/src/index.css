@@ -248,8 +248,13 @@ svg {
   color: var(--red);
 }
 
-.icon-btn:active {
+.icon-btn:active:not(:disabled) {
   transform: scale(0.92);
+}
+
+.icon-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
 }
 
 /* ---------- Уведомление об ошибке ---------- */

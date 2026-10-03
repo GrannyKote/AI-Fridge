@@ -350,13 +350,44 @@
   background: linear-gradient(180deg, rgba(255, 77, 79, 0.07), transparent), var(--surface);
 }
 
+.card--selected {
+  border-color: color-mix(in srgb, var(--green) 55%, var(--border));
+  background: linear-gradient(180deg, rgba(39, 221, 109, 0.1), transparent), var(--surface);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--green) 35%, transparent);
+}
+
+.selection-hint {
+  margin: -4px 0 12px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chip--move:not(:disabled) {
+  border-style: dashed;
+}
+
 .card__thumb {
   display: grid;
   place-items: center;
   width: 44px;
   height: 44px;
+  border: 2px solid transparent;
   border-radius: var(--radius-sm);
   font-size: 20px;
+  transition:
+    border-color 0.12s ease,
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.card__thumb:active {
+  transform: scale(0.94);
+}
+
+.card__thumb.is-selected {
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--green) 35%, transparent);
 }
 
 .card__thumb--dairy {
@@ -479,10 +510,16 @@
   pointer-events: auto;
 }
 
-.fab {
+.fab-group {
   position: absolute;
   right: var(--gutter);
   bottom: calc(100% + 16px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fab {
   display: grid;
   place-items: center;
   width: 56px;
@@ -492,6 +529,18 @@
   color: #06210f;
   box-shadow: 0 10px 24px rgba(39, 221, 109, 0.3);
   transition: transform 0.12s ease;
+}
+
+.fab--surface {
+  background: var(--surface-2);
+  color: var(--text);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.fab--danger {
+  background: var(--red-soft);
+  color: var(--red);
+  box-shadow: 0 10px 24px rgba(255, 77, 79, 0.22);
 }
 
 .fab svg {

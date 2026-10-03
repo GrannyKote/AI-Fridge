@@ -120,6 +120,8 @@ export const pantryApi = {
   usage: (groupId, period) => request(`/groups/${groupId}/usage?period=${period}`),
   addProduct: (groupId, payload) =>
     request(`/groups/${groupId}/products`, { method: 'POST', body: payload }),
+  moveProducts: (groupId, payload) =>
+    request(`/groups/${groupId}/products/move`, { method: 'POST', body: payload }),
   consumeProduct: (groupId, itemId, quantity) =>
     request(`/groups/${groupId}/products/${itemId}/consumption`, {
       method: 'POST',

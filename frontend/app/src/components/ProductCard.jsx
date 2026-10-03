@@ -8,17 +8,31 @@ import {
   statusOf,
 } from '../lib/pantry.js'
 
-export function ProductCard({ product, onAction }) {
+export function ProductCard({
+  product,
+  selected = false,
+  actionsDisabled = false,
+  onToggleSelect,
+  onAction,
+}) {
   const status = statusOf(product)
   const name = displayProductName(product.name)
   const { emoji, tone } = categoryView(product.category, product.category_id ?? 0)
   const subtitle = [product.storage_place, formatPrice(product.price)].filter(Boolean).join(' · ')
 
   return (
-    <article className={`card${status === 'expired' ? ' card--expired' : ''}`}>
-      <div className={`card__thumb card__thumb--${tone}`} aria-hidden="true">
+    <article
+      className={`card${status === 'expired' ? ' card--expired' : ''}${selected ? ' card--selected' : ''}`}
+    >
+      <button
+        className={`card__thumb card__thumb--${tone}${selected ? ' is-selected' : ''}`}
+        type="button"
+        onClick={() => onToggleSelect?.(product)}
+        aria-label={selected ? `Снять выбор «${name}»` : `Выбрать «${name}»`}
+        aria-pressed={selected}
+      >
         {emoji}
-      </div>
+      </button>
 
       <div className="card__body">
         <h3 className="card__title">{name}</h3>
@@ -36,6 +50,7 @@ export function ProductCard({ product, onAction }) {
         <button
           className="icon-btn"
           type="button"
+          disabled={actionsDisabled}
           onClick={() => onAction(product, 'use')}
           aria-label={`Использовать «${name}»`}
         >
@@ -44,6 +59,7 @@ export function ProductCard({ product, onAction }) {
         <button
           className="icon-btn icon-btn--danger"
           type="button"
+          disabled={actionsDisabled}
           onClick={() => onAction(product, 'delete')}
           aria-label={`Удалить «${name}»`}
         >

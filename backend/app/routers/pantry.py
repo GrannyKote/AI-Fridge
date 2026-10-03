@@ -10,6 +10,7 @@ from ..schemas import (
     ConsumptionCreate,
     PantryItemCreate,
     PantryItemOut,
+    PantryMoveCreate,
     PlaceOut,
     ProductSuggestionOut,
     UnitOut,
@@ -108,6 +109,25 @@ def add_product(
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
 
     return _to_item(created)
+
+
+@router.post("/groups/{group_id}/products/move", response_model=list[PantryItemOut])
+def move_products(
+    group_id: int,
+    payload: PantryMoveCreate,
+    session: Session = Depends(get_session),
+) -> list[PantryItemOut]:
+    try:
+        updated = pantry.move_storage_places(
+            session, group_id, payload.item_ids, payload.storage_place_id
+        )
+    except ValueError as error:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
+
+    if not updated:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Продукты не найдены")
+
+    return [_to_item(row) for row in updated]
 
 
 @router.post(

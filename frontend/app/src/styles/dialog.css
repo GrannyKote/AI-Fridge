@@ -143,6 +143,40 @@
   font-size: 13px;
 }
 
+.bulk-consume__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: min(48vh, 360px);
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.bulk-consume__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.bulk-consume__body {
+  min-width: 0;
+}
+
+.bulk-consume__name {
+  margin: 0;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .writeoff__presets {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

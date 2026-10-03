@@ -135,6 +135,34 @@ def get_product(session: Session, group_id: int, item_id: int):
     return session.execute(statement).mappings().first()
 
 
+def move_storage_places(
+    session: Session, group_id: int, item_ids: list[int], storage_place_id: int
+) -> list[dict]:
+    """Переносит выбранные строки кладовой в другое место хранения."""
+    if session.get(StoragePlace, storage_place_id) is None:
+        raise ValueError("Место хранения не найдено")
+
+    ids = list(dict.fromkeys(item_ids))
+    session.execute(
+        update(UserGroupProduct)
+        .where(
+            UserGroupProduct.id.in_(ids),
+            UserGroupProduct.id_user_group == group_id,
+            UserGroupProduct.is_over.is_not(True),
+            UserGroupProduct.is_deleted.is_not(True),
+        )
+        .values(id_storage_place=storage_place_id)
+    )
+    session.commit()
+
+    updated = []
+    for item_id in ids:
+        row = get_product(session, group_id, item_id)
+        if row is not None:
+            updated.append(row)
+    return updated
+
+
 def _lot_key(row) -> tuple:
     """Одинаковые для UI позиции: имя, продукт, срок, единица и место."""
     return (

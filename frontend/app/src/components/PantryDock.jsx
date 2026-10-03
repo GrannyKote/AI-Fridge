@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { APP_VERSION } from '../lib/appVersion.js'
-import { CartIcon, ChartIcon, FridgeIcon, PlusIcon, UserIcon } from './icons.jsx'
+import { CartIcon, ChartIcon, FridgeIcon, PlusIcon, TrashIcon, UserIcon, UtensilsIcon } from './icons.jsx'
 
 const TABS = [
   { key: 'pantry', title: 'Кладовая', icon: <FridgeIcon />, path: '/' },
@@ -9,7 +9,7 @@ const TABS = [
   { key: 'settings', title: 'Настройки', icon: <UserIcon />, path: '/settings' },
 ]
 
-export function PantryDock({ onAdd, tabs = TABS, addLabel = 'Добавить продукт' }) {
+export function PantryDock({ onAdd, bulkActions, tabs = TABS, addLabel = 'Добавить продукт' }) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
@@ -17,9 +17,31 @@ export function PantryDock({ onAdd, tabs = TABS, addLabel = 'Добавить п
     <div className="dock">
       <div className="dock__inner">
         {onAdd && (
-          <button className="fab" type="button" onClick={onAdd} aria-label={addLabel}>
-            <PlusIcon />
-          </button>
+          <div className="fab-group">
+            {bulkActions && (
+              <>
+                <button
+                  className="fab fab--surface"
+                  type="button"
+                  onClick={bulkActions.onConsume}
+                  aria-label={`Употребить выбранные, ${bulkActions.count}`}
+                >
+                  <UtensilsIcon />
+                </button>
+                <button
+                  className="fab fab--danger"
+                  type="button"
+                  onClick={bulkActions.onWaste}
+                  aria-label={`Списать выбранные, ${bulkActions.count}`}
+                >
+                  <TrashIcon />
+                </button>
+              </>
+            )}
+            <button className="fab" type="button" onClick={onAdd} aria-label={addLabel}>
+              <PlusIcon />
+            </button>
+          </div>
         )}
 
         <div className="dock__panel">
