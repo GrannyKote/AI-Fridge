@@ -78,6 +78,15 @@ export function NewsIcon() {
   )
 }
 
+export function FeedbackIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 5.5h14A1.5 1.5 0 0 1 20.5 7v8.5A1.5 1.5 0 0 1 19 17h-6.2L7 20.5V17H5A1.5 1.5 0 0 1 3.5 15.5V7A1.5 1.5 0 0 1 5 5.5Z" />
+      <path d="M8 10h8M8 13h5" />
+    </svg>
+  )
+}
+
 export function SearchIcon({ className }) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden="true">

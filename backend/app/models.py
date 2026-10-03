@@ -6,9 +6,11 @@ from sqlalchemy import (
     Date,
     DateTime,
     Integer,
+    LargeBinary,
     Numeric,
     SmallInteger,
     String,
+    Text,
     Time,
 )
 from sqlalchemy.orm import Mapped, mapped_column
@@ -187,3 +189,23 @@ class UserGroupProductWaste(Base):
     id_user_group_product: Mapped[int] = mapped_column(Integer, nullable=False)
     quantity: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     date_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class Feedback(Base):
+    __tablename__ = "feedback"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id_user: Mapped[int] = mapped_column(Integer, nullable=False)
+    datetime_created: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    feedback_text: Mapped[str | None] = mapped_column(Text)
+
+
+class FeedbackItem(Base):
+    __tablename__ = "feedback_item"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id_feedback: Mapped[int] = mapped_column(Integer, nullable=False)
+    # Сама картинка, приложенная к отзыву.
+    item: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)

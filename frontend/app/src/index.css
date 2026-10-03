@@ -56,7 +56,8 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
   color: inherit;
 }
@@ -125,6 +126,13 @@ svg {
 .field__input:focus {
   border-color: rgba(39, 221, 109, 0.5);
   box-shadow: 0 0 0 3px var(--green-soft);
+}
+
+.field__textarea {
+  height: auto;
+  min-height: 128px;
+  padding: 14px 16px;
+  resize: vertical;
 }
 
 .field__input--with-action {

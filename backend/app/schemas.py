@@ -181,3 +181,15 @@ class CheckoutItem(BaseModel):
 
 class PurchaseCheckout(BaseModel):
     items: list[CheckoutItem] = Field(min_length=1)
+
+
+class FeedbackItemOut(BaseModel):
+    id: int
+
+
+class FeedbackOut(BaseModel):
+    id: int
+    id_user: int
+    datetime_created: datetime
+    feedback_text: str
+    items: list[FeedbackItemOut] = []

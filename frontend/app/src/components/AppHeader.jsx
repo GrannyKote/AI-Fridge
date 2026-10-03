@@ -4,11 +4,12 @@ import { pantryApi, shoppingApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { notifyPurchaseChanged, usePurchaseChanged } from '../lib/purchaseEvents.js'
 import { CheckoutDialog } from './CheckoutDialog.jsx'
+import { FeedbackDialog } from './FeedbackDialog.jsx'
 import { NewsDialog } from './NewsDialog.jsx'
 import { NotificationsDialog } from './NotificationsDialog.jsx'
 import { PlanPurchaseDialog } from './PlanPurchaseDialog.jsx'
 import { PlannedPurchaseBanner } from './PlannedPurchaseBanner.jsx'
-import { BellIcon, NewsIcon } from './icons.jsx'
+import { BellIcon, FeedbackIcon, NewsIcon } from './icons.jsx'
 
 export function AppHeader({ onToast }) {
   const { user } = useAuth()
@@ -26,6 +27,7 @@ export function AppHeader({ onToast }) {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [newsOpen, setNewsOpen] = useState(false)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
 
   const load = useCallback(async () => {
     if (!groupId) {
@@ -101,6 +103,16 @@ export function AppHeader({ onToast }) {
             >
               <NewsIcon />
             </button>
+
+            <button
+              className="icon-btn icon-btn--round"
+              type="button"
+              onClick={() => setFeedbackOpen(true)}
+              aria-label="Обратная связь"
+              aria-expanded={feedbackOpen}
+            >
+              <FeedbackIcon />
+            </button>
           </div>
         </div>
 
@@ -135,6 +147,16 @@ export function AppHeader({ onToast }) {
       )}
 
       {newsOpen && <NewsDialog onClose={() => setNewsOpen(false)} />}
+
+      {feedbackOpen && (
+        <FeedbackDialog
+          onClose={() => setFeedbackOpen(false)}
+          onSent={() => {
+            setFeedbackOpen(false)
+            toast('Спасибо за отзыв')
+          }}
+        />
+      )}
 
       {planOpen && groupId && (
         <PlanPurchaseDialog

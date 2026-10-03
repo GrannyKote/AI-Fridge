@@ -31,15 +31,15 @@ function headers(body, token) {
   }
 }
 
-async function request(path, { method = 'GET', body } = {}) {
+async function request(path, { method = 'GET', body, form } = {}) {
   const token = readSession()?.token
   let response
 
   try {
     response = await fetch(`${BASE_URL}${path}`, {
       method,
-      headers: headers(body, token),
-      body: body ? JSON.stringify(body) : undefined,
+      headers: form ? headers(null, token) : headers(body, token),
+      body: form ?? (body ? JSON.stringify(body) : undefined),
     })
   } catch {
     throw new Error('Сервер недоступен. Проверьте, что бэкенд запущен')
@@ -98,6 +98,17 @@ export const pantryApi = {
       method: 'POST',
       body: payload,
     }),
+}
+
+export const feedbackApi = {
+  create: (text, files = []) => {
+    const form = new FormData()
+    form.append('text', text)
+    for (const file of files) {
+      form.append('images', file)
+    }
+    return request('/feedback', { method: 'POST', form })
+  },
 }
 
 export const shoppingApi = {
