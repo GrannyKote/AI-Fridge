@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://postgres:postgres@127.0.0.1:5432/diplom"
     db_schema: str = "diplom_all"
     default_group_name: str = "Новая группа пользователей"
+    # Ключ подписи JWT. На проде задаётся через JWT_SECRET в .env.
+    jwt_secret: str = "dev-secret-change-me"
+    jwt_algorithm: str = "HS256"
+    jwt_ttl_hours: int = 24 * 7
     cors_origins: list[str] = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",

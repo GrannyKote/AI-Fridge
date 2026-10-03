@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from ..database import get_session
+from ..dependencies import current_user_id
 from ..schemas import (
     CategoryOut,
     ConsumptionCreate,
@@ -33,6 +34,12 @@ def _to_item(row) -> PantryItemOut:
         storage_place_id=row["id_storage_place"],
         storage_place=row["storage_place"],
         best_before=row["best_before"],
+        first_reminder_days=row["first_reminder_days"],
+        second_reminder_days=row["second_reminder_days"],
+        first_reminder_shown=row["first_reminder_shown"],
+        first_reminder_seen=row["first_reminder_seen"],
+        second_reminder_shown=row["second_reminder_shown"],
+        second_reminder_seen=row["second_reminder_seen"],
         is_consumed=bool(row["is_consumed"]),
         is_wasted=bool(row["is_wasted"]),
         is_deleted=bool(row["is_deleted"]),
@@ -71,6 +78,16 @@ def products(group_id: int, session: Session = Depends(get_session)) -> list[Pan
     return [_to_item(row) for row in pantry.list_products(session, group_id)]
 
 
+@router.get("/groups/{group_id}/reminders", response_model=list[PantryItemOut])
+def reminders(group_id: int, session: Session = Depends(get_session)) -> list[PantryItemOut]:
+    return [_to_item(row) for row in pantry.list_reminders(session, group_id)]
+
+
+@router.post("/groups/{group_id}/reminders/seen", status_code=status.HTTP_204_NO_CONTENT)
+def reminders_seen(group_id: int, session: Session = Depends(get_session)) -> None:
+    pantry.mark_reminders_seen(session, group_id)
+
+
 @router.post(
     "/groups/{group_id}/products",
     response_model=PantryItemOut,
@@ -80,9 +97,10 @@ def add_product(
     group_id: int,
     payload: PantryItemCreate,
     session: Session = Depends(get_session),
+    user_id: int = Depends(current_user_id),
 ) -> PantryItemOut:
     try:
-        created = pantry.create_pantry_item(session, group_id, payload)
+        created = pantry.create_pantry_item(session, group_id, payload, user_id)
     except ValueError as error:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
 

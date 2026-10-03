@@ -1,8 +1,8 @@
 # AI-Fridge — бэкенд (FastAPI)
 
 API авторизации для дипломного проекта. Работает с локальным PostgreSQL,
-схема `diplom_all` базы `diplom`. Таблицы уже существуют, миграции не создаются:
-приложение только читает и пишет данные.
+схема `diplom_all` базы `diplom`. Структура схемы описана миграциями Alembic —
+см. раздел «Миграции».
 
 ## Запуск
 
@@ -10,6 +10,7 @@ API авторизации для дипломного проекта. Рабо�
 python -m venv .venv
 .venv\Scripts\activate          # Windows PowerShell: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+alembic upgrade head
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -23,6 +24,58 @@ uvicorn app.main:app --reload --port 8000
 | --- | --- | --- |
 | `DATABASE_URL` | `postgresql+psycopg://postgres:postgres@127.0.0.1:5432/diplom` | Строка подключения |
 | `DB_SCHEMA` | `diplom_all` | Схема с таблицами проекта |
+| `JWT_SECRET` | `dev-secret-change-me` | Ключ подписи токенов входа |
+
+## Миграции
+
+Все изменения структуры базы фиксируются миграциями Alembic в
+`alembic/versions`. Строка подключения берётся из того же `DATABASE_URL`, что и
+у приложения, поэтому отдельно её в `alembic.ini` прописывать не нужно. Таблица
+с текущей ревизией — `diplom_all.alembic_version`.
+
+```bash
+alembic upgrade head            # накатить всё до последней ревизии
+alembic current                 # какая ревизия стоит на базе
+alembic history                 # список ревизий
+alembic downgrade -1            # откатить одну ревизию
+alembic upgrade head --sql      # показать SQL, ничего не применяя
+```
+
+Новая миграция после правки `app/models.py`:
+
+```bash
+alembic revision --autogenerate -m "добавление индекса по login" --rev-id 0002
+```
+
+`--rev-id` задаёт номер ревизии вручную, чтобы файлы шли по порядку
+(`0001_...`, `0002_...`); без него Alembic сгенерирует случайный хеш.
+Автогенерацию нужно проверять глазами: часть колонок в базе названа
+не так, как в моделях (` unit_of_measurement`, `Id_storage_place`), и
+внешних ключей в схеме нет — лишние правки из файла стоит удалить.
+
+Первая ревизия `0001_baseline_schema` описывает схему в том виде, в котором она
+существовала до появления Alembic (раньше это был `docker/postgres/init.sql`),
+вместе со справочниками `storage_place`, `product_category` и
+` unit_of_measurement`. Если таблицы в базе уже есть, ревизия ничего не создаёт
+и только отмечается в `alembic_version` — поэтому `alembic upgrade head`
+безопасно запускать и на пустой, и на рабочей базе.
+
+Ревизия `0002` добавляет в `product` автора записи (`id_user_created`), время
+создания (`datetime_created`), дни двух напоминаний о сроке
+(`first_reminder_days`, `second_reminder_days`) и срок хранения в днях
+(`expires_in`). Эти колонки тоже могли появиться в базе руками, поэтому ревизия
+добавляет только отсутствующие.
+
+Ревизия `0003` добавляет в `user_group_product` время первого попадания
+продукта в список колокольчика (`first_reminder_shown`) и время просмотра
+этого списка (`first_reminder_seen`). Ревизия `0004` — то же для второго
+напоминания (`second_reminder_shown`, `second_reminder_seen`). После
+просмотра первого продукт пропадает из колокольчика и возвращается только
+когда наступает `second_reminder_days`; после просмотра второго исчезает
+окончательно.
+
+В Docker миграции накатываются сами: контейнер `backend` запускает
+`alembic upgrade head` перед `uvicorn`.
 
 ## Эндпоинты
 
@@ -34,7 +87,9 @@ uvicorn app.main:app --reload --port 8000
 | `GET` | `/api/units` | Единицы измерения из `unit_of_measurement` |
 | `GET` | `/api/products/search?query=` | Первые 5 продуктов из `product` по началу названия |
 | `GET` | `/api/groups/{group_id}/products` | Кладовая группы из `user_group_product` |
-| `POST` | `/api/groups/{group_id}/products` | Добавить продукт в кладовую |
+| `GET` | `/api/groups/{group_id}/reminders` | Текущие напоминания колокольчика; ставит `first_reminder_shown` или `second_reminder_shown` |
+| `POST` | `/api/groups/{group_id}/reminders/seen` | После просмотра ставит `first_reminder_seen` или `second_reminder_seen` |
+| `POST` | `/api/groups/{group_id}/products` | Добавить продукт в кладовую (нужен токен) |
 | `POST` | `/api/groups/{group_id}/products/{item_id}/consumption` | Записать потребление продукта |
 | `POST` | `/api/groups/{group_id}/products/{item_id}/waste` | Списать испорченный продукт или пометить запись ошибочной |
 | `GET` | `/api/health` | Проверка связи с базой |
@@ -51,12 +106,28 @@ uvicorn app.main:app --reload --port 8000
 {
   "id": 1,
   "login": "ivan.petrov",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "groups": [{ "id": 1, "name": "Новая группа пользователей" }]
 }
 ```
 
 Коды ошибок: `409` — логин занят, `401` — неверный логин или пароль,
 `422` — логин или пароль не прошли валидацию, `503` — нет связи с базой.
+
+## Токен доступа
+
+Регистрация и вход возвращают JWT (`app/services/tokens.py`), подписанный
+`JWT_SECRET` на `HS256`; в полезной нагрузке лежат `sub` — id пользователя,
+`login` и срок жизни `exp` (по умолчанию неделя). Клиент хранит токен вместе с
+сессией и отдаёт его обратно в заголовке:
+
+```
+Authorization: Bearer <токен>
+```
+
+Эндпоинты, которые заводят записи в `product`, требуют этот заголовок:
+зависимость `current_user_id` (`app/dependencies.py`) достаёт из токена id
+пользователя и отвечает `401`, если токен не передан, просрочен или подделан.
 
 Тело запроса на добавление продукта (`product_id` передаётся, только если
 пользователь выбрал продукт из подсказок):
@@ -108,7 +179,8 @@ uvicorn app.main:app --reload --port 8000
 1. категория ищется в `product_category` по названию без учёта регистра, при
    отсутствии — создаётся;
 2. продукт берётся по `product_id` из подсказки, иначе ищется в `product` по
-   названию, при отсутствии — создаётся с найденной категорией;
+   названию, при отсутствии — создаётся с найденной категорией, автором
+   (`id_user_created` из токена) и временем создания (`datetime_created`);
 3. в `user_group_product` записывается строка с количеством, единицей
    измерения и сроком годности.
 
@@ -180,6 +252,9 @@ app/
   routers/pantry.py   категории и кладовая
   services/users.py   работа с пользователями и группами
   services/pantry.py  выборка продуктов группы
+alembic/env.py        подключение Alembic к настройкам приложения
+alembic/versions/     миграции схемы diplom_all
+alembic.ini           конфигурация Alembic
 seed_demo.py          демо-данные для кладовой
 ```
 
@@ -201,8 +276,10 @@ seed_demo.py          демо-данные для кладовой
 Ещё одно место на будущее: в таблице `user` нет уникального индекса по `login`.
 Занятость логина проверяется запросом перед вставкой, поэтому при
 одновременных регистрациях теоретически возможны дубликаты. Надёжнее добавить
-в базу уникальный индекс:
+уникальный индекс отдельной миграцией:
 
-```sql
-create unique index user_login_lower_key on diplom_all."user" (lower(login));
+```python
+op.execute(
+    f'create unique index user_login_lower_key on "{SCHEMA}"."user" (lower(login))'
+)
 ```

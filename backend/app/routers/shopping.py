@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from ..database import get_session
+from ..dependencies import current_user_id
 from ..schemas import PlanDateUpdate, PurchaseCheckout, PurchaseCreate, PurchaseHeaderOut, PurchaseOut
 from ..services import shopping
 
@@ -16,6 +17,7 @@ def _to_item(row) -> PurchaseOut:
         unit=row["unit"],
         category_id=row["id_product_category"],
         category=row["category_name"],
+        expires_in=row["expires_in"],
     )
 
 
@@ -33,9 +35,10 @@ def add_purchase(
     group_id: int,
     payload: PurchaseCreate,
     session: Session = Depends(get_session),
+    user_id: int = Depends(current_user_id),
 ) -> PurchaseOut:
     try:
-        created = shopping.create_purchase(session, group_id, payload)
+        created = shopping.create_purchase(session, group_id, payload, user_id)
     except ValueError as error:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
 

@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -30,6 +30,8 @@ class UserOut(BaseModel):
 
     id: int
     login: str
+    # JWT: клиент отдаёт его обратно в заголовке Authorization.
+    token: str
     groups: list[GroupOut] = []
 
 
@@ -59,6 +61,8 @@ class ProductSuggestionOut(BaseModel):
     name: str
     category_id: int | None = None
     category: str | None = None
+    # Срок хранения в днях: из него считается срок годности по умолчанию.
+    expires_in: int | None = None
 
 
 class PantryItemOut(BaseModel):
@@ -73,6 +77,13 @@ class PantryItemOut(BaseModel):
     storage_place_id: int | None = None
     storage_place: str | None = None
     best_before: date
+    # За сколько дней до конца срока показывать продукт как «скоро испортится».
+    first_reminder_days: int | None = None
+    second_reminder_days: int | None = None
+    first_reminder_shown: datetime | None = None
+    first_reminder_seen: datetime | None = None
+    second_reminder_shown: datetime | None = None
+    second_reminder_seen: datetime | None = None
     is_consumed: bool = False
     is_wasted: bool = False
     is_deleted: bool = False
@@ -146,6 +157,7 @@ class PurchaseOut(BaseModel):
     unit: str | None = None
     category_id: int | None = None
     category: str | None = None
+    expires_in: int | None = None
 
 
 class PlanDateUpdate(BaseModel):

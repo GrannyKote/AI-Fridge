@@ -1,7 +1,16 @@
 from datetime import date, datetime, time
 from decimal import Decimal
 
-from sqlalchemy import Boolean, Date, DateTime, Integer, Numeric, String, Time
+from sqlalchemy import (
+    Boolean,
+    Date,
+    DateTime,
+    Integer,
+    Numeric,
+    SmallInteger,
+    String,
+    Time,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .config import settings
@@ -78,6 +87,14 @@ class Product(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(512), nullable=False)
     id_product_category: Mapped[int] = mapped_column(Integer, nullable=False)
+    # Автор продукта: NULL у позиций общего справочника.
+    id_user_created: Mapped[int | None] = mapped_column(Integer)
+    datetime_created: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # За сколько дней до истечения срока напомнить: первое и второе напоминание.
+    first_reminder_days: Mapped[int | None] = mapped_column(SmallInteger)
+    second_reminder_days: Mapped[int | None] = mapped_column(SmallInteger)
+    # Срок хранения продукта в днях — подсказка для best_before в кладовой.
+    expires_in: Mapped[int | None] = mapped_column(SmallInteger)
 
 
 class UnitOfMeasurement(Base):
@@ -117,6 +134,11 @@ class UserGroupProduct(Base):
     is_consumed: Mapped[bool | None] = mapped_column(Boolean)
     is_wasted: Mapped[bool | None] = mapped_column(Boolean)
     is_over: Mapped[bool | None] = mapped_column(Boolean)
+    # Когда продукт попал в список колокольчика и когда это напоминание посмотрели.
+    first_reminder_shown: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    first_reminder_seen: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    second_reminder_shown: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    second_reminder_seen: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class UserGroupPurchase(Base):

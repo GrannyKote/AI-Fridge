@@ -4,7 +4,8 @@ export function readSession() {
   try {
     const raw = localStorage.getItem(SESSION_KEY)
     const session = raw ? JSON.parse(raw) : null
-    return session?.login ? session : null
+    // Сессия без токена бесполезна: бэкенд не примет запросы.
+    return session?.login && session?.token ? session : null
   } catch {
     return null
   }

@@ -1,3 +1,5 @@
+import { readSession } from '../auth/sessionStore.js'
+
 const BASE_URL = import.meta.env.VITE_API_URL ?? '/api'
 
 function extractMessage(payload, fallback) {
@@ -15,13 +17,28 @@ function extractMessage(payload, fallback) {
   return fallback
 }
 
+// Токен просрочен или подделан — сообщаем об этом приложению, чтобы оно разлогинило.
+let unauthorizedHandler = null
+
+export function setUnauthorizedHandler(handler) {
+  unauthorizedHandler = handler
+}
+
+function headers(body, token) {
+  return {
+    ...(body ? { 'Content-Type': 'application/json' } : null),
+    ...(token ? { Authorization: `Bearer ${token}` } : null),
+  }
+}
+
 async function request(path, { method = 'GET', body } = {}) {
+  const token = readSession()?.token
   let response
 
   try {
     response = await fetch(`${BASE_URL}${path}`, {
       method,
-      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      headers: headers(body, token),
       body: body ? JSON.stringify(body) : undefined,
     })
   } catch {
@@ -33,6 +50,10 @@ async function request(path, { method = 'GET', body } = {}) {
   }
 
   const payload = await response.json().catch(() => null)
+
+  if (response.status === 401 && token) {
+    unauthorizedHandler?.()
+  }
 
   if (!response.ok) {
     throw new Error(extractMessage(payload, 'Не удалось выполнить запрос'))
@@ -61,6 +82,9 @@ export const pantryApi = {
   searchProducts: (query) =>
     request(`/products/search?query=${encodeURIComponent(query)}&limit=5`),
   products: (groupId) => request(`/groups/${groupId}/products`),
+  reminders: (groupId) => request(`/groups/${groupId}/reminders`),
+  markRemindersSeen: (groupId) =>
+    request(`/groups/${groupId}/reminders/seen`, { method: 'POST' }),
   usage: (groupId, period) => request(`/groups/${groupId}/usage?period=${period}`),
   addProduct: (groupId, payload) =>
     request(`/groups/${groupId}/products`, { method: 'POST', body: payload }),

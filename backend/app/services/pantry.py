@@ -1,8 +1,8 @@
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
 from ..models import (
@@ -46,6 +46,7 @@ def search_products(session: Session, query: str, limit: int = 5):
             Product.name,
             Product.id_product_category.label("category_id"),
             ProductCategory.name.label("category"),
+            Product.expires_in,
         )
         .outerjoin(ProductCategory, ProductCategory.id == Product.id_product_category)
         .where(func.lower(Product.name).like(f"{prefix}%", escape="\\"))
@@ -89,7 +90,15 @@ def _products_statement():
             ProductCategory.name.label("category_name"),
             StoragePlace.name.label("storage_place"),
             UnitOfMeasurement.name.label("unit"),
+            # За сколько дней до конца срока предупреждать — настройка самого продукта.
+            Product.first_reminder_days,
+            Product.second_reminder_days,
+            UserGroupProduct.first_reminder_shown,
+            UserGroupProduct.first_reminder_seen,
+            UserGroupProduct.second_reminder_shown,
+            UserGroupProduct.second_reminder_seen,
         )
+        .outerjoin(Product, Product.id == UserGroupProduct.id_product)
         .outerjoin(
             ProductCategory,
             ProductCategory.id == UserGroupProduct.id_product_category,
@@ -132,7 +141,9 @@ def money(value: float | None) -> Decimal | None:
     return None if value is None else Decimal(str(value))
 
 
-def create_pantry_item(session: Session, group_id: int, payload: PantryItemCreate) -> dict:
+def create_pantry_item(
+    session: Session, group_id: int, payload: PantryItemCreate, user_id: int
+) -> dict:
     """Кладёт продукт в кладовую, заводя справочники, если их ещё нет."""
     unit = session.get(UnitOfMeasurement, payload.unit_id)
     if unit is None:
@@ -140,7 +151,7 @@ def create_pantry_item(session: Session, group_id: int, payload: PantryItemCreat
 
     name = payload.name.strip()
     product, category = catalog.ensure_product(
-        session, name, payload.category, payload.product_id
+        session, name, payload.category, payload.product_id, user_id=user_id
     )
 
     item = UserGroupProduct(
@@ -159,6 +170,143 @@ def create_pantry_item(session: Session, group_id: int, payload: PantryItemCreat
     session.commit()
 
     return get_product(session, group_id, item.id)
+
+
+# Совпадает с SOON_THRESHOLD_DAYS на фронте, если у продукта нет своего порога.
+DEFAULT_FIRST_REMINDER_DAYS = 4
+
+
+def _catalog_days(value) -> int | None:
+    if value is None:
+        return None
+    days = int(value)
+    return days if days >= 0 else None
+
+
+def _days_left(row) -> int:
+    return (row["best_before"] - date.today()).days
+
+
+def _first_threshold(row) -> int:
+    days = _catalog_days(row["first_reminder_days"])
+    return DEFAULT_FIRST_REMINDER_DAYS if days is None else days
+
+
+def _in_first_window(row) -> bool:
+    return _days_left(row) <= _first_threshold(row)
+
+
+def _in_second_window(row) -> bool:
+    days = _catalog_days(row["second_reminder_days"])
+    return days is not None and _days_left(row) <= days
+
+
+def _reminder_stage(row) -> str | None:
+    """Какое напоминание сейчас висит в колокольчике."""
+    if row.get("first_reminder_seen") is None and _in_first_window(row):
+        return "first"
+    if (
+        row.get("first_reminder_seen") is not None
+        and row.get("second_reminder_seen") is None
+        and _in_second_window(row)
+    ):
+        return "second"
+    return None
+
+
+def _attention_rows(session: Session, group_id: int) -> list[dict]:
+    rows = []
+    for row in list_products(session, group_id):
+        item = dict(row)
+        stage = _reminder_stage(item)
+        if stage is None:
+            continue
+        item["reminder_stage"] = stage
+        rows.append(item)
+    return rows
+
+
+def _stamp_reminders(
+    session: Session,
+    group_id: int,
+    ids: list[int],
+    shown_column,
+    seen_column=None,
+    now: datetime | None = None,
+) -> None:
+    if not ids:
+        return
+
+    values = {shown_column.key: func.coalesce(shown_column, now)}
+    where = [
+        UserGroupProduct.id.in_(ids),
+        UserGroupProduct.id_user_group == group_id,
+    ]
+    if seen_column is None:
+        values = {shown_column.key: now}
+        where.append(shown_column.is_(None))
+    else:
+        values[seen_column.key] = now
+        where.append(seen_column.is_(None))
+
+    session.execute(update(UserGroupProduct).where(*where).values(**values))
+
+
+def list_reminders(session: Session, group_id: int) -> list[dict]:
+    """Список колокольчика: помечает shown при первом попадании на этап."""
+    rows = _attention_rows(session, group_id)
+    now = datetime.now().astimezone()
+    first_ids = [
+        row["id"]
+        for row in rows
+        if row["reminder_stage"] == "first" and row.get("first_reminder_shown") is None
+    ]
+    second_ids = [
+        row["id"]
+        for row in rows
+        if row["reminder_stage"] == "second" and row.get("second_reminder_shown") is None
+    ]
+
+    _stamp_reminders(session, group_id, first_ids, UserGroupProduct.first_reminder_shown, now=now)
+    _stamp_reminders(
+        session, group_id, second_ids, UserGroupProduct.second_reminder_shown, now=now
+    )
+    if first_ids or second_ids:
+        session.commit()
+        for row in rows:
+            if row["id"] in first_ids:
+                row["first_reminder_shown"] = now
+            if row["id"] in second_ids:
+                row["second_reminder_shown"] = now
+
+    return rows
+
+
+def mark_reminders_seen(session: Session, group_id: int) -> None:
+    """После просмотра списка ставит seen для текущего этапа напоминания."""
+    rows = _attention_rows(session, group_id)
+    now = datetime.now().astimezone()
+    first_ids = [row["id"] for row in rows if row["reminder_stage"] == "first"]
+    second_ids = [row["id"] for row in rows if row["reminder_stage"] == "second"]
+
+    _stamp_reminders(
+        session,
+        group_id,
+        first_ids,
+        UserGroupProduct.first_reminder_shown,
+        UserGroupProduct.first_reminder_seen,
+        now,
+    )
+    _stamp_reminders(
+        session,
+        group_id,
+        second_ids,
+        UserGroupProduct.second_reminder_shown,
+        UserGroupProduct.second_reminder_seen,
+        now,
+    )
+    if first_ids or second_ids:
+        session.commit()
 
 
 def _total_of(session: Session, model, item_id: int) -> Decimal:

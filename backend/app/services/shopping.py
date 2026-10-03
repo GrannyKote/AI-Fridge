@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..models import (
+    Product,
     ProductCategory,
     StoragePlace,
     UnitOfMeasurement,
@@ -28,7 +29,10 @@ def _product_statement():
             UserGroupPurchaseProduct.id_product_category,
             ProductCategory.name.label("category_name"),
             UnitOfMeasurement.name.label("unit"),
+            # Срок хранения из справочника: подставится в срок годности при расчёте покупок.
+            Product.expires_in,
         )
+        .outerjoin(Product, Product.id == UserGroupPurchaseProduct.id_product)
         .outerjoin(
             ProductCategory,
             ProductCategory.id == UserGroupPurchaseProduct.id_product_category,
@@ -99,14 +103,16 @@ def get_purchase(session: Session, group_id: int, item_id: int):
     return session.execute(statement).mappings().first()
 
 
-def create_purchase(session: Session, group_id: int, payload: PurchaseCreate):
+def create_purchase(
+    session: Session, group_id: int, payload: PurchaseCreate, user_id: int
+):
     unit = session.get(UnitOfMeasurement, payload.unit_id)
     if unit is None:
         raise ValueError("Единица измерения не найдена")
 
     name = payload.name.strip()
     product, category = catalog.ensure_product(
-        session, name, payload.category, payload.product_id
+        session, name, payload.category, payload.product_id, user_id=user_id
     )
     now = datetime.now()
     purchase = _ensure_open_purchase(session, group_id, now)

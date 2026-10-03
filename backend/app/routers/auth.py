@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_session
 from ..schemas import GroupOut, LoginRequest, RegisterRequest, UserOut
-from ..services import users
+from ..services import tokens, users
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -12,6 +12,7 @@ def _to_out(user, groups) -> UserOut:
     return UserOut(
         id=user.id,
         login=user.login,
+        token=tokens.create_access_token(user),
         groups=[GroupOut.model_validate(group) for group in groups],
     )
 

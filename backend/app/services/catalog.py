@@ -1,5 +1,7 @@
 """Справочники: продукт и категория заводятся, если их ещё нет."""
 
+from datetime import datetime
+
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -16,6 +18,8 @@ def ensure_product(
     name: str,
     category_name: str,
     product_id: int | None = None,
+    *,
+    user_id: int,
 ) -> tuple[Product, ProductCategory]:
     category = _find_by_name(session, ProductCategory, category_name)
     if category is None:
@@ -27,7 +31,12 @@ def ensure_product(
     if product is None:
         product = _find_by_name(session, Product, name)
     if product is None:
-        product = Product(name=name.strip(), id_product_category=category.id)
+        product = Product(
+            name=name.strip(),
+            id_product_category=category.id,
+            id_user_created=user_id,
+            datetime_created=datetime.now().astimezone(),
+        )
         session.add(product)
         session.flush()
 

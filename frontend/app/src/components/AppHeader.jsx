@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
-import { shoppingApi } from '../api/client.js'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { pantryApi, shoppingApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { notifyPurchaseChanged, usePurchaseChanged } from '../lib/purchaseEvents.js'
 import { CheckoutDialog } from './CheckoutDialog.jsx'
@@ -10,40 +10,56 @@ import { PlanPurchaseDialog } from './PlanPurchaseDialog.jsx'
 import { PlannedPurchaseBanner } from './PlannedPurchaseBanner.jsx'
 import { BellIcon, NewsIcon } from './icons.jsx'
 
-export function AppHeader({ alerts = 0, onToast }) {
+export function AppHeader({ onToast }) {
   const { user } = useAuth()
   const { pathname } = useLocation()
+  const navigate = useNavigate()
   const groupId = user.groups?.[0]?.id
   const showPlan = pathname !== '/settings'
 
   const [planDate, setPlanDate] = useState(null)
   const [items, setItems] = useState([])
+  // Продукты из групп «Просрочено» и «Скоро испортится»: счётчик и список в форме.
+  const [attention, setAttention] = useState([])
+  const [dialogProducts, setDialogProducts] = useState([])
   const [planOpen, setPlanOpen] = useState(false)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [newsOpen, setNewsOpen] = useState(false)
 
-  const loadPlan = useCallback(async () => {
+  const load = useCallback(async () => {
     if (!groupId) {
       setPlanDate(null)
       setItems([])
+      setAttention([])
       return
     }
 
-    const [header, purchaseList] = await Promise.all([
+    const [header, purchaseList, reminders] = await Promise.all([
       shoppingApi.header(groupId).catch(() => null),
       shoppingApi.list(groupId).catch(() => []),
+      pantryApi.reminders(groupId).catch(() => []),
     ])
 
     setPlanDate(header?.plan_date ?? null)
     setItems(purchaseList)
+    setAttention(reminders)
   }, [groupId])
 
   useEffect(() => {
-    loadPlan()
-  }, [loadPlan])
+    load()
+  }, [load])
 
-  usePurchaseChanged(loadPlan)
+  usePurchaseChanged(load)
+
+  const markRemindersSeen = useCallback(async () => {
+    if (!groupId) {
+      return
+    }
+
+    await pantryApi.markRemindersSeen(groupId).catch(() => {})
+    await load()
+  }, [groupId, load])
 
   function toast(message) {
     onToast?.(message)
@@ -59,12 +75,21 @@ export function AppHeader({ alerts = 0, onToast }) {
             <button
               className="icon-btn icon-btn--round"
               type="button"
-              onClick={() => setNotificationsOpen(true)}
-              aria-label={alerts > 0 ? `Уведомления, ${alerts}` : 'Уведомления'}
+              onClick={() => {
+                setDialogProducts(attention)
+                setNotificationsOpen(true)
+              }}
+              aria-label={
+                attention.length > 0
+                  ? `Требуют внимания, ${attention.length}`
+                  : 'Требуют внимания'
+              }
               aria-expanded={notificationsOpen}
             >
               <BellIcon />
-              {alerts > 0 && <span className="icon-btn__badge">{alerts}</span>}
+              {attention.length > 0 && (
+                <span className="icon-btn__badge">{attention.length}</span>
+              )}
             </button>
 
             <button
@@ -98,7 +123,15 @@ export function AppHeader({ alerts = 0, onToast }) {
       </header>
 
       {notificationsOpen && (
-        <NotificationsDialog onClose={() => setNotificationsOpen(false)} />
+        <NotificationsDialog
+          products={dialogProducts}
+          onClose={() => setNotificationsOpen(false)}
+          onViewed={markRemindersSeen}
+          onGo={() => {
+            setNotificationsOpen(false)
+            navigate('/')
+          }}
+        />
       )}
 
       {newsOpen && <NewsDialog onClose={() => setNewsOpen(false)} />}

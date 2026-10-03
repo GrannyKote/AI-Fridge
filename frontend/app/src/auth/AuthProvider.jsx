@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from 'react'
-import { authApi } from '../api/client.js'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { authApi, setUnauthorizedHandler } from '../api/client.js'
 import { AuthContext } from './authContext.js'
 import { clearSession, readSession, writeSession } from './sessionStore.js'
 
@@ -24,6 +24,12 @@ export function AuthProvider({ children }) {
     clearSession()
     setUser(null)
   }, [])
+
+  // Бэкенд ответил 401 — токен устарел, возвращаем пользователя на вход.
+  useEffect(() => {
+    setUnauthorizedHandler(signOut)
+    return () => setUnauthorizedHandler(null)
+  }, [signOut])
 
   const value = useMemo(
     () => ({ user, isAuthenticated: Boolean(user), signIn, signUp, signOut }),

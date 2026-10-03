@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { pantryApi } from '../api/client.js'
+import { dateAfterDays, defaultBestBeforeOf } from '../lib/pantry.js'
 import { FormAlert } from './FormAlert.jsx'
 import { SuggestInput } from './SuggestInput.jsx'
 import {
@@ -23,7 +24,7 @@ const EMPTY_FORM = {
   unitId: '',
   quantity: '1',
   price: '',
-  purchasedAt: today(),
+  purchasedAt: dateAfterDays(),
   bestBefore: '',
   placeId: '',
 }
@@ -57,10 +58,6 @@ const PLACE_BY_CATEGORY = {
   'Соусы и специи': 'Специи',
 }
 
-function today() {
-  return new Date().toISOString().slice(0, 10)
-}
-
 function placeIdOf(places, name, category) {
   const wanted = PLACE_BY_NAME[name] || PLACE_BY_CATEGORY[category] || 'Шкаф'
   return String(places.find((place) => place.name === wanted)?.id ?? places[0]?.id ?? '')
@@ -76,6 +73,7 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
   const [formError, setFormError] = useState('')
   const [pending, setPending] = useState(false)
   const [placeTouched, setPlaceTouched] = useState(false)
+  const [bestBeforeTouched, setBestBeforeTouched] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -112,6 +110,22 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
+  const update = useCallback((patch) => {
+    setForm((current) => {
+      const next = { ...current, ...patch }
+
+      if (!placeTouched && places.length > 0 && ('name' in patch || 'category' in patch)) {
+        next.placeId = placeIdOf(places, next.name.trim(), next.category)
+      }
+
+      return next
+    })
+  }, [placeTouched, places])
+
+  const clearError = useCallback((field) => {
+    setErrors((current) => ({ ...current, [field]: '' }))
+  }, [])
+
   useEffect(() => {
     const query = form.name.trim()
 
@@ -139,21 +153,29 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
     return () => clearTimeout(timer)
   }, [form.name])
 
-  function update(patch) {
-    setForm((current) => {
-      const next = { ...current, ...patch }
+  useEffect(() => {
+    if (bestBeforeTouched) {
+      return
+    }
 
-      if (!placeTouched && places.length > 0 && ('name' in patch || 'category' in patch)) {
-        next.placeId = placeIdOf(places, next.name.trim(), next.category)
-      }
+    const typed = form.name.trim().toLowerCase()
+    const match = nameSuggestions.find(
+      (item) => item.label.trim().toLowerCase() === typed,
+    )
+    const next = defaultBestBeforeOf(match?.product)
 
-      return next
+    if (!next || (form.bestBefore === next && form.productId === match.product.id)) {
+      return
+    }
+
+    update({
+      bestBefore: next,
+      productId: match.product.id,
+      category: match.product.category ?? form.category,
     })
-  }
-
-  function clearError(field) {
-    setErrors((current) => ({ ...current, [field]: '' }))
-  }
+    clearError('bestBefore')
+    clearError('category')
+  }, [nameSuggestions, bestBeforeTouched, form.name, form.bestBefore, form.productId, form.category, update, clearError])
 
   function validate() {
     const quantity = Number(form.quantity.replace(',', '.'))
@@ -255,11 +277,20 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
               clearError('name')
             }}
             onPick={({ product }) => {
-              update({
+              const patch = {
                 name: product.name,
                 productId: product.id,
                 category: product.category ?? '',
-              })
+              }
+
+              // Справочник знает срок хранения — предлагаем срок годности сами.
+              const next = defaultBestBeforeOf(product)
+              if (!bestBeforeTouched && next) {
+                patch.bestBefore = next
+                clearError('bestBefore')
+              }
+
+              update(patch)
               clearError('name')
               clearError('category')
             }}
@@ -390,6 +421,7 @@ export function AddProductDialog({ groupId, categories, onClose, onCreated }) {
                   type="date"
                   value={form.bestBefore}
                   onChange={(event) => {
+                    setBestBeforeTouched(true)
                     update({ bestBefore: event.target.value })
                     clearError('bestBefore')
                   }}

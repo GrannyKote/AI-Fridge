@@ -1,14 +1,13 @@
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool, text
+from sqlalchemy import create_engine, pool, text
 
 from app import models  # noqa: F401  — импорт регистрирует таблицы в Base.metadata
 from app.config import settings
 from app.database import Base
 
 config = context.config
-config.set_main_option("sqlalchemy.url", settings.database_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
@@ -26,7 +25,7 @@ def include_name(name: str | None, type_: str, parent_names: dict) -> bool:
 
 def run_migrations_offline() -> None:
     context.configure(
-        url=config.get_main_option("sqlalchemy.url"),
+        url=settings.database_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -41,13 +40,11 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    # Строка подключения берётся из настроек приложения, а не из alembic.ini,
+    # чтобы пароль с символом % не ломал разбор ini-файла.
+    engine = create_engine(settings.database_url, poolclass=pool.NullPool)
 
-    with connectable.connect() as connection:
+    with engine.connect() as connection:
         # Таблица alembic_version живёт в схеме проекта, поэтому схема должна
         # существовать до того, как Alembic начнёт читать историю ревизий.
         connection.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{SCHEMA}"'))

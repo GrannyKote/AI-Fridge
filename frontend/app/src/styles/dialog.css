@@ -450,8 +450,59 @@
 /* ---------- Уведомления ---------- */
 
 .notifications__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
   min-height: 140px;
   margin-top: 14px;
+  margin-bottom: 18px;
+}
+
+.notifications__empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.notifications__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.notifications__head svg {
+  width: 15px;
+  height: 15px;
+}
+
+.notifications__group--expired .notifications__head {
+  color: var(--red);
+}
+
+.notifications__group--soon .notifications__head {
+  color: var(--yellow);
+}
+
+.notifications__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.notifications__item {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 15px;
 }
 
 /* ---------- Подсказки ---------- */

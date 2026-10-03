@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { pantryApi, shoppingApi } from '../api/client.js'
-import { formatNumber } from '../lib/pantry.js'
+import { defaultBestBeforeOf, formatNumber } from '../lib/pantry.js'
 import { FormAlert } from './FormAlert.jsx'
 import { ArrowLeftIcon, CheckIcon } from './icons.jsx'
 import '../styles/dialog.css'
@@ -33,7 +33,8 @@ function toRows(items, places) {
     unit: item.unit ?? '',
     quantity: formatNumber(item.quantity),
     price: '',
-    bestBefore: '',
+    // Справочник знает срок хранения — предлагаем срок годности сами.
+    bestBefore: defaultBestBeforeOf(item),
     placeId: places.length ? placeIdOf(places, item.name, item.category) : '',
     checked: true,
     errors: {},

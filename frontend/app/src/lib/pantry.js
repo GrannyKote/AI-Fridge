@@ -10,6 +10,20 @@ export function daysUntil(bestBefore) {
   return Math.round((target - today) / MS_IN_DAY)
 }
 
+function catalogDays(value) {
+  if (value === null || value === undefined || value === '') {
+    return null
+  }
+
+  const days = Number(value)
+  return Number.isInteger(days) && days >= 0 ? days : null
+}
+
+// У продукта может быть свой срок предупреждения из справочника.
+export function soonThresholdOf(item) {
+  return catalogDays(item?.first_reminder_days) ?? SOON_THRESHOLD_DAYS
+}
+
 export function statusOf(item) {
   const days = daysUntil(item.best_before)
 
@@ -17,7 +31,24 @@ export function statusOf(item) {
     return 'expired'
   }
 
-  return days <= SOON_THRESHOLD_DAYS ? 'soon' : 'fresh'
+  return days <= soonThresholdOf(item) ? 'soon' : 'fresh'
+}
+
+// Дата для <input type="date"> по локальному времени: сегодня плюс сдвиг в днях.
+export function dateAfterDays(days = 0) {
+  const date = new Date()
+  date.setDate(date.getDate() + days)
+
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${date.getFullYear()}-${month}-${day}`
+}
+
+// Срок годности по умолчанию: сегодня плюс expires_in из справочника.
+export function defaultBestBeforeOf(product) {
+  const days = catalogDays(product?.expires_in)
+  return days === null ? '' : dateAfterDays(days)
 }
 
 export function daysWord(count) {

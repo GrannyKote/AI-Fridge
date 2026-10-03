@@ -45,12 +45,19 @@ def _id() -> sa.Column:
     return sa.Column("id", sa.Integer(), sa.Identity(always=False), primary_key=True)
 
 
+def _tables_already_exist() -> bool:
+    """База заведена до перехода на Alembic — создавать ничего не нужно."""
+    if op.get_context().as_sql:
+        # Режим --sql: подключения нет, схему считаем пустой.
+        return False
+    return sa.inspect(op.get_bind()).has_table("user", schema=SCHEMA)
+
+
 def upgrade() -> None:
     op.execute(f'CREATE SCHEMA IF NOT EXISTS "{SCHEMA}"')
 
-    if sa.inspect(op.get_bind()).has_table("user", schema=SCHEMA):
-        # База заведена до перехода на Alembic — таблицы уже на месте,
-        # ревизию достаточно отметить в alembic_version.
+    if _tables_already_exist():
+        # Ревизию достаточно отметить в alembic_version.
         return
 
     op.create_table(

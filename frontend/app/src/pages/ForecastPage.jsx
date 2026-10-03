@@ -74,15 +74,10 @@ export default function ForecastPage() {
     ]
   }, [products])
 
-  const alerts = useMemo(
-    () => products.filter((product) => statusOf(product) !== 'fresh').length,
-    [products],
-  )
-
   return (
     <div className="pantry">
       <div className="pantry__app">
-        <AppHeader alerts={alerts} onToast={setToast} />
+        <AppHeader onToast={setToast} />
 
         <main className="content">
           <div className="segmented" role="tablist" aria-label="Тип прогноза">

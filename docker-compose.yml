@@ -24,6 +24,7 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/diplom
       DB_SCHEMA: diplom_all
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
     expose:
       - "8000"
     depends_on:

@@ -174,7 +174,7 @@ export default function PantryPage() {
   return (
     <div className="pantry">
       <div className="pantry__app">
-        <AppHeader alerts={stats.expired + stats.soon} onToast={setToast} />
+        <AppHeader onToast={setToast} />
 
         <main className="content">
           <section className="stats" aria-label="Сводка по кладовой">
