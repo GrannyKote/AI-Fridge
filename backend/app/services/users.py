@@ -7,6 +7,11 @@ from ..config import settings
 from ..models import CreatedUser, LoginAttempt, User, UserGroup, UserGroupUser
 
 
+def _clip(value: str, max_len: int) -> str:
+    text = value or ""
+    return text if len(text) <= max_len else text[:max_len]
+
+
 def find_by_login(session: Session, login: str) -> User | None:
     statement = select(User).where(func.lower(User.login) == login.strip().lower())
     return session.scalars(statement).first()
@@ -45,8 +50,8 @@ def create_with_group(
         CreatedUser(
             login=user.login,
             date_time=now,
-            user_agent=user_agent,
-            ip=ip,
+            user_agent=_clip(user_agent, 512),
+            ip=_clip(ip, 256),
         )
     )
     session.commit()
@@ -66,8 +71,8 @@ def record_login_attempt(
         LoginAttempt(
             login=login.strip(),
             date_time=datetime.now().astimezone().timetz(),
-            user_agent=user_agent,
-            ip=ip,
+            user_agent=_clip(user_agent, 512),
+            ip=_clip(ip, 256),
             is_success=is_success,
         )
     )
