@@ -81,6 +81,25 @@ alembic revision --autogenerate -m "добавление индекса по log
 В Docker миграции накатываются сами: контейнер `backend` запускает
 `alembic upgrade head` перед `uvicorn`.
 
+### Restore бэкапа и расхождение схемы
+
+Если в базу залили дамп **после** того, как `alembic_version` уже на head, реальная
+схема может отставать от кода (нет `user.is_admin`, таблиц новостей/отзывов,
+колонок напоминаний в `user_group_product` и т.д.), а повторный
+`alembic upgrade head` ничего не сделает.
+
+1. Обновить код и накатить новые ревизии: `alembic upgrade head` (repair **0014**
+   вызывает общий модуль `app/schema_repair.py`).
+2. **После каждого restore** — без смены версии Alembic:
+
+```bash
+docker compose exec backend python repair_schema.py
+```
+
+Скрипт идемпотентен: добавляет только отсутствующие колонки и таблицы, чинит
+sequence для `id`. Новые поля из будущих миграций нужно дописывать в
+`app/schema_repair.py` (или добавить новую repair-ревизию).
+
 ## Эндпоинты
 
 | Метод | Путь | Описание |
