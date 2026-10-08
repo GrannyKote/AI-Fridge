@@ -104,6 +104,10 @@ class PantryItemCreate(BaseModel):
     product_id: int | None = None
 
 
+class PantryItemUpdate(PantryItemCreate):
+    """Редактирование: quantity — текущий остаток, не изначальное количество."""
+
+
 class ConsumptionCreate(BaseModel):
     quantity: float = Field(gt=0)
 

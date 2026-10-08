@@ -247,6 +247,100 @@ def create_pantry_item(
     return get_product(session, group_id, item.id)
 
 
+def _names_differ(old: str, new: str) -> bool:
+    return (
+        catalog.capitalized_name(old).strip().lower()
+        != catalog.capitalized_name(new).strip().lower()
+    )
+
+
+def _mark_lot_mistake(session: Session, group_id: int, lot: list[dict]) -> None:
+    for item in lot:
+        record = session.get(UserGroupProduct, item["id"])
+        if record is not None and record.id_user_group == group_id:
+            record.is_deleted = True
+
+
+def _set_lot_remaining(session: Session, lot: list[dict], new_remaining: Decimal) -> None:
+    current = sum((Decimal(item["remaining"]) for item in lot), Decimal(0))
+
+    if new_remaining == current:
+        return
+
+    if new_remaining > current:
+        record = session.get(UserGroupProduct, lot[0]["id"])
+        record.quantity = Decimal(record.quantity) + (new_remaining - current)
+        session.flush()
+        _update_flags(session, lot[0]["id"])
+        return
+
+    to_remove = current - new_remaining
+    for row in reversed(lot):
+        if to_remove <= 0:
+            break
+
+        remaining = Decimal(row["remaining"])
+        if remaining <= 0:
+            continue
+
+        take = min(remaining, to_remove)
+        record = session.get(UserGroupProduct, row["id"])
+        record.quantity = Decimal(record.quantity) - take
+        to_remove -= take
+        session.flush()
+        _update_flags(session, row["id"])
+
+
+def update_pantry_item(
+    session: Session, group_id: int, item_id: int, payload: PantryItemCreate, user_id: int
+) -> dict | None:
+    """Обновляет лот кладовой; при смене названия старый лот помечается ошибочным."""
+    seed = get_product(session, group_id, item_id)
+
+    if seed is None or seed["is_deleted"] or seed["is_over"]:
+        return None
+
+    unit = session.get(UnitOfMeasurement, payload.unit_id)
+    if unit is None:
+        raise ValueError("Единица измерения не найдена")
+
+    lot = _open_lot(session, group_id, seed)
+    new_name = catalog.capitalized_name(payload.name)
+
+    if _names_differ(seed["product_name"], new_name):
+        _mark_lot_mistake(session, group_id, lot)
+        session.commit()
+        return create_pantry_item(session, group_id, payload, user_id)
+
+    product, category = catalog.ensure_product(
+        session, new_name, payload.category, payload.product_id, user_id=user_id
+    )
+    price = money(payload.price)
+    new_remaining = Decimal(str(payload.quantity))
+    storage_place_id = payload.storage_place_id or storage.place_id_for(
+        session, new_name, category.name
+    )
+
+    for index, row in enumerate(lot):
+        record = session.get(UserGroupProduct, row["id"])
+        record.id_product = product.id
+        record.product_name = new_name
+        record.id_unit_of_measurement = unit.id
+        record.id_product_category = category.id
+        record.id_storage_place = storage_place_id
+        record.best_before = payload.best_before
+        record.price = price if index == 0 else None
+
+    _set_lot_remaining(session, lot, new_remaining)
+    session.commit()
+
+    updated_seed = get_product(session, group_id, lot[0]["id"])
+    if updated_seed is None:
+        return None
+
+    return _lot_result(session, group_id, updated_seed)
+
+
 # Совпадает с SOON_THRESHOLD_DAYS на фронте, если у продукта нет своего порога.
 DEFAULT_FIRST_REMINDER_DAYS = 4
 

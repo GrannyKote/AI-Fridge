@@ -14,6 +14,7 @@ export function ProductCard({
   actionsDisabled = false,
   onToggleSelect,
   onAction,
+  onEdit,
 }) {
   const status = statusOf(product)
   const name = displayProductName(product.name)
@@ -35,7 +36,15 @@ export function ProductCard({
       </button>
 
       <div className="card__body">
-        <h3 className="card__title">{name}</h3>
+        <button
+          className="card__title card__title-btn"
+          type="button"
+          disabled={actionsDisabled || !onEdit}
+          onClick={() => onEdit?.(product)}
+          aria-label={`Редактировать «${name}»`}
+        >
+          {name}
+        </button>
         {subtitle && <p className="card__place">{subtitle}</p>}
         <p className="card__meta">
           <span>{formatAmount(product)}</span>

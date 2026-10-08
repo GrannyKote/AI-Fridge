@@ -6,6 +6,7 @@ import {
   defaultBestBeforeOf,
   defaultQuantityForUnit,
   displayProductName,
+  formatNumber,
 } from '../lib/pantry.js'
 import { DateInput } from './DateInput.jsx'
 import { FormAlert } from './FormAlert.jsx'
@@ -76,6 +77,27 @@ function suggestionOf(product, key) {
   }
 }
 
+function formFromProduct(product, units, places) {
+  const remaining = product.remaining ?? product.quantity
+
+  return {
+    name: displayProductName(product.name),
+    productId: product.product_id ?? null,
+    category: product.category ?? '',
+    unitId: String(product.unit_id ?? unitIdOf(units)),
+    quantity: formatNumber(remaining),
+    price:
+      product.price === null || product.price === undefined || product.price === ''
+        ? ''
+        : formatNumber(product.price),
+    purchasedAt: dateAfterDays(),
+    bestBefore: product.best_before ?? '',
+    placeId: String(
+      product.storage_place_id ?? (places.length > 0 ? placeIdOf(places, product.name, product.category) : ''),
+    ),
+  }
+}
+
 function localSuggestions(products, query) {
   const seen = new Set()
   const items = []
@@ -114,15 +136,22 @@ export function AddProductDialog({
   products = [],
   units: unitsProp = [],
   places: placesProp = [],
+  editProduct = null,
   onClose,
   onCreated,
+  onUpdated,
 }) {
+  const isEdit = editProduct != null
   const initialUnits = catalogUnitsOf(unitsProp)
-  const [form, setForm] = useState(() => ({
-    ...EMPTY_FORM,
-    unitId: unitIdOf(initialUnits),
-    placeId: placesProp.length > 0 ? placeIdOf(placesProp, '', '') : '',
-  }))
+  const [form, setForm] = useState(() =>
+    isEdit
+      ? formFromProduct(editProduct, initialUnits, placesProp)
+      : {
+          ...EMPTY_FORM,
+          unitId: unitIdOf(initialUnits),
+          placeId: placesProp.length > 0 ? placeIdOf(placesProp, '', '') : '',
+        },
+  )
   const [method, setMethod] = useState('manual')
   const [units, setUnits] = useState(initialUnits)
   const [places, setPlaces] = useState(placesProp)
@@ -130,8 +159,8 @@ export function AddProductDialog({
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
   const [pending, setPending] = useState(false)
-  const [placeTouched, setPlaceTouched] = useState(false)
-  const [bestBeforeTouched, setBestBeforeTouched] = useState(false)
+  const [placeTouched, setPlaceTouched] = useState(isEdit)
+  const [bestBeforeTouched, setBestBeforeTouched] = useState(isEdit)
 
   useEffect(() => {
     let cancelled = false
@@ -279,7 +308,7 @@ export function AddProductDialog({
 
     setPending(true)
     try {
-      const created = await pantryApi.addProduct(groupId, {
+      const payload = {
         name: displayProductName(form.name),
         category: form.category,
         unit_id: Number(form.unitId),
@@ -288,8 +317,15 @@ export function AddProductDialog({
         best_before: form.bestBefore,
         storage_place_id: Number(form.placeId),
         product_id: form.productId,
-      })
-      onCreated(created)
+      }
+
+      if (isEdit) {
+        const updated = await pantryApi.updateProduct(groupId, editProduct.id, payload)
+        onUpdated?.(editProduct, updated)
+      } else {
+        const created = await pantryApi.addProduct(groupId, payload)
+        onCreated(created)
+      }
     } catch (error) {
       setFormError(error.message)
     } finally {
@@ -305,33 +341,35 @@ export function AddProductDialog({
             <ArrowLeftIcon />
           </button>
           <h2 className="add__title" id="add-title">
-            Добавить продукт
+            {isEdit ? 'Редактировать продукт' : 'Добавить продукт'}
           </h2>
         </header>
 
-        <div className="method" role="tablist" aria-label="Способ добавления">
-          {METHODS.map((item) => (
-            <button
-              key={item.key}
-              className={`method__item${method === item.key ? ' is-active' : ''}`}
-              type="button"
-              role="tab"
-              aria-selected={method === item.key}
-              onClick={() => {
-                if (item.key === 'manual') {
-                  setMethod(item.key)
-                  setFormError('')
-                  return
-                }
+        {!isEdit && (
+          <div className="method" role="tablist" aria-label="Способ добавления">
+            {METHODS.map((item) => (
+              <button
+                key={item.key}
+                className={`method__item${method === item.key ? ' is-active' : ''}`}
+                type="button"
+                role="tab"
+                aria-selected={method === item.key}
+                onClick={() => {
+                  if (item.key === 'manual') {
+                    setMethod(item.key)
+                    setFormError('')
+                    return
+                  }
 
-                setFormError(`Способ «${item.title}» появится позже`)
-              }}
-            >
-              {item.icon}
-              {item.title}
-            </button>
-          ))}
-        </div>
+                  setFormError(`Способ «${item.title}» появится позже`)
+                }}
+              >
+                {item.icon}
+                {item.title}
+              </button>
+            ))}
+          </div>
+        )}
 
         <form className="form add__form" onSubmit={handleSubmit} noValidate>
           <SuggestInput
@@ -423,10 +461,14 @@ export function AddProductDialog({
                   onChange={(event) => {
                     const unitId = event.target.value
                     const unit = units.find((item) => String(item.id) === unitId)
-                    update({
-                      unitId,
-                      quantity: defaultQuantityForUnit(unit?.name),
-                    })
+                    update(
+                      isEdit
+                        ? { unitId }
+                        : {
+                            unitId,
+                            quantity: defaultQuantityForUnit(unit?.name),
+                          },
+                    )
                     clearError('unitId')
                     clearError('quantity')
                   }}

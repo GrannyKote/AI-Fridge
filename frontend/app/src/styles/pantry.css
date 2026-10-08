@@ -427,6 +427,27 @@
   text-overflow: ellipsis;
 }
 
+.card__title-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.card__title-btn:disabled {
+  cursor: default;
+}
+
+.card__title-btn:not(:disabled):hover,
+.card__title-btn:not(:disabled):focus-visible {
+  text-decoration: underline;
+}
+
 .card__place {
   margin: 3px 0 0;
   overflow: hidden;

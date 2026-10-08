@@ -44,6 +44,7 @@ export default function PantryPage() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [activePlace, setActivePlace] = useState('all')
   const [addOpen, setAddOpen] = useState(false)
+  const [editTarget, setEditTarget] = useState(null)
   const [consumeTarget, setConsumeTarget] = useState(null)
   const [wasteTarget, setWasteTarget] = useState(null)
   const [selectedIds, setSelectedIds] = useState(() => new Set())
@@ -121,18 +122,41 @@ export default function PantryPage() {
     })
   }, [products, query, activeCategory, activePlace])
 
+  async function refreshCategories() {
+    try {
+      setCategories(await pantryApi.categories())
+    } catch {
+      // не критично: список категорий обновится при следующей загрузке
+    }
+  }
+
   async function handleCreated(item) {
     setAddOpen(false)
     setProducts((current) => addPantryItem(current, item))
     setToast(`«${displayProductName(item.name)}» добавлен`)
     notifyPurchaseChanged()
+    await refreshCategories()
+  }
 
-    try {
-      // Продукт мог завести новую категорию — обновляем фильтры.
-      setCategories(await pantryApi.categories())
-    } catch {
-      // не критично: список категорий обновится при следующей загрузке
-    }
+  async function handleUpdated(previous, item) {
+    setEditTarget(null)
+    notifyPurchaseChanged()
+
+    const renamed =
+      displayProductName(previous.name).trim().toLowerCase() !==
+      displayProductName(item.name).trim().toLowerCase()
+
+    setProducts((current) => {
+      const withoutPrevious = removePantryLot(current, previous)
+      return addPantryItem(withoutPrevious, item)
+    })
+
+    setToast(
+      renamed
+        ? `«${displayProductName(item.name)}» сохранён, старая запись убрана`
+        : `«${displayProductName(item.name)}» обновлён`,
+    )
+    await refreshCategories()
   }
 
   function toggleSelected(product) {
@@ -244,6 +268,14 @@ export default function PantryPage() {
     } else {
       setWasteTarget(product)
     }
+  }
+
+  function handleEditProduct(product) {
+    if (multiSelected) {
+      return
+    }
+
+    setEditTarget(product)
   }
 
   function replaceProduct(item) {
@@ -438,6 +470,7 @@ export default function PantryPage() {
                             actionsDisabled={multiSelected}
                             onToggleSelect={toggleSelected}
                             onAction={handleCardAction}
+                            onEdit={handleEditProduct}
                           />
                         ))}
                       </div>
@@ -480,6 +513,19 @@ export default function PantryPage() {
           places={places}
           onClose={() => setAddOpen(false)}
           onCreated={handleCreated}
+        />
+      )}
+
+      {editTarget && (
+        <AddProductDialog
+          groupId={groupId}
+          categories={categories}
+          products={products}
+          units={units}
+          places={places}
+          editProduct={editTarget}
+          onClose={() => setEditTarget(null)}
+          onUpdated={handleUpdated}
         />
       )}
 
