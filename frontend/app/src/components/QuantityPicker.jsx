@@ -2,12 +2,53 @@ import { categoryView, displayProductName, formatAmount, formatNumber, parseAmou
 import { MinusIcon, PlusIcon } from './icons.jsx'
 import '../styles/pantry.css'
 
-const PRESETS = [
+const RATIO_PRESETS = [
   { key: '25', label: '25%', ratio: 0.25 },
   { key: '50', label: '50%', ratio: 0.5 },
   { key: '75', label: '75%', ratio: 0.75 },
   { key: 'all', label: 'Всё', ratio: 1 },
 ]
+
+function percentLabel(portion, available) {
+  if (available <= 0) {
+    return '0%'
+  }
+
+  const percent = (portion / available) * 100
+
+  if (Math.abs(percent - 100) < 0.05) {
+    return '100%'
+  }
+
+  if (Math.abs(percent - Math.round(percent)) < 0.05) {
+    return `${Math.round(percent)}%`
+  }
+
+  return `${percent.toFixed(1)}%`
+}
+
+function presetsFor(available, unit) {
+  if (unit !== 'шт' || available < 1) {
+    return RATIO_PRESETS.map((preset) => ({
+      ...preset,
+      portion: shareOf(available, preset.ratio),
+    }))
+  }
+
+  const one = 1
+  const first = {
+    key: '1',
+    label: percentLabel(one, available),
+    portion: one,
+  }
+
+  const rest = RATIO_PRESETS.map((preset) => ({
+    ...preset,
+    portion: shareOf(available, preset.ratio),
+  })).filter((preset) => preset.portion > one)
+
+  return [first, ...rest]
+}
 
 function shareOf(available, ratio) {
   // «Всё» — это ровно остаток, без округления дробной части.
@@ -65,6 +106,7 @@ export function QuantityPicker({
   const safeAmount = Number.isFinite(amount) && amount > 0 ? Math.min(amount, available) : 0
   const step = stepSize(available, product.unit)
   const ratio = available > 0 ? (safeAmount / available) * 100 : 0
+  const presets = presetsFor(available, product.unit)
 
   function setAmount(next) {
     const clamped = Math.min(Math.max(next, 0), available)
@@ -76,24 +118,20 @@ export function QuantityPicker({
       <p className="writeoff__label">{label}</p>
 
       <div className="writeoff__presets">
-        {PRESETS.map((preset) => {
-          const portion = shareOf(available, preset.ratio)
-
-          return (
-            <button
-              key={preset.key}
-              className={`preset${sameAmount(value, portion) ? ' is-active' : ''}`}
-              type="button"
-              onClick={() => setAmount(portion)}
-            >
-              <span>{preset.label}</span>
-              <span className="preset__amount">
-                {formatNumber(portion)}
-                {product.unit ? ` ${product.unit}` : ''}
-              </span>
-            </button>
-          )
-        })}
+        {presets.map((preset) => (
+          <button
+            key={preset.key}
+            className={`preset${sameAmount(value, preset.portion) ? ' is-active' : ''}`}
+            type="button"
+            onClick={() => setAmount(preset.portion)}
+          >
+            <span>{preset.label}</span>
+            <span className="preset__amount">
+              {formatNumber(preset.portion)}
+              {product.unit ? ` ${product.unit}` : ''}
+            </span>
+          </button>
+        ))}
       </div>
 
       <div className={`writeoff__counter${error ? ' is-invalid' : ''}`}>
