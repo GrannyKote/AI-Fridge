@@ -183,8 +183,8 @@ export const FALLBACK_UNITS = [
 
 const DEFAULT_QUANTITY_BY_UNIT = {
   шт: '1',
-  г: '900',
-  мл: '900',
+  г: '1000',
+  мл: '1000',
 }
 
 export function defaultQuantityForUnit(unitName) {
