@@ -79,7 +79,32 @@ alembic revision --autogenerate -m "добавление индекса по log
 новость). Если таблицы уже заведены в базе руками, ревизия их не трогает.
 
 В Docker миграции накатываются сами: контейнер `backend` запускает
-`alembic upgrade head` перед `uvicorn`.
+`alembic upgrade head` перед `uvicorn` (см. `docker-entrypoint.sh`).
+
+### Docker: backend unhealthy
+
+Сначала смотрите логи:
+
+```bash
+docker compose logs backend --tail 200
+docker compose ps
+```
+
+Частые причины:
+
+| Симптом в логах | Что сделать |
+| --- | --- |
+| `alembic upgrade head failed` / `password authentication failed` | Пароль в `.env` (`POSTGRES_PASSWORD`) должен совпадать с тем, с которым **первый раз** создан том `postgres_data`. Смена пароля только в `.env` не меняет уже инициализированную БД. Либо верните старый пароль, либо пересоздайте том: `docker compose down -v` (удалит данные). |
+| `database files are incompatible with server` (postgres) | Том создан PostgreSQL 16, а в `docker-compose.yml` указан 17. Обновите данные (`pg_upgrade`) или временно верните образ `postgres:16-alpine`, либо удалите том и поднимите пустую БД. |
+| Долго «Running upgrade … 0014» и healthcheck | На большой базе repair может идти минуту; в compose для backend увеличен `start_period`. Дождитесь или снова проверьте логи. |
+| Traceback при `uvicorn` / импорте | Ошибка в коде или зависимостях; исправьте по traceback и пересоберите: `docker compose build backend --no-cache`. |
+
+Проверка миграций вручную:
+
+```bash
+docker compose run --rm backend alembic upgrade head
+docker compose up -d backend
+```
 
 ### Restore бэкапа и расхождение схемы
 

@@ -12,8 +12,10 @@ COPY alembic.ini .
 COPY alembic ./alembic
 COPY app ./app
 COPY repair_schema.py .
+COPY docker-entrypoint.sh .
+RUN chmod +x docker-entrypoint.sh
 
 EXPOSE 8000
 
 # Перед запуском API схема доводится до последней ревизии.
-CMD ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips '*'"]
+CMD ["./docker-entrypoint.sh"]
