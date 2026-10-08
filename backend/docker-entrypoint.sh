@@ -12,6 +12,11 @@ if ! python wait_for_db.py; then
   exit 1
 fi
 
+if ! python dedupe_alembic_version.py; then
+  echo "ERROR: could not normalize alembic_version table." >&2
+  exit 1
+fi
+
 echo "Running database migrations (alembic upgrade head)..."
 attempt=1
 max_attempts=3

@@ -95,6 +95,7 @@ docker compose ps
 | Симптом в логах | Что сделать |
 | --- | --- |
 | `alembic upgrade head failed` / `password authentication failed` | Пароль в `.env` (`POSTGRES_PASSWORD`) должен совпадать с тем, с которым **первый раз** создан том `postgres_data`. Смена пароля только в `.env` не меняет уже инициализированную БД. Либо верните старый пароль, либо пересоздайте том: `docker compose down -v` (удалит данные). |
+| `Requested revision 0014 overlaps with other requested revisions 0008` | В `diplom_all.alembic_version` **несколько строк** (часто после restore или ручного `stamp`). Перед миграциями entrypoint вызывает `dedupe_alembic_version.py`; вручную: `SELECT * FROM diplom_all.alembic_version;` — должна остаться одна, самая новая ревизия (например `0014`), затем `docker compose up -d backend`. |
 | `database files are incompatible with server` (postgres) | Том создан PostgreSQL 16, а в `docker-compose.yml` указан 17. Обновите данные (`pg_upgrade`) или временно верните образ `postgres:16-alpine`, либо удалите том и поднимите пустую БД. |
 | Долго «Running upgrade … 0014» и healthcheck | На большой базе repair может идти минуту; в compose для backend увеличен `start_period`. Дождитесь или снова проверьте логи. |
 | Traceback при `uvicorn` / импорте | Ошибка в коде или зависимостях; исправьте по traceback и пересоберите: `docker compose build backend --no-cache`. |
