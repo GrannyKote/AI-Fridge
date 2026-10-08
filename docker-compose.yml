@@ -22,7 +22,11 @@ services:
       context: ./backend
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/diplom
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: diplom
+      POSTGRES_PORT: "5432"
       DB_SCHEMA: diplom_all
       JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
     expose:
@@ -31,13 +35,7 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test:
-        [
-          "CMD",
-          "python",
-          "-c",
-          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)",
-        ]
+      test: ["CMD", "python", "docker_healthcheck.py"]
       interval: 10s
       timeout: 5s
       retries: 8

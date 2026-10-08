@@ -13,9 +13,10 @@ COPY alembic ./alembic
 COPY app ./app
 COPY repair_schema.py .
 COPY docker-entrypoint.sh .
-RUN chmod +x docker-entrypoint.sh
+COPY docker_healthcheck.py .
+RUN sed -i 's/\r$//' docker-entrypoint.sh && chmod +x docker-entrypoint.sh
 
 EXPOSE 8000
 
 # Перед запуском API схема доводится до последней ревизии.
-CMD ["./docker-entrypoint.sh"]
+CMD ["sh", "docker-entrypoint.sh"]
