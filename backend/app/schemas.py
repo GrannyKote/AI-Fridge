@@ -64,6 +64,7 @@ class ProductSuggestionOut(BaseModel):
     category: str | None = None
     # Срок хранения в днях: из него считается срок годности по умолчанию.
     expires_in: int | None = None
+    storage_place_id: int | None = None
 
 
 class PantryItemOut(BaseModel):

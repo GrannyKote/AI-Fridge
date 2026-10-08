@@ -55,7 +55,14 @@ const PLACE_BY_CATEGORY = {
   'Соусы и специи': 'Специи',
 }
 
-function placeIdOf(places, name, category) {
+function placeIdOf(places, name, category, storagePlaceId = null) {
+  if (
+    storagePlaceId != null &&
+    places.some((place) => String(place.id) === String(storagePlaceId))
+  ) {
+    return String(storagePlaceId)
+  }
+
   const wanted = PLACE_BY_NAME[name] || PLACE_BY_CATEGORY[category] || 'Шкаф'
   return String(places.find((place) => place.name === wanted)?.id ?? places[0]?.id ?? '')
 }
@@ -93,7 +100,9 @@ function formFromProduct(product, units, places) {
     purchasedAt: dateAfterDays(),
     bestBefore: product.best_before ?? '',
     placeId: String(
-      product.storage_place_id ?? (places.length > 0 ? placeIdOf(places, product.name, product.category) : ''),
+      places.length > 0
+        ? placeIdOf(places, product.name, product.category, product.storage_place_id)
+        : '',
     ),
   }
 }
@@ -117,6 +126,7 @@ function localSuggestions(products, query) {
           name,
           category: product.category ?? '',
           expires_in: product.expires_in,
+          storage_place_id: product.storage_place_id,
         },
         `local-${key}`,
       ),
@@ -212,7 +222,12 @@ export function AddProductDialog({
       const next = { ...current, ...patch }
 
       if (!placeTouched && places.length > 0 && ('name' in patch || 'category' in patch)) {
-        next.placeId = placeIdOf(places, next.name.trim(), next.category)
+        next.placeId = placeIdOf(
+          places,
+          next.name.trim(),
+          next.category,
+          'storage_place_id' in patch ? patch.storage_place_id : undefined,
+        )
       }
 
       return next
@@ -262,14 +277,36 @@ export function AddProductDialog({
       return
     }
 
-    update({
+    const patch = {
       bestBefore: next,
       productId: match.product.id ?? null,
       category: match.product.category ?? form.category,
-    })
+    }
+
+    if (!placeTouched && places.length > 0) {
+      patch.placeId = placeIdOf(
+        places,
+        form.name.trim(),
+        patch.category,
+        match.product.storage_place_id,
+      )
+    }
+
+    update(patch)
     clearError('bestBefore')
     clearError('category')
-  }, [nameSuggestions, bestBeforeTouched, form.name, form.bestBefore, form.productId, form.category, update, clearError])
+  }, [
+    nameSuggestions,
+    bestBeforeTouched,
+    placeTouched,
+    places,
+    form.name,
+    form.bestBefore,
+    form.productId,
+    form.category,
+    update,
+    clearError,
+  ])
 
   function validate() {
     const quantity = Number(form.quantity.replace(',', '.'))
@@ -391,6 +428,15 @@ export function AddProductDialog({
               if (!bestBeforeTouched && next) {
                 patch.bestBefore = next
                 clearError('bestBefore')
+              }
+
+              if (!placeTouched && places.length > 0) {
+                patch.placeId = placeIdOf(
+                  places,
+                  patch.name,
+                  patch.category,
+                  product.storage_place_id,
+                )
               }
 
               update(patch)

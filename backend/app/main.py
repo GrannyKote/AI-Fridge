@@ -41,6 +41,12 @@ async def database_unavailable(_: Request, exc: OperationalError) -> JSONRespons
     )
 
 
+@app.get("/api/health/live", tags=["service"])
+def health_live() -> dict[str, str]:
+    """Liveness: API-процесс поднят (без проверки БД)."""
+    return {"status": "ok"}
+
+
 @app.get("/api/health", tags=["service"])
 def health(session: Session = Depends(get_session)) -> dict[str, str]:
     session.execute(text("select 1"))

@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..models import Product, ProductCategory
+from . import storage
 
 
 def _find_by_name(session: Session, model, name: str):
@@ -36,11 +37,13 @@ def ensure_product(
     if product is None:
         product = _find_by_name(session, Product, name)
     if product is None:
+        product_name = capitalized_name(name)
         product = Product(
-            name=capitalized_name(name),
+            name=product_name,
             id_product_category=category.id,
             id_user_created=user_id,
             datetime_created=datetime.now().astimezone(),
+            id_storage_place=storage.place_id_for(session, product_name, category.name),
         )
         session.add(product)
         session.flush()

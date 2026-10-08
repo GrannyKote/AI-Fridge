@@ -39,6 +39,7 @@ def search_products(session: Session, query: str, limit: int = 5):
             Product.id_product_category.label("category_id"),
             ProductCategory.name.label("category"),
             Product.expires_in,
+            Product.id_storage_place.label("storage_place_id"),
         )
         .outerjoin(ProductCategory, ProductCategory.id == Product.id_product_category)
         .order_by(Product.name)
@@ -238,8 +239,13 @@ def create_pantry_item(
         price=money(payload.price),
         best_before=payload.best_before,
         id_product_category=category.id,
-        id_storage_place=payload.storage_place_id
-        or storage.place_id_for(session, name, category.name),
+        id_storage_place=storage.default_place_id(
+            session,
+            product=product,
+            name=name,
+            category=category.name,
+            explicit_id=payload.storage_place_id,
+        ),
     )
     session.add(item)
     session.commit()
@@ -317,8 +323,12 @@ def update_pantry_item(
     )
     price = money(payload.price)
     new_remaining = Decimal(str(payload.quantity))
-    storage_place_id = payload.storage_place_id or storage.place_id_for(
-        session, new_name, category.name
+    storage_place_id = storage.default_place_id(
+        session,
+        product=product,
+        name=new_name,
+        category=category.name,
+        explicit_id=payload.storage_place_id,
     )
 
     for index, row in enumerate(lot):

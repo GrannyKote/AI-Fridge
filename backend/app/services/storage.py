@@ -3,7 +3,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ..models import StoragePlace
+from ..models import Product, StoragePlace
 
 # Сначала смотрим на конкретный продукт, иначе — на категорию.
 BY_NAME = {
@@ -36,3 +36,22 @@ def place_id_for(session: Session, name: str, category: str | None) -> int:
         raise ValueError("В storage_place нет мест хранения")
 
     return place_id
+
+
+def default_place_id(
+    session: Session,
+    *,
+    product: Product | None,
+    name: str,
+    category: str | None,
+    explicit_id: int | None = None,
+) -> int:
+    """Явный выбор пользователя → справочник product → эвристика по имени/категории."""
+    if explicit_id is not None and session.get(StoragePlace, explicit_id) is not None:
+        return explicit_id
+
+    catalog_id = product.id_storage_place if product is not None else None
+    if catalog_id is not None and session.get(StoragePlace, catalog_id) is not None:
+        return catalog_id
+
+    return place_id_for(session, name, category)

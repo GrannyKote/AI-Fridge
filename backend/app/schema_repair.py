@@ -19,6 +19,7 @@ PRODUCT_COLUMNS: tuple[tuple[str, sa.types.TypeEngine], ...] = (
     ("first_reminder_days", sa.SmallInteger()),
     ("second_reminder_days", sa.SmallInteger()),
     ("expires_in", sa.SmallInteger()),
+    ("id_storage_place", sa.Integer()),
 )
 
 UGP_FIRST_REMINDER: tuple[tuple[str, sa.types.TypeEngine], ...] = (

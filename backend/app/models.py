@@ -99,6 +99,8 @@ class Product(Base):
     second_reminder_days: Mapped[int | None] = mapped_column(SmallInteger)
     # Срок хранения продукта в днях — подсказка для best_before в кладовой.
     expires_in: Mapped[int | None] = mapped_column(SmallInteger)
+    # Место хранения по умолчанию для новых строк кладовой.
+    id_storage_place: Mapped[int | None] = mapped_column(Integer)
 
 
 class UnitOfMeasurement(Base):
