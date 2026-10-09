@@ -1,0 +1,16 @@
+# Переменные задаются в docker-compose (см. .env.example):
+#   DOMAIN       — продуктыдома.рф (xn--80ahaxliddjxj2h.xn--p1ai)
+#   ACME_EMAIL   — e-mail для Let's Encrypt
+
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode gzip
+
+	reverse_proxy frontend:80 {
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Forwarded-Host {host}
+	}
+}
