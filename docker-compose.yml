@@ -59,7 +59,6 @@ services:
       - "${CADDY_HTTPS_PORT:-443}:443"
     environment:
       DOMAIN: ${DOMAIN:-xn--80ahaxliddjxj2h.xn--p1ai}
-      ACME_EMAIL: ${ACME_EMAIL:-noreply@caddy.local}
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
