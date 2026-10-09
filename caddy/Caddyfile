@@ -1,6 +1,6 @@
 # Переменные задаются в docker-compose (см. .env.example):
 #   DOMAIN       — продуктыдома.рф (xn--80ahaxliddjxj2h.xn--p1ai)
-#   ACME_EMAIL   — e-mail для Let's Encrypt
+#   ACME_EMAIL   — e-mail для Let's Encrypt (в compose есть значение по умолчанию)
 
 {
 	email {$ACME_EMAIL}
