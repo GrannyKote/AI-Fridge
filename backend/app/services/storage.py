@@ -44,14 +44,26 @@ def default_place_id(
     product: Product | None,
     name: str,
     category: str | None,
+) -> int:
+    """product.id_storage_place, иначе эвристика по имени/категории."""
+    if product is not None and product.id_storage_place is not None:
+        place = session.get(StoragePlace, product.id_storage_place)
+        if place is not None:
+            return place.id
+
+    return place_id_for(session, name, category)
+
+
+def resolve_storage_place_id(
+    session: Session,
+    *,
+    product: Product | None,
+    name: str,
+    category: str | None,
     explicit_id: int | None = None,
 ) -> int:
-    """Явный выбор пользователя → справочник product → эвристика по имени/категории."""
+    """Явный storage_place_id из запроса или default_place_id."""
     if explicit_id is not None and session.get(StoragePlace, explicit_id) is not None:
         return explicit_id
 
-    catalog_id = product.id_storage_place if product is not None else None
-    if catalog_id is not None and session.get(StoragePlace, catalog_id) is not None:
-        return catalog_id
-
-    return place_id_for(session, name, category)
+    return default_place_id(session, product=product, name=name, category=category)

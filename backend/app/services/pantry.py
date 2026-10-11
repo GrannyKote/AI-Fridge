@@ -239,7 +239,7 @@ def create_pantry_item(
         price=money(payload.price),
         best_before=payload.best_before,
         id_product_category=category.id,
-        id_storage_place=storage.default_place_id(
+        id_storage_place=storage.resolve_storage_place_id(
             session,
             product=product,
             name=name,
@@ -323,7 +323,7 @@ def update_pantry_item(
     )
     price = money(payload.price)
     new_remaining = Decimal(str(payload.quantity))
-    storage_place_id = storage.default_place_id(
+    storage_place_id = storage.resolve_storage_place_id(
         session,
         product=product,
         name=new_name,

@@ -352,7 +352,8 @@ export function AddProductDialog({
         quantity: Number(form.quantity.replace(',', '.')),
         price: form.price.trim() === '' ? null : Number(form.price.replace(',', '.')),
         best_before: form.bestBefore,
-        storage_place_id: Number(form.placeId),
+        // Без явного выбора места сервер берёт product.id_storage_place или эвристику.
+        storage_place_id: placeTouched ? Number(form.placeId) : null,
         product_id: form.productId,
       }
 
