@@ -1,6 +1,6 @@
 import { PantryDock } from './PantryDock.jsx'
 import { AdminHeader } from './AdminHeader.jsx'
-import { FeedbackIcon, NewsIcon } from './icons.jsx'
+import { FeedbackIcon, NewsIcon, UserIcon } from './icons.jsx'
 import '../styles/pantry.css'
 import '../styles/settings.css'
 import '../styles/admin.css'
@@ -8,6 +8,12 @@ import '../styles/admin.css'
 const ADMIN_TABS = [
   { key: 'admin-news', title: 'Управление новостями', icon: <NewsIcon />, path: '/admin/news' },
   { key: 'admin-feedback', title: 'Обратная связь', icon: <FeedbackIcon />, path: '/admin/feedback' },
+  {
+    key: 'admin-users',
+    title: 'Управление пользователями',
+    icon: <UserIcon />,
+    path: '/admin/users',
+  },
 ]
 
 export function AdminShell({ title, children, toast, onAdd }) {

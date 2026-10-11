@@ -258,3 +258,13 @@ class AdminFeedbackDetailOut(BaseModel):
     is_seen: bool = False
     datetime_seen: datetime | None = None
     items: list[FeedbackItemOut] = []
+
+
+class AdminUserListItemOut(BaseModel):
+    id: int
+    login: str
+    datetime_registered: datetime | None = None
+
+
+class AdminUserPasswordUpdate(BaseModel):
+    password: str = Field(min_length=6, max_length=256)

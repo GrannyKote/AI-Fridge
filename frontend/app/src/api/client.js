@@ -172,6 +172,12 @@ export const adminNewsApi = {
   remove: (newsId) => request(`/admin/news/${newsId}`, { method: 'DELETE' }),
 }
 
+export const adminUsersApi = {
+  list: () => request('/admin/users'),
+  setPassword: (userId, password) =>
+    request(`/admin/users/${userId}/password`, { method: 'PATCH', body: { password } }),
+}
+
 export const adminFeedbackApi = {
   list: () => request('/admin/feedback'),
   get: (feedbackId) => request(`/admin/feedback/${feedbackId}`),

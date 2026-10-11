@@ -11,11 +11,33 @@ from ..schemas import (
     AdminNewsOut,
     AdminNewsUpdate,
     AdminNewsViewerOut,
+    AdminUserListItemOut,
+    AdminUserPasswordUpdate,
 )
 from ..services import feedback as feedback_service
 from ..services import news as news_service
+from ..services import users as users_service
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
+
+
+@router.get("/users", response_model=list[AdminUserListItemOut])
+def list_users(
+    session: Session = Depends(get_session),
+    _: int = Depends(current_admin_id),
+) -> list[AdminUserListItemOut]:
+    return [AdminUserListItemOut(**row) for row in users_service.list_for_admin(session)]
+
+
+@router.patch("/users/{user_id}/password", status_code=status.HTTP_204_NO_CONTENT)
+def update_user_password(
+    user_id: int,
+    payload: AdminUserPasswordUpdate,
+    session: Session = Depends(get_session),
+    _: int = Depends(current_admin_id),
+) -> None:
+    if users_service.set_password(session, user_id, payload.password) is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Пользователь не найден")
 
 
 @router.get("/feedback", response_model=list[AdminFeedbackListItemOut])

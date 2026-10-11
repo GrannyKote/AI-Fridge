@@ -59,6 +59,41 @@ def create_with_group(
     return user, group
 
 
+def list_for_admin(session: Session) -> list[dict]:
+    registration = (
+        select(
+            func.lower(CreatedUser.login).label("login_key"),
+            func.min(CreatedUser.date_time).label("datetime_registered"),
+        )
+        .group_by(func.lower(CreatedUser.login))
+        .subquery()
+    )
+    statement = (
+        select(User.id, User.login, registration.c.datetime_registered)
+        .outerjoin(registration, func.lower(User.login) == registration.c.login_key)
+        .order_by(User.login.asc())
+    )
+    rows = session.execute(statement).all()
+    return [
+        {
+            "id": row.id,
+            "login": row.login,
+            "datetime_registered": row.datetime_registered,
+        }
+        for row in rows
+    ]
+
+
+def set_password(session: Session, user_id: int, password: str) -> User | None:
+    user = session.get(User, user_id)
+    if user is None:
+        return None
+    user.password = password
+    session.commit()
+    session.refresh(user)
+    return user
+
+
 def record_login_attempt(
     session: Session,
     login: str,

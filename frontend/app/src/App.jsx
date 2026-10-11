@@ -4,6 +4,7 @@ import { useAuth } from './auth/useAuth.js'
 import { ThemeProvider } from './theme/ThemeProvider.jsx'
 import AdminFeedbackPage from './pages/AdminFeedbackPage.jsx'
 import AdminNewsPage from './pages/AdminNewsPage.jsx'
+import AdminUsersPage from './pages/AdminUsersPage.jsx'
 import ForecastPage from './pages/ForecastPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import PantryPage from './pages/PantryPage.jsx'
@@ -99,6 +100,14 @@ export default function App() {
               element={
                 <RequireAdmin>
                   <AdminFeedbackPage />
+                </RequireAdmin>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <RequireAdmin>
+                  <AdminUsersPage />
                 </RequireAdmin>
               }
             />
