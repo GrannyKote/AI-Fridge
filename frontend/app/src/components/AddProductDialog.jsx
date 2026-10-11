@@ -36,9 +36,9 @@ const EMPTY_FORM = {
 }
 
 const METHODS = [
-  { key: 'manual', title: 'Вручную', icon: <PencilIcon /> },
   { key: 'receipt', title: 'Чек', icon: <CameraIcon /> },
   { key: 'voice', title: 'Голос', icon: <MicIcon /> },
+  { key: 'manual', title: 'Вручную', icon: <PencilIcon /> },
 ]
 
 const PLACE_BY_NAME = {
