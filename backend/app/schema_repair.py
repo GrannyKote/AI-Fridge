@@ -204,6 +204,24 @@ def _repair_columns_and_tables(op: Any) -> None:
             schema=SCHEMA,
         )
 
+    personal_cols = _table_columns(op, "personal_news")
+    if personal_cols is not None and personal_cols and "id_feedback" not in personal_cols:
+        op.drop_table("personal_news", schema=SCHEMA)
+        personal_cols = {}
+    if personal_cols is not None and not personal_cols:
+        op.create_table(
+            "personal_news",
+            _id(),
+            sa.Column("id_user", sa.Integer(), nullable=False),
+            sa.Column("id_feedback", sa.Integer(), nullable=False),
+            sa.Column("id_user_created", sa.Integer(), nullable=False),
+            sa.Column("datetime_created", sa.DateTime(timezone=True), nullable=False),
+            sa.Column("header", sa.String(1024), nullable=False),
+            sa.Column("body", sa.Text()),
+            sa.Column("datetime_seen", sa.DateTime(timezone=True)),
+            schema=SCHEMA,
+        )
+
     user_cols = _table_columns(op, "user")
     if user_cols is not None and user_cols and "is_admin" not in user_cols:
         op.add_column(

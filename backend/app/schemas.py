@@ -212,6 +212,7 @@ class NewsListItemOut(BaseModel):
     id: int
     header: str
     is_seen: bool = False
+    is_personal: bool = False
 
 
 class NewsOut(BaseModel):
@@ -219,6 +220,7 @@ class NewsOut(BaseModel):
     header: str
     body: str = ""
     is_seen: bool = False
+    is_personal: bool = False
 
 
 class AdminNewsListItemOut(BaseModel):
@@ -235,6 +237,15 @@ class AdminNewsOut(BaseModel):
 class AdminNewsUpdate(BaseModel):
     header: str = Field(min_length=1, max_length=1024)
     body: str = Field(default="", max_length=20000)
+
+
+class AdminFeedbackReplyCreate(BaseModel):
+    header: str = Field(min_length=1, max_length=1024)
+    body: str = Field(default="", max_length=20000)
+
+
+class AdminFeedbackReplyOut(BaseModel):
+    id: int
 
 
 class AdminNewsViewerOut(BaseModel):

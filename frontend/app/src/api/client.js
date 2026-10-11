@@ -160,6 +160,8 @@ export const pantryApi = {
 export const newsApi = {
   list: () => request('/news'),
   markSeen: (newsId) => request(`/news/${newsId}/seen`, { method: 'POST' }),
+  markPersonalSeen: (personalId) =>
+    request(`/news/personal/${personalId}/seen`, { method: 'POST' }),
 }
 
 export const adminNewsApi = {
@@ -181,6 +183,8 @@ export const adminUsersApi = {
 export const adminFeedbackApi = {
   list: () => request('/admin/feedback'),
   get: (feedbackId) => request(`/admin/feedback/${feedbackId}`),
+  reply: (feedbackId, payload) =>
+    request(`/admin/feedback/${feedbackId}/reply`, { method: 'POST', body: payload }),
   itemUrl: (feedbackId, itemId, { download = false } = {}) =>
     `${BASE_URL}/admin/feedback/${feedbackId}/items/${itemId}${download ? '?download=1' : ''}`,
   fetchItem: (feedbackId, itemId, options) =>

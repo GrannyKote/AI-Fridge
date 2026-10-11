@@ -54,13 +54,25 @@ export function NewsDialog({ onClose, onChanged }) {
   }, [])
 
   async function openNews(item) {
-    setSelected({ id: item.id, header: item.header, body: '', is_seen: item.is_seen })
+    setSelected({
+      id: item.id,
+      header: item.header,
+      body: '',
+      is_seen: item.is_seen,
+      is_personal: item.is_personal,
+    })
 
     try {
-      const opened = await newsApi.markSeen(item.id)
+      const opened = item.is_personal
+        ? await newsApi.markPersonalSeen(item.id)
+        : await newsApi.markSeen(item.id)
       setSelected(opened)
       setItems((current) =>
-        current.map((news) => (news.id === item.id ? { ...news, is_seen: true } : news)),
+        current.map((news) =>
+          news.id === item.id && news.is_personal === item.is_personal
+            ? { ...news, is_seen: true }
+            : news,
+        ),
       )
       if (!item.is_seen) {
         onChanged?.()
@@ -107,7 +119,7 @@ export function NewsDialog({ onClose, onChanged }) {
               ) : (
                 <ul className="news__list">
                   {items.map((item) => (
-                    <li key={item.id}>
+                    <li key={`${item.is_personal ? 'personal' : 'news'}-${item.id}`}>
                       <button
                         className={`news__item${item.is_seen ? ' news__item--seen' : ''}`}
                         type="button"

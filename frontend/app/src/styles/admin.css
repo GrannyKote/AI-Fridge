@@ -216,6 +216,17 @@
   cursor: wait;
 }
 
+.admin-feedback__reply-btn {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.admin-feedback__reply-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .admin-feedback__photo {
   display: block;
   width: 100%;

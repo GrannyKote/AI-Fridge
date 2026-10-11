@@ -9,12 +9,13 @@ from ..services import news as news_service
 router = APIRouter(prefix="/api", tags=["news"])
 
 
-def _to_news(item, seen: bool) -> NewsOut:
+def _to_news(item, seen: bool, *, is_personal: bool = False) -> NewsOut:
     return NewsOut(
         id=item.id,
         header=item.header,
         body=item.body or "",
         is_seen=seen,
+        is_personal=is_personal,
     )
 
 
@@ -35,4 +36,16 @@ def mark_news_seen(
     item = news_service.mark_seen(session, user_id, news_id)
     if item is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Новость не найдена")
-    return _to_news(item, seen=True)
+    return _to_news(item, seen=True, is_personal=False)
+
+
+@router.post("/news/personal/{personal_id}/seen", response_model=NewsOut)
+def mark_personal_news_seen(
+    personal_id: int,
+    session: Session = Depends(get_session),
+    user_id: int = Depends(current_user_id),
+) -> NewsOut:
+    item = news_service.mark_personal_seen(session, user_id, personal_id)
+    if item is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Новость не найдена")
+    return _to_news(item, seen=True, is_personal=True)

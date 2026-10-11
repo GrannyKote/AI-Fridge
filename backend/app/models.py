@@ -250,3 +250,20 @@ class UserNewsSeen(Base):
     id_news: Mapped[int] = mapped_column(Integer, nullable=False)
     id_user_seen: Mapped[int] = mapped_column(Integer, nullable=False)
     datetime_seen: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+# В базе у personal_news составной первичный ключ
+# (id, id_user, id_feedback, id_user_created, datetime_created, header).
+# Для ORM достаточно колонки id.
+class PersonalNews(Base):
+    __tablename__ = "personal_news"
+    __table_args__ = {"schema": SCHEMA}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id_user: Mapped[int] = mapped_column(Integer, nullable=False)
+    id_feedback: Mapped[int] = mapped_column(Integer, nullable=False)
+    id_user_created: Mapped[int] = mapped_column(Integer, nullable=False)
+    datetime_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    header: Mapped[str] = mapped_column(String(1024), nullable=False)
+    body: Mapped[str | None] = mapped_column(Text)
+    datetime_seen: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

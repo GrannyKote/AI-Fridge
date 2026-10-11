@@ -5,26 +5,58 @@ from datetime import datetime
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
-from ..models import News, NewsUpdate, User, UserNewsSeen
+from ..models import News, NewsUpdate, PersonalNews, User, UserNewsSeen
 
 
 def list_news(session: Session, user_id: int) -> list[dict]:
-    statement = (
+    news_statement = (
         select(News, UserNewsSeen.id)
         .outerjoin(
             UserNewsSeen,
             and_(UserNewsSeen.id_news == News.id, UserNewsSeen.id_user_seen == user_id),
         )
         .where(News.is_deleted.is_not(True))
-        .order_by(News.datetime_created.desc(), News.id.desc())
     )
-    return [
+    regular = [
         {
             "id": news.id,
             "header": news.header,
             "is_seen": seen_id is not None,
+            "is_personal": False,
+            "_sort": news.datetime_created,
         }
-        for news, seen_id in session.execute(statement)
+        for news, seen_id in session.execute(news_statement)
+    ]
+
+    personal_statement = (
+        select(PersonalNews)
+        .where(PersonalNews.id_user == user_id)
+        .order_by(PersonalNews.datetime_created.desc(), PersonalNews.id.desc())
+    )
+    personal = [
+        {
+            "id": item.id,
+            "header": item.header,
+            "is_seen": item.datetime_seen is not None,
+            "is_personal": True,
+            "_sort": item.datetime_created,
+        }
+        for item in session.scalars(personal_statement)
+    ]
+
+    merged = sorted(
+        regular + personal,
+        key=lambda row: (row["_sort"], row["id"]),
+        reverse=True,
+    )
+    return [
+        {
+            "id": row["id"],
+            "header": row["header"],
+            "is_seen": row["is_seen"],
+            "is_personal": row["is_personal"],
+        }
+        for row in merged
     ]
 
 
@@ -33,6 +65,13 @@ def get_news(session: Session, news_id: int) -> News | None:
     if news is None or news.is_deleted:
         return None
     return news
+
+
+def get_personal_news(session: Session, personal_id: int, user_id: int) -> PersonalNews | None:
+    item = session.get(PersonalNews, personal_id)
+    if item is None or item.id_user != user_id:
+        return None
+    return item
 
 
 def mark_seen(session: Session, user_id: int, news_id: int) -> News | None:
@@ -57,6 +96,19 @@ def mark_seen(session: Session, user_id: int, news_id: int) -> News | None:
         session.commit()
 
     return news
+
+
+def mark_personal_seen(session: Session, user_id: int, personal_id: int) -> PersonalNews | None:
+    item = get_personal_news(session, personal_id, user_id)
+    if item is None:
+        return None
+
+    if item.datetime_seen is None:
+        item.datetime_seen = datetime.now().astimezone()
+        session.commit()
+        session.refresh(item)
+
+    return item
 
 
 def create_news(

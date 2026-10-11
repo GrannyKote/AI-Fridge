@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ..models import Feedback, FeedbackItem, User
+from ..models import Feedback, FeedbackItem, PersonalNews, User
 
 MAX_IMAGES = 3
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -163,6 +163,36 @@ def get_for_admin(session: Session, feedback_id: int) -> dict | None:
         "datetime_seen": feedback.datetime_seen,
         "items": [{"id": item.id} for item in items],
     }
+
+
+def create_reply(
+    session: Session,
+    admin_id: int,
+    feedback_id: int,
+    header: str,
+    body: str,
+) -> PersonalNews | None:
+    feedback = session.get(Feedback, feedback_id)
+    if feedback is None:
+        return None
+
+    reply_header = header.strip()
+    if not reply_header:
+        raise ValueError("Введите заголовок ответа")
+
+    reply = PersonalNews(
+        id_user=feedback.id_user,
+        id_feedback=feedback.id,
+        id_user_created=admin_id,
+        datetime_created=datetime.now(timezone.utc),
+        header=reply_header,
+        body=(body or "").strip() or None,
+        datetime_seen=None,
+    )
+    session.add(reply)
+    session.commit()
+    session.refresh(reply)
+    return reply
 
 
 def get_item_for_admin(

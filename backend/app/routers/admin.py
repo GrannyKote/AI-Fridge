@@ -7,6 +7,8 @@ from ..dependencies import current_admin_id
 from ..schemas import (
     AdminFeedbackDetailOut,
     AdminFeedbackListItemOut,
+    AdminFeedbackReplyCreate,
+    AdminFeedbackReplyOut,
     AdminNewsListItemOut,
     AdminNewsOut,
     AdminNewsUpdate,
@@ -80,6 +82,33 @@ def get_feedback_item(
         media_type=media_type,
         headers={"Content-Disposition": f'{disposition}; filename="{filename}"'},
     )
+
+
+@router.post(
+    "/feedback/{feedback_id}/reply",
+    response_model=AdminFeedbackReplyOut,
+    status_code=status.HTTP_201_CREATED,
+)
+def reply_to_feedback(
+    feedback_id: int,
+    payload: AdminFeedbackReplyCreate,
+    session: Session = Depends(get_session),
+    admin_id: int = Depends(current_admin_id),
+) -> AdminFeedbackReplyOut:
+    try:
+        reply = feedback_service.create_reply(
+            session,
+            admin_id,
+            feedback_id,
+            payload.header,
+            payload.body,
+        )
+    except ValueError as error:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
+
+    if reply is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Отзыв не найден")
+    return AdminFeedbackReplyOut(id=reply.id)
 
 
 def _to_out(item) -> AdminNewsOut:

@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { adminFeedbackApi } from '../api/client.js'
 import { FormAlert } from './FormAlert.jsx'
+import { TextField } from './TextField.jsx'
 import { ArrowLeftIcon } from './icons.jsx'
 import '../styles/dialog.css'
 
@@ -17,23 +18,66 @@ function formatCreatedAt(value) {
   return Number.isNaN(date.getTime()) ? value : createdAtFormatter.format(date)
 }
 
-export function AdminFeedbackDialog({ feedbackId, onClose, onOpened }) {
+function FeedbackDetailBlock({ detail, previews, downloadingId, onDownload }) {
+  return (
+    <div className="admin-feedback__detail">
+      <div className="admin-feedback__detail-head">
+        <span className="admin-feedback__login">{detail.login}</span>
+        <time className="admin-feedback__time" dateTime={detail.datetime_created}>
+          {formatCreatedAt(detail.datetime_created)}
+        </time>
+      </div>
+
+      <p className="admin-feedback__text">{detail.feedback_text}</p>
+
+      {previews.length > 0 && (
+        <ul className="admin-feedback__photos">
+          {previews.map((preview) => (
+            <li key={preview.id}>
+              <button
+                className="admin-feedback__photo-btn"
+                type="button"
+                onClick={() => onDownload(preview.id)}
+                disabled={downloadingId === preview.id}
+                aria-label="Скачать изображение в полном размере"
+              >
+                <img className="admin-feedback__photo" src={preview.url} alt="" loading="lazy" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+export function AdminFeedbackDialog({ feedbackId, onClose, onOpened, onReplied }) {
+  const replyBodyId = useId()
+  const [mode, setMode] = useState('view')
   const [detail, setDetail] = useState(null)
   const [formError, setFormError] = useState('')
   const [loading, setLoading] = useState(true)
   const [previews, setPreviews] = useState([])
   const [downloadingId, setDownloadingId] = useState(null)
+  const [replyHeader, setReplyHeader] = useState('')
+  const [replyBody, setReplyBody] = useState('')
+  const [replyHeaderError, setReplyHeaderError] = useState('')
+  const [replyPending, setReplyPending] = useState(false)
 
   useEffect(() => {
     function handleKeyDown(event) {
-      if (event.key === 'Escape' && !downloadingId) {
+      if (event.key === 'Escape' && !downloadingId && !replyPending) {
+        if (mode === 'reply') {
+          setMode('view')
+          return
+        }
         onClose()
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [downloadingId, onClose])
+  }, [downloadingId, mode, onClose, replyPending])
 
   useEffect(() => {
     let cancelled = false
@@ -43,6 +87,10 @@ export function AdminFeedbackDialog({ feedbackId, onClose, onOpened }) {
       setLoading(true)
       setFormError('')
       setPreviews([])
+      setMode('view')
+      setReplyHeader('')
+      setReplyBody('')
+      setReplyHeaderError('')
       try {
         const nextDetail = await adminFeedbackApi.get(feedbackId)
         if (cancelled) {
@@ -100,18 +148,67 @@ export function AdminFeedbackDialog({ feedbackId, onClose, onOpened }) {
     }
   }
 
+  function handleBack() {
+    if (mode === 'reply') {
+      setMode('view')
+      setFormError('')
+      setReplyHeaderError('')
+      return
+    }
+    onClose()
+  }
+
+  async function handleReplySubmit(event) {
+    event.preventDefault()
+    setFormError('')
+    setReplyHeaderError('')
+
+    const nextHeader = replyHeader.trim()
+    if (!nextHeader) {
+      setReplyHeaderError('Введите заголовок ответа')
+      return
+    }
+
+    setReplyPending(true)
+    try {
+      await adminFeedbackApi.reply(feedbackId, {
+        header: nextHeader,
+        body: replyBody.trim(),
+      })
+      onReplied?.()
+      onClose()
+    } catch (replyError) {
+      setFormError(replyError.message)
+    } finally {
+      setReplyPending(false)
+    }
+  }
+
+  const dialogLabel = mode === 'reply' ? 'Ответ на отзыв' : 'Отзыв'
+
   return (
-    <div className="dialog" role="dialog" aria-modal="true" aria-label="Отзыв">
-      <button className="dialog__backdrop" type="button" onClick={onClose} aria-label="Закрыть" />
+    <div className="dialog" role="dialog" aria-modal="true" aria-label={dialogLabel}>
+      <button
+        className="dialog__backdrop"
+        type="button"
+        onClick={replyPending ? undefined : onClose}
+        aria-label="Закрыть"
+      />
 
       <div className="dialog__sheet">
         <div className="dialog__grabber" aria-hidden="true" />
 
         <div className="news__head">
-          <button className="icon-btn" type="button" onClick={onClose} aria-label="Назад к списку">
+          <button
+            className="icon-btn"
+            type="button"
+            onClick={handleBack}
+            disabled={replyPending}
+            aria-label={mode === 'reply' ? 'Назад к отзыву' : 'Назад к списку'}
+          >
             <ArrowLeftIcon />
           </button>
-          <h2 className="dialog__title">Отзыв</h2>
+          <h2 className="dialog__title">{dialogLabel}</h2>
         </div>
 
         {loading && <p className="notifications__empty">Загружаем...</p>}
@@ -120,42 +217,67 @@ export function AdminFeedbackDialog({ feedbackId, onClose, onOpened }) {
           <p className="notifications__empty">{formError}</p>
         )}
 
-        {!loading && detail && (
-          <div className="admin-feedback__detail">
-            <div className="admin-feedback__detail-head">
-              <span className="admin-feedback__login">{detail.login}</span>
-              <time className="admin-feedback__time" dateTime={detail.datetime_created}>
-                {formatCreatedAt(detail.datetime_created)}
-              </time>
+        {!loading && detail && mode === 'view' && (
+          <>
+            <FeedbackDetailBlock
+              detail={detail}
+              previews={previews}
+              downloadingId={downloadingId}
+              onDownload={handleDownload}
+            />
+            <FormAlert>{formError}</FormAlert>
+            <button
+              className="btn btn--primary admin-feedback__reply-btn"
+              type="button"
+              onClick={() => setMode('reply')}
+            >
+              Ответить
+            </button>
+          </>
+        )}
+
+        {!loading && detail && mode === 'reply' && (
+          <form className="form admin-feedback__reply-form" onSubmit={handleReplySubmit} noValidate>
+            <FeedbackDetailBlock
+              detail={detail}
+              previews={previews}
+              downloadingId={downloadingId}
+              onDownload={handleDownload}
+            />
+
+            <TextField
+              label="Заголовок ответа"
+              value={replyHeader}
+              onChange={(value) => {
+                setReplyHeader(value)
+                setReplyHeaderError('')
+              }}
+              error={replyHeaderError}
+              maxLength={1024}
+            />
+
+            <div className="field">
+              <label className="field__label" htmlFor={replyBodyId}>
+                Ответ
+              </label>
+              <div className="field__control">
+                <textarea
+                  id={replyBodyId}
+                  className="field__input field__textarea"
+                  value={replyBody}
+                  onChange={(event) => setReplyBody(event.target.value)}
+                  rows={6}
+                  maxLength={20000}
+                />
+              </div>
             </div>
 
-            <p className="admin-feedback__text">{detail.feedback_text}</p>
-
-            {previews.length > 0 && (
-              <ul className="admin-feedback__photos">
-                {previews.map((preview) => (
-                  <li key={preview.id}>
-                    <button
-                      className="admin-feedback__photo-btn"
-                      type="button"
-                      onClick={() => handleDownload(preview.id)}
-                      disabled={downloadingId === preview.id}
-                      aria-label="Скачать изображение в полном размере"
-                    >
-                      <img
-                        className="admin-feedback__photo"
-                        src={preview.url}
-                        alt=""
-                        loading="lazy"
-                      />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-
             <FormAlert>{formError}</FormAlert>
-          </div>
+
+            <button className="btn btn--primary" type="submit" disabled={replyPending}>
+              {replyPending ? 'Добавляем...' : 'Добавить ответ'}
+            </button>
+          </form>
         )}
       </div>
     </div>
