@@ -1,4 +1,5 @@
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,12 +9,21 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from .config import settings
-from .database import get_session
+from .database import engine, get_session
 from .routers import admin, auth, feedback, news, pantry, shopping
 
 logger = logging.getLogger("uvicorn.error")
 
-app = FastAPI(title="AI-Fridge API", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    """Прогреваем пул соединений до приёма запросов (после alembic в entrypoint)."""
+    with engine.connect() as connection:
+        connection.execute(text("select 1"))
+    yield
+
+
+app = FastAPI(title="AI-Fridge API", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

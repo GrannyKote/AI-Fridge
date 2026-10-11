@@ -6,7 +6,7 @@ import urllib.request
 
 def main() -> int:
     try:
-        with urllib.request.urlopen("http://127.0.0.1:8000/api/health/live", timeout=3) as response:
+        with urllib.request.urlopen("http://127.0.0.1:8000/api/health", timeout=5) as response:
             if response.status != 200:
                 print(f"unexpected status: {response.status}", file=sys.stderr)
                 return 1

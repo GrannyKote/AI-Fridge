@@ -31,7 +31,16 @@ function headers(body, token) {
   }
 }
 
-async function request(path, { method = 'GET', body, form } = {}) {
+const RETRYABLE_STATUSES = new Set([502, 503, 504])
+const MAX_GET_ATTEMPTS = 3
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
+
+async function request(path, { method = 'GET', body, form, attempt = 0 } = {}) {
   const token = readSession()?.token
   let response
 
@@ -42,6 +51,10 @@ async function request(path, { method = 'GET', body, form } = {}) {
       body: form ?? (body ? JSON.stringify(body) : undefined),
     })
   } catch {
+    if (method === 'GET' && attempt + 1 < MAX_GET_ATTEMPTS) {
+      await wait(300 * (attempt + 1))
+      return request(path, { method, body, form, attempt: attempt + 1 })
+    }
     throw new Error('Сервер недоступен. Проверьте, что бэкенд запущен')
   }
 
@@ -56,6 +69,14 @@ async function request(path, { method = 'GET', body, form } = {}) {
   }
 
   if (!response.ok) {
+    if (
+      method === 'GET' &&
+      RETRYABLE_STATUSES.has(response.status) &&
+      attempt + 1 < MAX_GET_ATTEMPTS
+    ) {
+      await wait(300 * (attempt + 1))
+      return request(path, { method, body, form, attempt: attempt + 1 })
+    }
     throw new Error(extractMessage(payload, 'Не удалось выполнить запрос'))
   }
 

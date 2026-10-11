@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { pantryApi } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { AddProductDialog } from '../components/AddProductDialog.jsx'
@@ -56,9 +56,12 @@ export default function PantryPage() {
   const multiSelected = selectedIds.size >= 2
   const categoryChipsRef = useHorizontalScroll()
   const placeChipsRef = useHorizontalScroll()
+  const loadTicket = useRef(0)
 
   const load = useCallback(
     async (silent = false) => {
+      const ticket = ++loadTicket.current
+
       if (!groupId) {
         setState('error')
         setError('У пользователя нет группы, кладовую показать не получится')
@@ -76,12 +79,18 @@ export default function PantryPage() {
           pantryApi.units(),
           pantryApi.products(groupId),
         ])
+        if (ticket !== loadTicket.current) {
+          return
+        }
         setCategories(categoryList)
         setPlaces(placeList)
         setUnits(unitList)
         setProducts(mergeMatchingProducts(productList))
         setState('ready')
       } catch (loadError) {
+        if (ticket !== loadTicket.current) {
+          return
+        }
         setError(loadError.message)
         setState('error')
       }

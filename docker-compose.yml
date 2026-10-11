@@ -49,7 +49,7 @@ services:
       - "80"
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
 
   caddy:
     image: caddy:2.9-alpine
