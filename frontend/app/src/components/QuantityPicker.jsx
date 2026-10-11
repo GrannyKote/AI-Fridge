@@ -27,6 +27,12 @@ function percentLabel(portion, available) {
   return `${percent.toFixed(1)}%`
 }
 
+export function defaultPresetPortion(available, unit) {
+  const presets = presetsFor(available, unit)
+  const portion = presets[0]?.portion ?? 0
+  return portion > 0 ? formatNumber(portion) : ''
+}
+
 function presetsFor(available, unit) {
   if (unit !== 'шт' || available < 1) {
     return RATIO_PRESETS.map((preset) => ({
@@ -35,17 +41,17 @@ function presetsFor(available, unit) {
     }))
   }
 
-  const one = 1
   const first = {
     key: '1',
-    label: percentLabel(one, available),
-    portion: one,
+    label: percentLabel(1, available),
+    portion: 1,
   }
 
-  const rest = RATIO_PRESETS.map((preset) => ({
+  // Как у остальных единиц — четыре варианта; минимум — 1 шт, дальше 50%, 75% и «Всё».
+  const rest = RATIO_PRESETS.slice(1).map((preset) => ({
     ...preset,
     portion: shareOf(available, preset.ratio),
-  })).filter((preset) => preset.portion > one)
+  }))
 
   return [first, ...rest]
 }

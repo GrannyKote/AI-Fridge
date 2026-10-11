@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react'
 import { pantryApi } from '../api/client.js'
 import { FormAlert } from './FormAlert.jsx'
-import { QuantityPicker, ProductHead } from './QuantityPicker.jsx'
+import { QuantityPicker, ProductHead, defaultPresetPortion } from './QuantityPicker.jsx'
 import { actionAmount, amountError, parseAmount } from '../lib/pantry.js'
 import '../styles/dialog.css'
 
 export function ConsumeDialog({ groupId, product, onClose, onConsumed }) {
-  const [quantity, setQuantity] = useState('')
+  const available = Number(product.remaining ?? product.quantity)
+  const [quantity, setQuantity] = useState(() => defaultPresetPortion(available, product.unit))
   const [error, setError] = useState('')
   const [formError, setFormError] = useState('')
   const [pending, setPending] = useState(false)
-
-  const available = Number(product.remaining ?? product.quantity)
   const summary = actionAmount(quantity, product.unit)
 
   useEffect(() => {
