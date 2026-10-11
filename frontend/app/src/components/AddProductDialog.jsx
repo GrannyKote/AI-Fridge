@@ -293,24 +293,38 @@ export function AddProductDialog({
   }, [form.name, products])
 
   useEffect(() => {
-    if (bestBeforeTouched) {
+    const typed = form.name.trim().toLowerCase()
+    if (!typed) {
       return
     }
 
-    const typed = form.name.trim().toLowerCase()
     const match = nameSuggestions.find(
       (item) => item.label.trim().toLowerCase() === typed,
     )
-    const next = defaultBestBeforeOf(match?.product)
+    if (!match) {
+      return
+    }
 
-    if (!next || (form.bestBefore === next && form.productId === (match.product.id ?? null))) {
+    const nextProductId = match.product.id ?? null
+    const nextCategory = match.product.category ?? ''
+    const nextBestBefore = defaultBestBeforeOf(match.product)
+
+    const alreadySynced =
+      form.productId === nextProductId &&
+      (form.category || '') === nextCategory &&
+      (!nextBestBefore || bestBeforeTouched || form.bestBefore === nextBestBefore)
+
+    if (alreadySynced) {
       return
     }
 
     const patch = {
-      bestBefore: next,
-      productId: match.product.id ?? null,
-      category: match.product.category ?? form.category,
+      productId: nextProductId,
+      category: nextCategory || form.category,
+    }
+
+    if (!bestBeforeTouched && nextBestBefore) {
+      patch.bestBefore = nextBestBefore
     }
 
     if (!placeTouched && places.length > 0) {
@@ -454,6 +468,11 @@ export function AddProductDialog({
             label="Название"
             value={form.name}
             onChange={(value) => {
+              if (!isEdit) {
+                setPlaceTouched(false)
+                setBestBeforeTouched(false)
+                setAmountTouched(false)
+              }
               update({ name: value, productId: null })
               clearError('name')
             }}
