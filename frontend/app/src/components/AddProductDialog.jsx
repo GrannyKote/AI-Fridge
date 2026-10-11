@@ -162,7 +162,7 @@ export function AddProductDialog({
           placeId: placesProp.length > 0 ? placeIdOf(placesProp, '', '') : '',
         },
   )
-  const [method, setMethod] = useState('manual')
+  const [method, setMethod] = useState('receipt')
   const [units, setUnits] = useState(initialUnits)
   const [places, setPlaces] = useState(placesProp)
   const [nameSuggestions, setNameSuggestions] = useState([])
