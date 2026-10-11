@@ -65,6 +65,8 @@ class ProductSuggestionOut(BaseModel):
     # Срок хранения в днях: из него считается срок годности по умолчанию.
     expires_in: int | None = None
     storage_place_id: int | None = None
+    unit_id: int | None = None
+    quantity: float | None = None
 
 
 class PantryItemOut(BaseModel):
@@ -97,8 +99,8 @@ class PantryItemOut(BaseModel):
 class PantryItemCreate(BaseModel):
     name: str = Field(min_length=1, max_length=512)
     category: str = Field(min_length=1, max_length=512)
-    unit_id: int
-    quantity: float = Field(gt=0)
+    unit_id: int | None = None
+    quantity: float | None = Field(default=None, gt=0)
     price: float | None = Field(default=None, ge=0)
     best_before: date
     storage_place_id: int | None = None

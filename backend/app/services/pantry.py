@@ -40,6 +40,8 @@ def search_products(session: Session, query: str, limit: int = 5):
             ProductCategory.name.label("category"),
             Product.expires_in,
             Product.id_storage_place.label("storage_place_id"),
+            Product.id_unit_of_measurement.label("unit_id"),
+            Product.quantity,
         )
         .outerjoin(ProductCategory, ProductCategory.id == Product.id_product_category)
         .order_by(Product.name)
@@ -217,17 +219,52 @@ def money(value: float | None) -> Decimal | None:
     return None if value is None else Decimal(str(value))
 
 
+def resolve_unit_and_quantity(
+    session: Session,
+    *,
+    product: Product | None,
+    unit_id: int | None,
+    quantity: float | None,
+) -> tuple[UnitOfMeasurement, Decimal]:
+    """Явные unit_id/quantity из запроса или значения по умолчанию из справочника product."""
+    resolved_unit_id = unit_id
+    if resolved_unit_id is not None and session.get(UnitOfMeasurement, resolved_unit_id) is None:
+        resolved_unit_id = None
+    if (
+        resolved_unit_id is None
+        and product is not None
+        and product.id_unit_of_measurement is not None
+    ):
+        resolved_unit_id = product.id_unit_of_measurement
+
+    unit = (
+        session.get(UnitOfMeasurement, resolved_unit_id) if resolved_unit_id is not None else None
+    )
+    if unit is None:
+        raise ValueError("Единица измерения не найдена")
+
+    resolved_quantity = quantity
+    if resolved_quantity is None and product is not None and product.quantity is not None:
+        resolved_quantity = float(product.quantity)
+    if resolved_quantity is None or resolved_quantity <= 0:
+        raise ValueError("Укажите количество больше нуля")
+
+    return unit, Decimal(str(resolved_quantity))
+
+
 def create_pantry_item(
     session: Session, group_id: int, payload: PantryItemCreate, user_id: int
 ) -> dict:
     """Кладёт продукт в кладовую, заводя справочники, если их ещё нет."""
-    unit = session.get(UnitOfMeasurement, payload.unit_id)
-    if unit is None:
-        raise ValueError("Единица измерения не найдена")
-
     name = catalog.capitalized_name(payload.name)
     product, category = catalog.ensure_product(
         session, name, payload.category, payload.product_id, user_id=user_id
+    )
+    unit, quantity = resolve_unit_and_quantity(
+        session,
+        product=product,
+        unit_id=payload.unit_id,
+        quantity=payload.quantity,
     )
 
     item = UserGroupProduct(
@@ -235,7 +272,7 @@ def create_pantry_item(
         id_product=product.id,
         product_name=name,
         id_unit_of_measurement=unit.id,
-        quantity=Decimal(str(payload.quantity)),
+        quantity=quantity,
         price=money(payload.price),
         best_before=payload.best_before,
         id_product_category=category.id,
@@ -306,10 +343,6 @@ def update_pantry_item(
     if seed is None or seed["is_deleted"] or seed["is_over"]:
         return None
 
-    unit = session.get(UnitOfMeasurement, payload.unit_id)
-    if unit is None:
-        raise ValueError("Единица измерения не найдена")
-
     lot = _open_lot(session, group_id, seed)
     new_name = catalog.capitalized_name(payload.name)
 
@@ -321,8 +354,13 @@ def update_pantry_item(
     product, category = catalog.ensure_product(
         session, new_name, payload.category, payload.product_id, user_id=user_id
     )
+    unit, new_remaining = resolve_unit_and_quantity(
+        session,
+        product=product,
+        unit_id=payload.unit_id,
+        quantity=payload.quantity,
+    )
     price = money(payload.price)
-    new_remaining = Decimal(str(payload.quantity))
     storage_place_id = storage.resolve_storage_place_id(
         session,
         product=product,

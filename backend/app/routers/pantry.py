@@ -72,10 +72,22 @@ def search_products(
     limit: int = Query(default=5, ge=1, le=20),
     session: Session = Depends(get_session),
 ) -> list[ProductSuggestionOut]:
-    return [
-        ProductSuggestionOut(**{**row, "name": catalog.capitalized_name(row["name"])})
-        for row in pantry.search_products(session, query, limit)
-    ]
+    items: list[ProductSuggestionOut] = []
+    for row in pantry.search_products(session, query, limit):
+        quantity = row.get("quantity")
+        items.append(
+            ProductSuggestionOut(
+                id=row["id"],
+                name=catalog.capitalized_name(row["name"]),
+                category_id=row.get("category_id"),
+                category=row.get("category"),
+                expires_in=row.get("expires_in"),
+                storage_place_id=row.get("storage_place_id"),
+                unit_id=row.get("unit_id"),
+                quantity=None if quantity is None else float(quantity),
+            )
+        )
+    return items
 
 
 @router.get("/groups/{group_id}/products", response_model=list[PantryItemOut])

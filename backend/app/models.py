@@ -101,6 +101,9 @@ class Product(Base):
     expires_in: Mapped[int | None] = mapped_column(SmallInteger)
     # Место хранения по умолчанию для новых строк кладовой.
     id_storage_place: Mapped[int | None] = mapped_column(Integer)
+    # Единица и количество по умолчанию при добавлении в кладовую.
+    id_unit_of_measurement: Mapped[int | None] = mapped_column(Integer)
+    quantity: Mapped[Decimal | None] = mapped_column(Numeric)
 
 
 class UnitOfMeasurement(Base):

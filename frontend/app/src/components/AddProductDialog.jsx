@@ -71,6 +71,35 @@ function unitIdOf(units) {
   return String(units.find((unit) => unit.name === 'шт')?.id ?? units[0]?.id ?? '')
 }
 
+function defaultAmountOf(product, units) {
+  if (product.unit_id == null && product.quantity == null) {
+    return null
+  }
+
+  const unitId =
+    product.unit_id != null ? String(product.unit_id) : unitIdOf(units)
+  const unit = units.find((item) => String(item.id) === unitId)
+  const quantity =
+    product.quantity != null
+      ? formatNumber(product.quantity)
+      : defaultQuantityForUnit(unit?.name)
+
+  return { unitId, quantity }
+}
+
+function applyCatalogAmount(patch, product, units, amountTouched) {
+  if (amountTouched) {
+    return patch
+  }
+
+  const amount = defaultAmountOf(product, units)
+  if (!amount) {
+    return patch
+  }
+
+  return { ...patch, unitId: amount.unitId, quantity: amount.quantity }
+}
+
 function catalogUnitsOf(units) {
   return units.length > 0 ? units : FALLBACK_UNITS
 }
@@ -171,6 +200,7 @@ export function AddProductDialog({
   const [pending, setPending] = useState(false)
   const [placeTouched, setPlaceTouched] = useState(isEdit)
   const [bestBeforeTouched, setBestBeforeTouched] = useState(isEdit)
+  const [amountTouched, setAmountTouched] = useState(isEdit)
 
   useEffect(() => {
     let cancelled = false
@@ -292,13 +322,23 @@ export function AddProductDialog({
       )
     }
 
+    Object.assign(patch, applyCatalogAmount({}, match.product, units, amountTouched))
+
     update(patch)
     clearError('bestBefore')
     clearError('category')
+    if (patch.unitId) {
+      clearError('unitId')
+    }
+    if (patch.quantity) {
+      clearError('quantity')
+    }
   }, [
     nameSuggestions,
     bestBeforeTouched,
     placeTouched,
+    amountTouched,
+    units,
     places,
     form.name,
     form.bestBefore,
@@ -440,9 +480,17 @@ export function AddProductDialog({
                 )
               }
 
+              Object.assign(patch, applyCatalogAmount({}, product, units, amountTouched))
+
               update(patch)
               clearError('name')
               clearError('category')
+              if (patch.unitId) {
+                clearError('unitId')
+              }
+              if (patch.quantity) {
+                clearError('quantity')
+              }
             }}
             suggestions={nameSuggestions}
             error={errors.name}
@@ -488,6 +536,7 @@ export function AddProductDialog({
                   inputMode="decimal"
                   value={form.quantity}
                   onChange={(event) => {
+                    setAmountTouched(true)
                     update({ quantity: event.target.value })
                     clearError('quantity')
                   }}
@@ -506,6 +555,7 @@ export function AddProductDialog({
                   className="field__input field__select"
                   value={form.unitId}
                   onChange={(event) => {
+                    setAmountTouched(true)
                     const unitId = event.target.value
                     const unit = units.find((item) => String(item.id) === unitId)
                     update(
