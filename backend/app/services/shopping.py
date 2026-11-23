@@ -169,12 +169,13 @@ def set_plan_date(session: Session, group_id: int, plan_date: date) -> UserGroup
     return purchase
 
 
-def checkout_purchase(session: Session, group_id: int, payload: PurchaseCheckout) -> None:
+def checkout_purchase(session: Session, group_id: int, payload: PurchaseCheckout) -> list[int]:
     purchase = _open_purchase(session, group_id)
     if purchase is None:
         raise ValueError("Нет открытого списка покупок")
 
     seen: set[int] = set()
+    products: list[UserGroupProduct] = []
     now = datetime.now()
 
     for item in payload.items:
@@ -196,7 +197,7 @@ def checkout_purchase(session: Session, group_id: int, payload: PurchaseCheckout
         if place is None:
             raise ValueError("Место хранения не найдено")
 
-        session.add(
+        products.append(
             UserGroupProduct(
                 id_user_group=group_id,
                 id_product=row.id_product,
@@ -212,4 +213,6 @@ def checkout_purchase(session: Session, group_id: int, payload: PurchaseCheckout
         row.is_purchased = True
 
     purchase.actual_date = now
+    session.add_all(products)
     session.commit()
+    return [product.id for product in products]

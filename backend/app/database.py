@@ -1,5 +1,6 @@
 from collections.abc import Iterator
 
+from fastapi import Request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
@@ -20,6 +21,8 @@ class Base(DeclarativeBase):
     pass
 
 
-def get_session() -> Iterator[Session]:
-    with SessionLocal() as session:
+def get_session(request: Request) -> Iterator[Session]:
+    connection = getattr(request.state, "offline_connection", None)
+    options = {"bind": connection, "join_transaction_mode": "rollback_only"} if connection else {}
+    with SessionLocal(**options) as session:
         yield session

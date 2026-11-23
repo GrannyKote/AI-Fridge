@@ -1,0 +1,146 @@
+PANTRY
+Sort  (cost=169921.12..169921.17 rows=18 width=165) (actual time=504.547..504.552 rows=19 loops=1)
+  Sort Key: user_group_product.best_before, user_group_product.id
+  Sort Method: quicksort  Memory: 26kB
+  Buffers: shared hit=56497 read=4045 dirtied=3193 written=3487
+  ->  Nested Loop Left Join  (cost=1.10..169920.75 rows=18 width=165) (actual time=101.922..504.313 rows=19 loops=1)
+        Join Filter: (" unit_of_measurement".id = user_group_product.id_unit_of_measurement)
+        Buffers: shared hit=56497 read=4045 dirtied=3193 written=3487
+        ->  Nested Loop Left Join  (cost=1.10..12.34 rows=18 width=128) (actual time=0.413..0.727 rows=19 loops=1)
+              Join Filter: (storage_place.id = user_group_product."Id_storage_place")
+              Buffers: shared hit=1 read=6 dirtied=6 written=1
+              ->  Hash Left Join  (cost=1.10..11.05 rows=18 width=122) (actual time=0.292..0.534 rows=19 loops=1)
+                    Hash Cond: (user_group_product.id_product_category = product_category.id)
+                    Buffers: shared hit=1 read=5 dirtied=5 written=1
+                    ->  Hash Left Join  (cost=0.01..9.87 rows=18 width=111) (actual time=0.242..0.425 rows=19 loops=1)
+                          Hash Cond: (user_group_product.id_product = product.id)
+                          Buffers: shared read=5 dirtied=5 written=1
+                          ->  Seq Scan on user_group_product  (cost=0.00..9.81 rows=18 width=107) (actual time=0.204..0.309 rows=19 loops=1)
+                                Filter: ((is_over IS NOT TRUE) AND (is_deleted IS NOT TRUE) AND (id_user_group = 1))
+                                Rows Removed by Filter: 366
+                                Buffers: shared read=5 dirtied=5 written=1
+                          ->  Hash  (cost=0.00..0.00 rows=1 width=8) (actual time=0.013..0.014 rows=0 loops=1)
+                                Buckets: 1024  Batches: 1  Memory Usage: 8kB
+                                ->  Seq Scan on product  (cost=0.00..0.00 rows=1 width=8) (actual time=0.012..0.013 rows=0 loops=1)
+                    ->  Hash  (cost=1.04..1.04 rows=4 width=15) (actual time=0.022..0.022 rows=4 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                          Buffers: shared hit=1
+                          ->  Seq Scan on product_category  (cost=0.00..1.04 rows=4 width=15) (actual time=0.014..0.015 rows=4 loops=1)
+                                Buffers: shared hit=1
+              ->  Materialize  (cost=0.00..1.01 rows=1 width=10) (actual time=0.007..0.007 rows=1 loops=19)
+                    Buffers: shared read=1 dirtied=1
+                    ->  Seq Scan on storage_place  (cost=0.00..1.01 rows=1 width=10) (actual time=0.093..0.093 rows=1 loops=1)
+                          Buffers: shared read=1 dirtied=1
+        ->  Materialize  (cost=0.00..1.01 rows=1 width=9) (actual time=0.004..0.004 rows=1 loops=19)
+              Buffers: shared read=1 dirtied=1 written=1
+              ->  Seq Scan on " unit_of_measurement"  (cost=0.00..1.01 rows=1 width=9) (actual time=0.067..0.067 rows=1 loops=1)
+                    Buffers: shared read=1 dirtied=1 written=1
+        SubPlan 1
+          ->  Aggregate  (cost=4719.63..4719.64 rows=1 width=32) (actual time=14.640..14.640 rows=1 loops=19)
+                Buffers: shared hit=27822 read=2445 dirtied=1593 written=2010
+                ->  Seq Scan on user_group_product_consumption  (cost=0.00..4718.00 rows=651 width=5) (actual time=0.507..14.500 rows=1244 loops=19)
+                      Filter: (id_user_group_product = user_group_product.id)
+                      Rows Removed by Filter: 248756
+                      Buffers: shared hit=27822 read=2445 dirtied=1593 written=2010
+        SubPlan 2
+          ->  Aggregate  (cost=4719.63..4719.64 rows=1 width=32) (actual time=11.838..11.838 rows=1 loops=19)
+                Buffers: shared hit=28674 read=1593 dirtied=1593 written=1475
+                ->  Seq Scan on user_group_product_waste  (cost=0.00..4718.00 rows=651 width=5) (actual time=0.505..11.694 rows=1218 loops=19)
+                      Filter: (id_user_group_product = user_group_product.id)
+                      Rows Removed by Filter: 248782
+                      Buffers: shared hit=28674 read=1593 dirtied=1593 written=1475
+Planning:
+  Buffers: shared hit=217 read=39 dirtied=6 written=16
+Planning Time: 7.643 ms
+Execution Time: 504.793 ms
+
+user_group_product_consumption
+Hash Join  (cost=15.10..6245.13 rows=60763 width=43) (actual time=0.095..33.737 rows=120024 loops=1)
+  Hash Cond: (user_group_product_consumption.id_user_group_product = user_group_product.id)
+  Buffers: shared hit=1600
+  ->  Seq Scan on user_group_product_consumption  (cost=0.00..4718.00 rows=241173 width=17) (actual time=0.010..15.051 rows=240050 loops=1)
+        Filter: (date_time >= '2025-01-01 12:17:33'::timestamp without time zone)
+        Rows Removed by Filter: 9950
+        Buffers: shared hit=1593
+  ->  Hash  (cost=13.89..13.89 rows=97 width=34) (actual time=0.077..0.081 rows=97 loops=1)
+        Buckets: 1024  Batches: 1  Memory Usage: 15kB
+        Buffers: shared hit=7
+        ->  Nested Loop Left Join  (cost=1.09..13.89 rows=97 width=34) (actual time=0.025..0.071 rows=97 loops=1)
+              Join Filter: (" unit_of_measurement".id = user_group_product.id_unit_of_measurement)
+              Buffers: shared hit=7
+              ->  Hash Left Join  (cost=1.09..11.42 rows=97 width=33) (actual time=0.018..0.051 rows=97 loops=1)
+                    Hash Cond: (user_group_product.id_product_category = product_category.id)
+                    Buffers: shared hit=6
+                    ->  Seq Scan on user_group_product  (cost=0.00..9.81 rows=97 width=22) (actual time=0.004..0.021 rows=97 loops=1)
+                          Filter: (id_user_group = 1)
+                          Rows Removed by Filter: 288
+                          Buffers: shared hit=5
+                    ->  Hash  (cost=1.04..1.04 rows=4 width=15) (actual time=0.006..0.008 rows=4 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                          Buffers: shared hit=1
+                          ->  Seq Scan on product_category  (cost=0.00..1.04 rows=4 width=15) (actual time=0.002..0.003 rows=4 loops=1)
+                                Buffers: shared hit=1
+              ->  Materialize  (cost=0.00..1.01 rows=1 width=9) (actual time=0.000..0.000 rows=1 loops=97)
+                    Buffers: shared hit=1
+                    ->  Seq Scan on " unit_of_measurement"  (cost=0.00..1.01 rows=1 width=9) (actual time=0.003..0.003 rows=1 loops=1)
+                          Buffers: shared hit=1
+Planning:
+  Buffers: shared hit=11 read=3
+Planning Time: 0.347 ms
+Execution Time: 36.192 ms
+
+user_group_product_waste
+Hash Join  (cost=15.10..6237.24 rows=60446 width=43) (actual time=0.151..35.349 rows=120010 loops=1)
+  Hash Cond: (user_group_product_waste.id_user_group_product = user_group_product.id)
+  Buffers: shared hit=1600
+  ->  Seq Scan on user_group_product_waste  (cost=0.00..4718.00 rows=239913 width=17) (actual time=0.022..16.890 rows=240021 loops=1)
+        Filter: (date_time >= '2025-01-01 12:17:33'::timestamp without time zone)
+        Rows Removed by Filter: 9979
+        Buffers: shared hit=1593
+  ->  Hash  (cost=13.89..13.89 rows=97 width=34) (actual time=0.121..0.125 rows=97 loops=1)
+        Buckets: 1024  Batches: 1  Memory Usage: 15kB
+        Buffers: shared hit=7
+        ->  Nested Loop Left Join  (cost=1.09..13.89 rows=97 width=34) (actual time=0.032..0.115 rows=97 loops=1)
+              Join Filter: (" unit_of_measurement".id = user_group_product.id_unit_of_measurement)
+              Buffers: shared hit=7
+              ->  Hash Left Join  (cost=1.09..11.42 rows=97 width=33) (actual time=0.024..0.092 rows=97 loops=1)
+                    Hash Cond: (user_group_product.id_product_category = product_category.id)
+                    Buffers: shared hit=6
+                    ->  Seq Scan on user_group_product  (cost=0.00..9.81 rows=97 width=22) (actual time=0.008..0.043 rows=97 loops=1)
+                          Filter: (id_user_group = 1)
+                          Rows Removed by Filter: 288
+                          Buffers: shared hit=5
+                    ->  Hash  (cost=1.04..1.04 rows=4 width=15) (actual time=0.010..0.011 rows=4 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                          Buffers: shared hit=1
+                          ->  Seq Scan on product_category  (cost=0.00..1.04 rows=4 width=15) (actual time=0.004..0.005 rows=4 loops=1)
+                                Buffers: shared hit=1
+              ->  Materialize  (cost=0.00..1.01 rows=1 width=9) (actual time=0.000..0.000 rows=1 loops=97)
+                    Buffers: shared hit=1
+                    ->  Seq Scan on " unit_of_measurement"  (cost=0.00..1.01 rows=1 width=9) (actual time=0.006..0.006 rows=1 loops=1)
+                          Buffers: shared hit=1
+Planning:
+  Buffers: shared hit=11
+Planning Time: 0.351 ms
+Execution Time: 37.956 ms
+
+INSERT user_group_product_consumption
+Insert on user_group_product_consumption  (cost=0.00..0.01 rows=0 width=0) (actual time=2.010..2.011 rows=0 loops=1)
+  Buffers: shared hit=33 read=11 dirtied=4
+  WAL: records=3 bytes=197
+  ->  Result  (cost=0.00..0.01 rows=1 width=48) (actual time=1.020..1.022 rows=1 loops=1)
+        Buffers: shared hit=8 read=5 dirtied=3
+        WAL: records=1 bytes=54
+Planning:
+  Buffers: shared hit=8 read=5
+Planning Time: 0.617 ms
+Execution Time: 2.036 ms
+
+INSERT user_group_product_waste
+Insert on user_group_product_waste  (cost=0.00..0.01 rows=0 width=0) (actual time=1.505..1.505 rows=0 loops=1)
+  Buffers: shared hit=25 read=6 dirtied=2
+  WAL: records=2 bytes=143
+  ->  Result  (cost=0.00..0.01 rows=1 width=48) (actual time=0.399..0.399 rows=1 loops=1)
+        Buffers: shared hit=11 read=1 dirtied=1
+Planning Time: 0.011 ms
+Execution Time: 1.513 ms

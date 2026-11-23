@@ -1,4 +1,5 @@
 import { readSession } from '../auth/sessionStore.js'
+import { createOfflineRequest } from './offlineStore.js'
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? '/api'
 
@@ -40,22 +41,29 @@ function wait(ms) {
   })
 }
 
-async function request(path, { method = 'GET', body, form, attempt = 0 } = {}) {
-  const token = readSession()?.token
+async function send(path, {
+  method = 'GET', body, form, attempt = 0, token = readSession()?.token,
+  background = false, operationId,
+} = {}) {
+  const options = { method, body, form, token, background, operationId }
   let response
 
   try {
     response = await fetch(`${BASE_URL}${path}`, {
       method,
-      headers: form ? headers(null, token) : headers(body, token),
+      headers: {
+        ...headers(form ? null : body, token),
+        ...(operationId ? { 'Idempotency-Key': operationId } : {}),
+      },
       body: form ?? (body ? JSON.stringify(body) : undefined),
+      signal: background ? AbortSignal.timeout(operationId ? 30000 : 10000) : undefined,
     })
   } catch {
-    if (method === 'GET' && attempt + 1 < MAX_GET_ATTEMPTS) {
+    if (!background && method === 'GET' && attempt + 1 < MAX_GET_ATTEMPTS) {
       await wait(300 * (attempt + 1))
-      return request(path, { method, body, form, attempt: attempt + 1 })
+      return send(path, { ...options, attempt: attempt + 1 })
     }
-    throw new Error('Сервер недоступен. Проверьте, что бэкенд запущен')
+    throw Object.assign(new Error('Сервер недоступен. Проверьте подключение'), { transient: true })
   }
 
   if (response.status === 204) {
@@ -64,23 +72,39 @@ async function request(path, { method = 'GET', body, form, attempt = 0 } = {}) {
 
   const payload = await response.json().catch(() => null)
 
-  if (response.status === 401 && token) {
+  if (response.status === 401 && token && !background) {
     unauthorizedHandler?.()
   }
 
   if (!response.ok) {
     if (
-      method === 'GET' &&
+      !background && method === 'GET' &&
       RETRYABLE_STATUSES.has(response.status) &&
       attempt + 1 < MAX_GET_ATTEMPTS
     ) {
       await wait(300 * (attempt + 1))
-      return request(path, { method, body, form, attempt: attempt + 1 })
+      return send(path, { ...options, attempt: attempt + 1 })
     }
-    throw new Error(extractMessage(payload, 'Не удалось выполнить запрос'))
+    throw Object.assign(new Error(extractMessage(payload, 'Не удалось выполнить запрос')), {
+      status: response.status,
+      transient: response.status >= 500 || response.status === 429,
+    })
   }
 
   return payload
+}
+
+const { request, start, synchronize } = createOfflineRequest(send)
+export { start as startOfflineSync, synchronize as synchronizeOffline }
+
+export function prepareOffline(user) {
+  const paths = ['/categories', '/units', '/places']
+  for (const { id } of user.groups ?? []) {
+    for (const resource of ['products', 'purchases', 'purchase', 'reminders']) {
+      paths.push(`/groups/${id}/${resource}`)
+    }
+  }
+  return Promise.all(paths.map((path) => request(path)))
 }
 
 async function fetchBlob(path) {
@@ -139,10 +163,16 @@ export const pantryApi = {
   markRemindersSeen: (groupId) =>
     request(`/groups/${groupId}/reminders/seen`, { method: 'POST' }),
   usage: (groupId, period) => request(`/groups/${groupId}/usage?period=${period}`),
-  addProduct: (groupId, payload) =>
-    request(`/groups/${groupId}/products`, { method: 'POST', body: payload }),
-  updateProduct: (groupId, itemId, payload) =>
-    request(`/groups/${groupId}/products/${itemId}`, { method: 'PATCH', body: payload }),
+  addProduct: (groupId, payload, localPlaceId) =>
+    request(`/groups/${groupId}/products`, {
+      method: 'POST', body: payload,
+      localBody: { ...payload, storage_place_id: payload.storage_place_id ?? localPlaceId },
+    }),
+  updateProduct: (groupId, itemId, payload, localPlaceId) =>
+    request(`/groups/${groupId}/products/${itemId}`, {
+      method: 'PATCH', body: payload,
+      localBody: { ...payload, storage_place_id: payload.storage_place_id ?? localPlaceId },
+    }),
   moveProducts: (groupId, payload) =>
     request(`/groups/${groupId}/products/move`, { method: 'POST', body: payload }),
   consumeProduct: (groupId, itemId, quantity) =>

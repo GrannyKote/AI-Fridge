@@ -412,10 +412,10 @@ export function AddProductDialog({
       }
 
       if (isEdit) {
-        const updated = await pantryApi.updateProduct(groupId, editProduct.id, payload)
+        const updated = await pantryApi.updateProduct(groupId, editProduct.id, payload, Number(form.placeId))
         onUpdated?.(editProduct, updated)
       } else {
-        const created = await pantryApi.addProduct(groupId, payload)
+        const created = await pantryApi.addProduct(groupId, payload, Number(form.placeId))
         onCreated(created)
       }
     } catch (error) {

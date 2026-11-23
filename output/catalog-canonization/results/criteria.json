@@ -1,0 +1,21 @@
+{
+  "criteria": {
+    "dcr_reduction_at_least_50_pct": false,
+    "recall_at_least_85_pct": true,
+    "recall_gain_at_least_30_points": true,
+    "fmr_at_most_2_pct": true,
+    "http_p95_at_most_50_ms_in_every_trial": true
+  },
+  "dcr_relative_reduction": 0.24449300261500795,
+  "recall_gain": 0.8998265394622723,
+  "max_hybrid_http_p95_ms": 30.77140002278611,
+  "max_hybrid_server_p95_ms": 28.008,
+  "duplicate_outcomes_improved": 1031,
+  "duplicate_outcomes_worsened": 0,
+  "false_merges_in_audit_by_mode": {
+    "baseline": 0,
+    "hybrid": 0,
+    "pgvector": 0
+  },
+  "verdict": "partially_confirmed"
+}

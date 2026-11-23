@@ -1,0 +1,799 @@
+mode,noise,query,expected,distractor,top1_id,top1,matched_id,matched,false_merge,distractor_in_top5
+baseline,trap_novel,колбаса лимон копчёный,novel-107,колбаса лимон,,,,,0,False
+baseline,trap_novel,мороженое кокос веганский,novel-148,мороженое кокос,,,,,0,False
+baseline,trap_novel,хлебцы персик обезжиренный,novel-924,хлебцы персик,,,,,0,False
+baseline,trap_novel,варенье карамель без сахара,novel-359,варенье карамель,,,,,0,False
+baseline,trap_novel,ряженка ваниль копчёный,novel-120,ряженка ваниль,,,,,0,False
+baseline,trap_novel,компот кокос без сахара,novel-388,компот кокос,,,,,0,False
+baseline,trap_novel,зефир малина обезжиренный,novel-202,зефир малина,,,,,0,False
+baseline,trap_novel,зефир лимон копчёный,novel-207,зефир лимон,,,,,0,False
+baseline,trap_novel,равиоли карамель копчёный,novel-889,равиоли карамель,,,,,0,False
+baseline,trap_novel,ряженка клубника веганский,novel-121,ряженка клубника,,,,,0,False
+baseline,trap_novel,сметана кокос без сахара,novel-48,сметана кокос,,,,,0,False
+baseline,trap_novel,вафли лимон копчёный,novel-237,вафли лимон,,,,,0,False
+baseline,trap_novel,гранола малина копчёный,novel-532,гранола малина,,,,,0,False
+baseline,trap_novel,равиоли малина обезжиренный,novel-882,равиоли малина,,,,,0,False
+baseline,trap_novel,сухари яблоко без сахара,novel-955,сухари яблоко,,,,,0,False
+baseline,trap_novel,халва яблоко копчёный,novel-475,халва яблоко,,,,,0,False
+baseline,trap_novel,пельмени лимон обезжиренный,novel-877,пельмени лимон,,,,,0,False
+baseline,trap_novel,запеканка яблоко обезжиренный,novel-585,запеканка яблоко,,,,,0,False
+baseline,trap_novel,сырники ваниль веганский,novel-560,сырники ваниль,,,,,0,False
+baseline,trap_novel,нуга лимон без сахара,novel-757,нуга лимон,,,,,0,False
+baseline,trap_novel,сырники банан копчёный,novel-566,сырники банан,,,,,0,False
+baseline,trap_novel,сорбет персик веганский,novel-674,сорбет персик,,,,,0,False
+baseline,trap_novel,нектар персик обезжиренный,novel-374,нектар персик,,,,,0,False
+baseline,trap_novel,каша кокос копчёный,novel-508,каша кокос,,,,,0,False
+baseline,trap_novel,батончик малина копчёный,novel-702,батончик малина,,,,,0,False
+baseline,trap_novel,парфе лимон обезжиренный,novel-697,парфе лимон,,,,,0,False
+baseline,trap_novel,кофе клубника копчёный,novel-431,кофе клубника,,,,,0,False
+baseline,trap_novel,кекс кокос обезжиренный,novel-258,кекс кокос,,,,,0,False
+baseline,trap_novel,блины малина обезжиренный,novel-572,блины малина,,,,,0,False
+baseline,trap_novel,сок малина копчёный,novel-362,сок малина,,,,,0,False
+baseline,trap_novel,гренки карамель без сахара,novel-919,гренки карамель,,,,,0,False
+baseline,trap_novel,запеканка банан копчёный,novel-586,запеканка банан,,,,,0,False
+baseline,trap_novel,колбаса банан без сахара,novel-106,колбаса банан,,,,,0,False
+baseline,trap_novel,карамель яблоко копчёный,novel-735,карамель яблоко,,,,,0,False
+baseline,trap_novel,сорбет вишня веганский,novel-673,сорбет вишня,,,,,0,False
+baseline,trap_novel,каша банан копчёный,novel-506,каша банан,,,,,0,False
+baseline,trap_novel,повидло яблоко копчёный,novel-345,повидло яблоко,,,,,0,False
+baseline,trap_novel,какао карамель веганский,novel-449,какао карамель,,,,,0,False
+baseline,trap_novel,зефир ваниль без сахара,novel-200,зефир ваниль,,,,,0,False
+baseline,trap_novel,сырники яблоко без сахара,novel-565,сырники яблоко,,,,,0,False
+baseline,trap_novel,козинаки кокос обезжиренный,novel-488,козинаки кокос,,,,,0,False
+baseline,trap_novel,сорбет малина копчёный,novel-672,сорбет малина,,,,,0,False
+baseline,trap_novel,мороженое лимон обезжиренный,novel-147,мороженое лимон,,,,,0,False
+baseline,trap_novel,драже лимон обезжиренный,novel-717,драже лимон,,,,,0,False
+baseline,trap_novel,халва вишня веганский,novel-473,халва вишня,,,,,0,False
+baseline,trap_novel,батончик клубника без сахара,novel-701,батончик клубника,,,,,0,False
+baseline,trap_novel,панкейки лимон обезжиренный,novel-547,панкейки лимон,,,,,0,False
+baseline,trap_novel,сироп лимон обезжиренный,novel-327,сироп лимон,,,,,0,False
+baseline,trap_novel,маффин лимон копчёный,novel-637,маффин лимон,,,,,0,False
+baseline,trap_novel,блины клубника копчёный,novel-571,блины клубника,,,,,0,False
+baseline,trap_novel,леденцы кокос обезжиренный,novel-728,леденцы кокос,,,,,0,False
+baseline,trap_novel,кекс ваниль копчёный,novel-250,кекс ваниль,,,,,0,False
+baseline,trap_novel,творог ваниль обезжиренный,novel-30,творог ваниль,,,,,0,False
+baseline,trap_novel,кофе карамель без сахара,novel-439,кофе карамель,,,,,0,False
+baseline,trap_novel,бисквит карамель копчёный,novel-269,бисквит карамель,,,,,0,False
+baseline,trap_novel,суфле карамель копчёный,novel-199,суфле карамель,,,,,0,False
+baseline,trap_novel,брауни малина обезжиренный,novel-642,брауни малина,,,,,0,False
+baseline,trap_novel,макароны карамель обезжиренный,novel-119,макароны карамель,,,,,0,False
+baseline,trap_novel,кисель клубника без сахара,novel-411,кисель клубника,,,,,0,False
+baseline,trap_novel,вареники малина веганский,novel-892,вареники малина,,,,,0,False
+baseline,trap_novel,рулет ваниль веганский,novel-310,рулет ваниль,,,,,0,False
+baseline,trap_novel,рулет малина обезжиренный,novel-312,рулет малина,,,,,0,False
+baseline,trap_novel,гранола кокос веганский,novel-538,гранола кокос,,,,,0,False
+baseline,trap_novel,мюсли персик копчёный,novel-524,мюсли персик,,,,,0,False
+baseline,trap_novel,конфеты лимон обезжиренный,novel-467,конфеты лимон,,,,,0,False
+baseline,trap_novel,сухарики яблоко копчёный,novel-965,сухарики яблоко,,,,,0,False
+baseline,trap_novel,салат персик копчёный,novel-854,салат персик,,,,,0,False
+baseline,trap_novel,мороженое банан обезжиренный,novel-146,мороженое банан,,,,,0,False
+baseline,trap_novel,паштет ваниль обезжиренный,novel-840,паштет ваниль,,,,,0,False
+baseline,trap_novel,блины банан обезжиренный,novel-576,блины банан,,,,,0,False
+baseline,trap_novel,попкорн клубника веганский,novel-971,попкорн клубника,,,,,0,False
+baseline,trap_novel,чай лимон копчёный,novel-427,чай лимон,,,,,0,False
+baseline,trap_novel,чипсы банан без сахара,novel-936,чипсы банан,,,,,0,False
+baseline,trap_novel,трюфель лимон веганский,novel-767,трюфель лимон,,,,,0,False
+baseline,trap_novel,зефир клубника обезжиренный,novel-201,зефир клубника,,,,,0,False
+baseline,trap_novel,сухари вишня обезжиренный,novel-953,сухари вишня,,,,,0,False
+baseline,trap_novel,вафли банан без сахара,novel-236,вафли банан,,,,,0,False
+baseline,trap_novel,тарт вишня копчёный,novel-623,тарт вишня,,,,,0,False
+baseline,trap_novel,пончик кокос без сахара,novel-298,пончик кокос,,,,,0,False
+baseline,trap_novel,салат ваниль веганский,novel-850,салат ваниль,,,,,0,False
+baseline,trap_novel,лимонад лимон без сахара,novel-407,лимонад лимон,,,,,0,False
+baseline,trap_novel,хлопья банан обезжиренный,novel-516,хлопья банан,,,,,0,False
+baseline,trap_novel,начинка малина обезжиренный,novel-792,начинка малина,,,,,0,False
+baseline,trap_novel,пудинг персик без сахара,novel-174,пудинг персик,,,,,0,False
+baseline,trap_novel,попкорн ваниль без сахара,novel-970,попкорн ваниль,,,,,0,False
+baseline,trap_novel,пломбир яблоко обезжиренный,novel-155,пломбир яблоко,,,,,0,False
+baseline,trap_novel,джем яблоко обезжиренный,novel-335,джем яблоко,,,,,0,False
+baseline,trap_novel,котлеты клубника обезжиренный,novel-861,котлеты клубника,,,,,0,False
+baseline,trap_novel,варенье банан без сахара,novel-356,варенье банан,,,,,0,False
+baseline,trap_novel,сметана банан копчёный,novel-46,сметана банан,,,,,0,False
+baseline,trap_novel,желе ваниль без сахара,novel-450,желе ваниль,,,,,0,False
+baseline,trap_novel,сухари клубника копчёный,novel-951,сухари клубника,,,,,0,False
+baseline,trap_novel,конфеты вишня без сахара,novel-463,конфеты вишня,,,,,0,False
+baseline,trap_novel,сухарики карамель копчёный,novel-969,сухарики карамель,,,,,0,False
+baseline,trap_novel,крекер яблоко копчёный,novel-275,крекер яблоко,,,,,0,False
+baseline,trap_novel,десерт малина веганский,novel-682,десерт малина,,,,,0,False
+baseline,trap_novel,йогурт лимон веганский,novel-7,йогурт лимон,,,,,0,False
+baseline,trap_novel,оладьи яблоко веганский,novel-555,оладьи яблоко,,,,,0,False
+baseline,trap_novel,салат малина копчёный,novel-852,салат малина,,,,,0,False
+baseline,trap_novel,тарт малина без сахара,novel-622,тарт малина,,,,,0,False
+baseline,trap_novel,какао вишня обезжиренный,novel-443,какао вишня,,,,,0,False
+baseline,trap_novel,творог вишня без сахара,novel-33,творог вишня,,,,,0,False
+baseline,trap_novel,кефир персик обезжиренный,novel-14,кефир персик,,,,,0,False
+baseline,trap_novel,сок яблоко без сахара,novel-365,сок яблоко,,,,,0,False
+baseline,trap_novel,чизкейк вишня копчёный,novel-653,чизкейк вишня,,,,,0,False
+baseline,trap_novel,желе малина обезжиренный,novel-452,желе малина,,,,,0,False
+baseline,trap_novel,желе яблоко веганский,novel-455,желе яблоко,,,,,0,False
+baseline,trap_novel,помадка клубника обезжиренный,novel-741,помадка клубника,,,,,0,False
+baseline,trap_novel,дип карамель веганский,novel-829,дип карамель,,,,,0,False
+baseline,trap_novel,чипсы лимон веганский,novel-937,чипсы лимон,,,,,0,False
+baseline,trap_novel,брауни ваниль копчёный,novel-640,брауни ваниль,,,,,0,False
+baseline,trap_novel,мармелад малина копчёный,novel-212,мармелад малина,,,,,0,False
+baseline,trap_novel,бисквит яблоко копчёный,novel-265,бисквит яблоко,,,,,0,False
+baseline,trap_novel,козинаки персик без сахара,novel-484,козинаки персик,,,,,0,False
+baseline,trap_novel,паста ваниль без сахара,novel-800,паста ваниль,,,,,0,False
+baseline,trap_novel,карамель лимон копчёный,novel-737,карамель лимон,,,,,0,False
+baseline,trap_novel,сироп кокос без сахара,novel-328,сироп кокос,,,,,0,False
+baseline,trap_novel,творожок малина обезжиренный,novel-52,творожок малина,,,,,0,False
+baseline,trap_novel,макарун кокос без сахара,novel-668,макарун кокос,,,,,0,False
+baseline,trap_novel,салат кокос копчёный,novel-858,салат кокос,,,,,0,False
+baseline,trap_novel,простокваша малина веганский,novel-132,простокваша малина,,,,,0,False
+baseline,trap_novel,пастила малина копчёный,novel-222,пастила малина,,,,,0,False
+baseline,trap_novel,блины персик обезжиренный,novel-574,блины персик,,,,,0,False
+baseline,trap_novel,мюсли банан веганский,novel-526,мюсли банан,,,,,0,False
+baseline,trap_novel,сырники клубника без сахара,novel-561,сырники клубника,,,,,0,False
+baseline,trap_novel,брауни банан копчёный,novel-646,брауни банан,,,,,0,False
+baseline,trap_novel,гренки вишня обезжиренный,novel-913,гренки вишня,,,,,0,False
+baseline,trap_novel,нуга кокос копчёный,novel-758,нуга кокос,,,,,0,False
+baseline,trap_novel,мюсли малина веганский,novel-522,мюсли малина,,,,,0,False
+baseline,trap_novel,топпинг малина копчёный,novel-782,топпинг малина,,,,,0,False
+baseline,trap_novel,варенье лимон копчёный,novel-357,варенье лимон,,,,,0,False
+baseline,trap_novel,шоколад малина обезжиренный,novel-82,шоколад малина,,,,,0,False
+baseline,trap_novel,вареники лимон без сахара,novel-897,вареники лимон,,,,,0,False
+baseline,trap_novel,сок клубника без сахара,novel-361,сок клубника,,,,,0,False
+baseline,trap_novel,батончик лимон без сахара,novel-707,батончик лимон,,,,,0,False
+baseline,trap_novel,паста вишня обезжиренный,novel-803,паста вишня,,,,,0,False
+baseline,trap_novel,сгущенка клубника обезжиренный,novel-61,сгущенка клубника,,,,,0,False
+baseline,trap_novel,нектар карамель обезжиренный,novel-379,нектар карамель,,,,,0,False
+baseline,trap_novel,морс персик обезжиренный,novel-394,морс персик,,,,,0,False
+baseline,trap_novel,компот карамель копчёный,novel-389,компот карамель,,,,,0,False
+baseline,trap_novel,мюсли ваниль обезжиренный,novel-520,мюсли ваниль,,,,,0,False
+baseline,trap_novel,макароны персик веганский,novel-114,макароны персик,,,,,0,False
+baseline,trap_novel,салат вишня обезжиренный,novel-853,салат вишня,,,,,0,False
+baseline,trap_novel,газировка лимон копчёный,novel-77,газировка лимон,,,,,0,False
+baseline,trap_novel,мармелад карамель без сахара,novel-219,мармелад карамель,,,,,0,False
+baseline,trap_novel,мусс малина обезжиренный,novel-182,мусс малина,,,,,0,False
+baseline,trap_novel,маффин малина веганский,novel-632,маффин малина,,,,,0,False
+baseline,trap_novel,эклер ваниль обезжиренный,novel-280,эклер ваниль,,,,,0,False
+baseline,trap_novel,салат банан копчёный,novel-856,салат банан,,,,,0,False
+baseline,trap_novel,сгущенка карамель обезжиренный,novel-69,сгущенка карамель,,,,,0,False
+baseline,trap_novel,мусс яблоко копчёный,novel-185,мусс яблоко,,,,,0,False
+baseline,trap_novel,пастила персик копчёный,novel-224,пастила персик,,,,,0,False
+baseline,trap_novel,йогурт персик без сахара,novel-4,йогурт персик,,,,,0,False
+baseline,trap_novel,соус персик веганский,novel-814,соус персик,,,,,0,False
+baseline,trap_novel,карамель клубника веганский,novel-731,карамель клубника,,,,,0,False
+baseline,trap_novel,печенье лимон копчёный,novel-97,печенье лимон,,,,,0,False
+baseline,trap_novel,рулет клубника веганский,novel-311,рулет клубника,,,,,0,False
+baseline,trap_novel,панкейки яблоко копчёный,novel-545,панкейки яблоко,,,,,0,False
+baseline,trap_novel,сухари ваниль без сахара,novel-950,сухари ваниль,,,,,0,False
+baseline,trap_novel,молоко вишня обезжиренный,novel-23,молоко вишня,,,,,0,False
+baseline,trap_novel,макароны лимон обезжиренный,novel-117,макароны лимон,,,,,0,False
+baseline,trap_novel,чизкейк карамель веганский,novel-659,чизкейк карамель,,,,,0,False
+baseline,trap_novel,молоко малина веганский,novel-22,молоко малина,,,,,0,False
+baseline,trap_novel,пицца малина обезжиренный,novel-902,пицца малина,,,,,0,False
+baseline,trap_novel,каша карамель веганский,novel-509,каша карамель,,,,,0,False
+baseline,trap_novel,запеканка малина обезжиренный,novel-582,запеканка малина,,,,,0,False
+baseline,trap_novel,лимонад персик без сахара,novel-404,лимонад персик,,,,,0,False
+baseline,trap_novel,лимонад ваниль копчёный,novel-400,лимонад ваниль,,,,,0,False
+baseline,trap_novel,печенье персик копчёный,novel-94,печенье персик,,,,,0,False
+baseline,trap_novel,десерт персик без сахара,novel-684,десерт персик,,,,,0,False
+baseline,trap_novel,пломбир малина веганский,novel-152,пломбир малина,,,,,0,False
+baseline,trap_novel,печенье ваниль без сахара,novel-90,печенье ваниль,,,,,0,False
+baseline,trap_novel,пирожное кокос веганский,novel-618,пирожное кокос,,,,,0,False
+baseline,trap_novel,тарт лимон веганский,novel-627,тарт лимон,,,,,0,False
+baseline,trap_novel,крекер карамель обезжиренный,novel-279,крекер карамель,,,,,0,False
+baseline,trap_novel,лимонад банан без сахара,novel-406,лимонад банан,,,,,0,False
+baseline,trap_novel,сок банан без сахара,novel-366,сок банан,,,,,0,False
+baseline,trap_novel,трюфель персик веганский,novel-764,трюфель персик,,,,,0,False
+baseline,trap_novel,простокваша карамель веганский,novel-139,простокваша карамель,,,,,0,False
+baseline,trap_novel,паштет лимон копчёный,novel-847,паштет лимон,,,,,0,False
+baseline,trap_novel,пирог персик копчёный,novel-604,пирог персик,,,,,0,False
+baseline,trap_novel,пельмени карамель копчёный,novel-879,пельмени карамель,,,,,0,False
+baseline,trap_novel,мюсли лимон обезжиренный,novel-527,мюсли лимон,,,,,0,False
+baseline,trap_novel,помадка ваниль веганский,novel-740,помадка ваниль,,,,,0,False
+baseline,trap_novel,нектар клубника без сахара,novel-371,нектар клубника,,,,,0,False
+baseline,trap_novel,сорбет клубника веганский,novel-671,сорбет клубника,,,,,0,False
+baseline,trap_novel,соус малина обезжиренный,novel-812,соус малина,,,,,0,False
+baseline,trap_novel,карамель малина обезжиренный,novel-732,карамель малина,,,,,0,False
+baseline,trap_novel,колбаса вишня без сахара,novel-103,колбаса вишня,,,,,0,False
+baseline,trap_novel,газировка яблоко копчёный,novel-75,газировка яблоко,,,,,0,False
+baseline,trap_novel,тарт яблоко обезжиренный,novel-625,тарт яблоко,,,,,0,False
+baseline,trap_novel,пудинг банан без сахара,novel-176,пудинг банан,,,,,0,False
+baseline,trap_novel,топпинг банан копчёный,novel-786,топпинг банан,,,,,0,False
+baseline,trap_novel,гренки клубника копчёный,novel-911,гренки клубника,,,,,0,False
+baseline,trap_novel,сгущенка яблоко без сахара,novel-65,сгущенка яблоко,,,,,0,False
+baseline,trap_novel,пломбир клубника обезжиренный,novel-151,пломбир клубника,,,,,0,False
+baseline,trap_novel,какао ваниль без сахара,novel-440,какао ваниль,,,,,0,False
+baseline,trap_novel,хумус клубника копчёный,novel-831,хумус клубника,,,,,0,False
+baseline,trap_novel,пирог карамель веганский,novel-609,пирог карамель,,,,,0,False
+baseline,trap_novel,хлебцы яблоко обезжиренный,novel-925,хлебцы яблоко,,,,,0,False
+baseline,trap_novel,пончик лимон обезжиренный,novel-297,пончик лимон,,,,,0,False
+baseline,trap_novel,бисквит малина без сахара,novel-262,бисквит малина,,,,,0,False
+baseline,trap_novel,сушки карамель копчёный,novel-949,сушки карамель,,,,,0,False
+baseline,trap_novel,повидло кокос копчёный,novel-348,повидло кокос,,,,,0,False
+baseline,trap_novel,ряженка персик без сахара,novel-124,ряженка персик,,,,,0,False
+baseline,trap_novel,чай клубника веганский,novel-421,чай клубника,,,,,0,False
+baseline,trap_novel,помадка банан веганский,novel-746,помадка банан,,,,,0,False
+baseline,trap_novel,эклер клубника веганский,novel-281,эклер клубника,,,,,0,False
+baseline,trap_novel,крем клубника веганский,novel-161,крем клубника,,,,,0,False
+baseline,trap_novel,вареники клубника обезжиренный,novel-891,вареники клубника,,,,,0,False
+baseline,trap_novel,брауни клубника обезжиренный,novel-641,брауни клубника,,,,,0,False
+baseline,trap_novel,газировка кокос веганский,novel-78,газировка кокос,,,,,0,False
+baseline,trap_novel,газировка вишня веганский,novel-73,газировка вишня,,,,,0,False
+baseline,trap_novel,сироп вишня копчёный,novel-323,сироп вишня,,,,,0,False
+baseline,trap_novel,простокваша лимон веганский,novel-137,простокваша лимон,,,,,0,False
+baseline,trap_novel,повидло ваниль копчёный,novel-340,повидло ваниль,,,,,0,False
+baseline,trap_novel,макароны банан веганский,novel-116,макароны банан,,,,,0,False
+baseline,trap_novel,чизкейк кокос копчёный,novel-658,чизкейк кокос,,,,,0,False
+baseline,trap_novel,сметана лимон без сахара,novel-47,сметана лимон,,,,,0,False
+baseline,trap_novel,ирис карамель веганский,novel-499,ирис карамель,,,,,0,False
+baseline,trap_novel,сок персик обезжиренный,novel-364,сок персик,,,,,0,False
+baseline,trap_novel,сорбет банан веганский,novel-676,сорбет банан,,,,,0,False
+baseline,trap_novel,крекер лимон без сахара,novel-277,крекер лимон,,,,,0,False
+baseline,trap_novel,мюсли клубника обезжиренный,novel-521,мюсли клубника,,,,,0,False
+baseline,trap_novel,булочка банан обезжиренный,novel-306,булочка банан,,,,,0,False
+baseline,trap_novel,халва клубника обезжиренный,novel-471,халва клубника,,,,,0,False
+baseline,trap_novel,сырники карамель обезжиренный,novel-569,сырники карамель,,,,,0,False
+baseline,trap_novel,леденцы ваниль без сахара,novel-720,леденцы ваниль,,,,,0,False
+baseline,trap_novel,чипсы малина обезжиренный,novel-932,чипсы малина,,,,,0,False
+baseline,trap_novel,рулет яблоко копчёный,novel-315,рулет яблоко,,,,,0,False
+baseline,trap_novel,пудинг яблоко копчёный,novel-175,пудинг яблоко,,,,,0,False
+baseline,trap_novel,зефир яблоко без сахара,novel-205,зефир яблоко,,,,,0,False
+baseline,trap_novel,желе лимон копчёный,novel-457,желе лимон,,,,,0,False
+baseline,trap_novel,паштет яблоко копчёный,novel-845,паштет яблоко,,,,,0,False
+baseline,trap_novel,топпинг клубника веганский,novel-781,топпинг клубника,,,,,0,False
+baseline,trap_novel,пончик клубника веганский,novel-291,пончик клубника,,,,,0,False
+baseline,trap_novel,топпинг яблоко без сахара,novel-785,топпинг яблоко,,,,,0,False
+baseline,trap_novel,паштет персик обезжиренный,novel-844,паштет персик,,,,,0,False
+baseline,trap_novel,джем карамель обезжиренный,novel-339,джем карамель,,,,,0,False
+baseline,trap_novel,йогурт ваниль без сахара,novel-0,йогурт ваниль,,,,,0,False
+baseline,trap_novel,хлопья клубника обезжиренный,novel-511,хлопья клубника,,,,,0,False
+baseline,trap_novel,мармелад лимон без сахара,novel-217,мармелад лимон,,,,,0,False
+baseline,trap_novel,паштет карамель копчёный,novel-849,паштет карамель,,,,,0,False
+baseline,trap_novel,гренки ваниль веганский,novel-910,гренки ваниль,,,,,0,False
+baseline,trap_novel,сухари малина без сахара,novel-952,сухари малина,,,,,0,False
+baseline,trap_novel,карамель вишня веганский,novel-733,карамель вишня,,,,,0,False
+baseline,trap_novel,печенье карамель веганский,novel-99,печенье карамель,,,,,0,False
+baseline,trap_novel,компот клубника обезжиренный,novel-381,компот клубника,,,,,0,False
+baseline,trap_novel,булочка яблоко копчёный,novel-305,булочка яблоко,,,,,0,False
+baseline,trap_novel,халва ваниль без сахара,novel-470,халва ваниль,,,,,0,False
+baseline,trap_present,масло сливочное 300 г,масло сливочное,масло оливковое,,,,,0,False
+baseline,trap_present,масло оливковое 300 г,масло оливковое,масло сливочное,,,,,0,False
+baseline,trap_present,"молоко 2,5% 300 г","молоко 2,5%","молоко 3,2%",,,,,0,False
+baseline,trap_present,"молоко 3,2% 300 г","молоко 3,2%","молоко 2,5%",,,,,0,False
+baseline,trap_present,йогурт без сахара 300 г,йогурт без сахара,йогурт с сахаром,,,,,0,False
+baseline,trap_present,йогурт с сахаром 300 г,йогурт с сахаром,йогурт без сахара,,,,,0,False
+baseline,trap_present,кофе молотый 300 г,кофе молотый,кофе растворимый,,,,,0,False
+baseline,trap_present,кофе растворимый 300 г,кофе растворимый,кофе молотый,,,,,0,False
+baseline,trap_present,лук репчатый 300 г,лук репчатый,лук зелёный,,,,,0,False
+baseline,trap_present,лук зелёный 300 г,лук зелёный,лук репчатый,,,,,0,False
+baseline,trap_present,рис пропаренный 300 г,рис пропаренный,рис непропаренный,,,,,0,False
+baseline,trap_present,рис непропаренный 300 г,рис непропаренный,рис пропаренный,,,,,0,False
+baseline,trap_present,молоко безлактозное 300 г,молоко безлактозное,молоко цельное,,,,,0,False
+baseline,trap_present,молоко цельное 300 г,молоко цельное,молоко безлактозное,,,,,0,False
+baseline,trap_present,перец красный 300 г,перец красный,перец чёрный,,,,,0,False
+baseline,trap_present,перец чёрный 300 г,перец чёрный,перец красный,,,,,0,False
+hybrid,trap_novel,колбаса лимон копчёный,novel-107,колбаса лимон,108,колбаса лимон,,,0,True
+hybrid,trap_novel,мороженое кокос веганский,novel-148,мороженое кокос,149,мороженое кокос,,,0,True
+hybrid,trap_novel,хлебцы персик обезжиренный,novel-924,хлебцы персик,925,хлебцы персик,,,0,True
+hybrid,trap_novel,варенье карамель без сахара,novel-359,варенье карамель,360,варенье карамель,,,0,True
+hybrid,trap_novel,ряженка ваниль копчёный,novel-120,ряженка ваниль,121,ряженка ваниль,,,0,True
+hybrid,trap_novel,компот кокос без сахара,novel-388,компот кокос,389,компот кокос,,,0,True
+hybrid,trap_novel,зефир малина обезжиренный,novel-202,зефир малина,203,зефир малина,,,0,True
+hybrid,trap_novel,зефир лимон копчёный,novel-207,зефир лимон,208,зефир лимон,,,0,True
+hybrid,trap_novel,равиоли карамель копчёный,novel-889,равиоли карамель,890,равиоли карамель,,,0,True
+hybrid,trap_novel,ряженка клубника веганский,novel-121,ряженка клубника,122,ряженка клубника,,,0,True
+hybrid,trap_novel,сметана кокос без сахара,novel-48,сметана кокос,49,сметана кокос,,,0,True
+hybrid,trap_novel,вафли лимон копчёный,novel-237,вафли лимон,238,вафли лимон,,,0,True
+hybrid,trap_novel,гранола малина копчёный,novel-532,гранола малина,533,гранола малина,,,0,True
+hybrid,trap_novel,равиоли малина обезжиренный,novel-882,равиоли малина,883,равиоли малина,,,0,True
+hybrid,trap_novel,сухари яблоко без сахара,novel-955,сухари яблоко,956,сухари яблоко,,,0,True
+hybrid,trap_novel,халва яблоко копчёный,novel-475,халва яблоко,476,халва яблоко,,,0,True
+hybrid,trap_novel,пельмени лимон обезжиренный,novel-877,пельмени лимон,878,пельмени лимон,,,0,True
+hybrid,trap_novel,запеканка яблоко обезжиренный,novel-585,запеканка яблоко,586,запеканка яблоко,,,0,True
+hybrid,trap_novel,сырники ваниль веганский,novel-560,сырники ваниль,561,сырники ваниль,,,0,True
+hybrid,trap_novel,нуга лимон без сахара,novel-757,нуга лимон,758,нуга лимон,,,0,True
+hybrid,trap_novel,сырники банан копчёный,novel-566,сырники банан,567,сырники банан,,,0,True
+hybrid,trap_novel,сорбет персик веганский,novel-674,сорбет персик,675,сорбет персик,,,0,True
+hybrid,trap_novel,нектар персик обезжиренный,novel-374,нектар персик,375,нектар персик,,,0,True
+hybrid,trap_novel,каша кокос копчёный,novel-508,каша кокос,509,каша кокос,,,0,True
+hybrid,trap_novel,батончик малина копчёный,novel-702,батончик малина,703,батончик малина,,,0,True
+hybrid,trap_novel,парфе лимон обезжиренный,novel-697,парфе лимон,698,парфе лимон,,,0,True
+hybrid,trap_novel,кофе клубника копчёный,novel-431,кофе клубника,432,кофе клубника,,,0,True
+hybrid,trap_novel,кекс кокос обезжиренный,novel-258,кекс кокос,259,кекс кокос,,,0,True
+hybrid,trap_novel,блины малина обезжиренный,novel-572,блины малина,573,блины малина,,,0,True
+hybrid,trap_novel,сок малина копчёный,novel-362,сок малина,363,сок малина,,,0,True
+hybrid,trap_novel,гренки карамель без сахара,novel-919,гренки карамель,920,гренки карамель,,,0,True
+hybrid,trap_novel,запеканка банан копчёный,novel-586,запеканка банан,587,запеканка банан,,,0,True
+hybrid,trap_novel,колбаса банан без сахара,novel-106,колбаса банан,107,колбаса банан,,,0,True
+hybrid,trap_novel,карамель яблоко копчёный,novel-735,карамель яблоко,736,карамель яблоко,,,0,True
+hybrid,trap_novel,сорбет вишня веганский,novel-673,сорбет вишня,674,сорбет вишня,,,0,True
+hybrid,trap_novel,каша банан копчёный,novel-506,каша банан,507,каша банан,,,0,True
+hybrid,trap_novel,повидло яблоко копчёный,novel-345,повидло яблоко,346,повидло яблоко,,,0,True
+hybrid,trap_novel,какао карамель веганский,novel-449,какао карамель,450,какао карамель,,,0,True
+hybrid,trap_novel,зефир ваниль без сахара,novel-200,зефир ваниль,201,зефир ваниль,,,0,True
+hybrid,trap_novel,сырники яблоко без сахара,novel-565,сырники яблоко,566,сырники яблоко,,,0,True
+hybrid,trap_novel,козинаки кокос обезжиренный,novel-488,козинаки кокос,489,козинаки кокос,,,0,True
+hybrid,trap_novel,сорбет малина копчёный,novel-672,сорбет малина,673,сорбет малина,,,0,True
+hybrid,trap_novel,мороженое лимон обезжиренный,novel-147,мороженое лимон,148,мороженое лимон,,,0,True
+hybrid,trap_novel,драже лимон обезжиренный,novel-717,драже лимон,718,драже лимон,,,0,True
+hybrid,trap_novel,халва вишня веганский,novel-473,халва вишня,474,халва вишня,,,0,True
+hybrid,trap_novel,батончик клубника без сахара,novel-701,батончик клубника,702,батончик клубника,,,0,True
+hybrid,trap_novel,панкейки лимон обезжиренный,novel-547,панкейки лимон,548,панкейки лимон,,,0,True
+hybrid,trap_novel,сироп лимон обезжиренный,novel-327,сироп лимон,328,сироп лимон,,,0,True
+hybrid,trap_novel,маффин лимон копчёный,novel-637,маффин лимон,638,маффин лимон,,,0,True
+hybrid,trap_novel,блины клубника копчёный,novel-571,блины клубника,572,блины клубника,,,0,True
+hybrid,trap_novel,леденцы кокос обезжиренный,novel-728,леденцы кокос,729,леденцы кокос,,,0,True
+hybrid,trap_novel,кекс ваниль копчёный,novel-250,кекс ваниль,251,кекс ваниль,,,0,True
+hybrid,trap_novel,творог ваниль обезжиренный,novel-30,творог ваниль,31,творог ваниль,,,0,True
+hybrid,trap_novel,кофе карамель без сахара,novel-439,кофе карамель,440,кофе карамель,,,0,True
+hybrid,trap_novel,бисквит карамель копчёный,novel-269,бисквит карамель,270,бисквит карамель,,,0,True
+hybrid,trap_novel,суфле карамель копчёный,novel-199,суфле карамель,200,суфле карамель,,,0,True
+hybrid,trap_novel,брауни малина обезжиренный,novel-642,брауни малина,643,брауни малина,,,0,True
+hybrid,trap_novel,макароны карамель обезжиренный,novel-119,макароны карамель,120,макароны карамель,,,0,True
+hybrid,trap_novel,кисель клубника без сахара,novel-411,кисель клубника,412,кисель клубника,,,0,True
+hybrid,trap_novel,вареники малина веганский,novel-892,вареники малина,893,вареники малина,,,0,True
+hybrid,trap_novel,рулет ваниль веганский,novel-310,рулет ваниль,311,рулет ваниль,,,0,True
+hybrid,trap_novel,рулет малина обезжиренный,novel-312,рулет малина,313,рулет малина,,,0,True
+hybrid,trap_novel,гранола кокос веганский,novel-538,гранола кокос,539,гранола кокос,,,0,True
+hybrid,trap_novel,мюсли персик копчёный,novel-524,мюсли персик,525,мюсли персик,,,0,True
+hybrid,trap_novel,конфеты лимон обезжиренный,novel-467,конфеты лимон,468,конфеты лимон,,,0,True
+hybrid,trap_novel,сухарики яблоко копчёный,novel-965,сухарики яблоко,966,сухарики яблоко,,,0,True
+hybrid,trap_novel,салат персик копчёный,novel-854,салат персик,855,салат персик,,,0,True
+hybrid,trap_novel,мороженое банан обезжиренный,novel-146,мороженое банан,147,мороженое банан,,,0,True
+hybrid,trap_novel,паштет ваниль обезжиренный,novel-840,паштет ваниль,841,паштет ваниль,,,0,True
+hybrid,trap_novel,блины банан обезжиренный,novel-576,блины банан,577,блины банан,,,0,True
+hybrid,trap_novel,попкорн клубника веганский,novel-971,попкорн клубника,972,попкорн клубника,,,0,True
+hybrid,trap_novel,чай лимон копчёный,novel-427,чай лимон,428,чай лимон,,,0,True
+hybrid,trap_novel,чипсы банан без сахара,novel-936,чипсы банан,937,чипсы банан,,,0,True
+hybrid,trap_novel,трюфель лимон веганский,novel-767,трюфель лимон,768,трюфель лимон,,,0,True
+hybrid,trap_novel,зефир клубника обезжиренный,novel-201,зефир клубника,202,зефир клубника,,,0,True
+hybrid,trap_novel,сухари вишня обезжиренный,novel-953,сухари вишня,954,сухари вишня,,,0,True
+hybrid,trap_novel,вафли банан без сахара,novel-236,вафли банан,237,вафли банан,,,0,True
+hybrid,trap_novel,тарт вишня копчёный,novel-623,тарт вишня,624,тарт вишня,,,0,True
+hybrid,trap_novel,пончик кокос без сахара,novel-298,пончик кокос,299,пончик кокос,,,0,True
+hybrid,trap_novel,салат ваниль веганский,novel-850,салат ваниль,851,салат ваниль,,,0,True
+hybrid,trap_novel,лимонад лимон без сахара,novel-407,лимонад лимон,408,лимонад лимон,,,0,True
+hybrid,trap_novel,хлопья банан обезжиренный,novel-516,хлопья банан,517,хлопья банан,,,0,True
+hybrid,trap_novel,начинка малина обезжиренный,novel-792,начинка малина,793,начинка малина,,,0,True
+hybrid,trap_novel,пудинг персик без сахара,novel-174,пудинг персик,175,пудинг персик,,,0,True
+hybrid,trap_novel,попкорн ваниль без сахара,novel-970,попкорн ваниль,971,попкорн ваниль,,,0,True
+hybrid,trap_novel,пломбир яблоко обезжиренный,novel-155,пломбир яблоко,156,пломбир яблоко,,,0,True
+hybrid,trap_novel,джем яблоко обезжиренный,novel-335,джем яблоко,336,джем яблоко,,,0,True
+hybrid,trap_novel,котлеты клубника обезжиренный,novel-861,котлеты клубника,862,котлеты клубника,,,0,True
+hybrid,trap_novel,варенье банан без сахара,novel-356,варенье банан,357,варенье банан,,,0,True
+hybrid,trap_novel,сметана банан копчёный,novel-46,сметана банан,47,сметана банан,,,0,True
+hybrid,trap_novel,желе ваниль без сахара,novel-450,желе ваниль,451,желе ваниль,,,0,True
+hybrid,trap_novel,сухари клубника копчёный,novel-951,сухари клубника,952,сухари клубника,,,0,True
+hybrid,trap_novel,конфеты вишня без сахара,novel-463,конфеты вишня,464,конфеты вишня,,,0,True
+hybrid,trap_novel,сухарики карамель копчёный,novel-969,сухарики карамель,970,сухарики карамель,,,0,True
+hybrid,trap_novel,крекер яблоко копчёный,novel-275,крекер яблоко,276,крекер яблоко,,,0,True
+hybrid,trap_novel,десерт малина веганский,novel-682,десерт малина,683,десерт малина,,,0,True
+hybrid,trap_novel,йогурт лимон веганский,novel-7,йогурт лимон,8,йогурт лимон,,,0,True
+hybrid,trap_novel,оладьи яблоко веганский,novel-555,оладьи яблоко,556,оладьи яблоко,,,0,True
+hybrid,trap_novel,салат малина копчёный,novel-852,салат малина,853,салат малина,,,0,True
+hybrid,trap_novel,тарт малина без сахара,novel-622,тарт малина,623,тарт малина,,,0,True
+hybrid,trap_novel,какао вишня обезжиренный,novel-443,какао вишня,444,какао вишня,,,0,True
+hybrid,trap_novel,творог вишня без сахара,novel-33,творог вишня,34,творог вишня,,,0,True
+hybrid,trap_novel,кефир персик обезжиренный,novel-14,кефир персик,15,кефир персик,,,0,True
+hybrid,trap_novel,сок яблоко без сахара,novel-365,сок яблоко,366,сок яблоко,,,0,True
+hybrid,trap_novel,чизкейк вишня копчёный,novel-653,чизкейк вишня,654,чизкейк вишня,,,0,True
+hybrid,trap_novel,желе малина обезжиренный,novel-452,желе малина,453,желе малина,,,0,True
+hybrid,trap_novel,желе яблоко веганский,novel-455,желе яблоко,456,желе яблоко,,,0,True
+hybrid,trap_novel,помадка клубника обезжиренный,novel-741,помадка клубника,742,помадка клубника,,,0,True
+hybrid,trap_novel,дип карамель веганский,novel-829,дип карамель,830,дип карамель,,,0,True
+hybrid,trap_novel,чипсы лимон веганский,novel-937,чипсы лимон,938,чипсы лимон,,,0,True
+hybrid,trap_novel,брауни ваниль копчёный,novel-640,брауни ваниль,641,брауни ваниль,,,0,True
+hybrid,trap_novel,мармелад малина копчёный,novel-212,мармелад малина,213,мармелад малина,,,0,True
+hybrid,trap_novel,бисквит яблоко копчёный,novel-265,бисквит яблоко,266,бисквит яблоко,,,0,True
+hybrid,trap_novel,козинаки персик без сахара,novel-484,козинаки персик,485,козинаки персик,,,0,True
+hybrid,trap_novel,паста ваниль без сахара,novel-800,паста ваниль,801,паста ваниль,,,0,True
+hybrid,trap_novel,карамель лимон копчёный,novel-737,карамель лимон,738,карамель лимон,,,0,True
+hybrid,trap_novel,сироп кокос без сахара,novel-328,сироп кокос,329,сироп кокос,,,0,True
+hybrid,trap_novel,творожок малина обезжиренный,novel-52,творожок малина,53,творожок малина,,,0,True
+hybrid,trap_novel,макарун кокос без сахара,novel-668,макарун кокос,669,макарун кокос,,,0,True
+hybrid,trap_novel,салат кокос копчёный,novel-858,салат кокос,859,салат кокос,,,0,True
+hybrid,trap_novel,простокваша малина веганский,novel-132,простокваша малина,133,простокваша малина,,,0,True
+hybrid,trap_novel,пастила малина копчёный,novel-222,пастила малина,223,пастила малина,,,0,True
+hybrid,trap_novel,блины персик обезжиренный,novel-574,блины персик,575,блины персик,,,0,True
+hybrid,trap_novel,мюсли банан веганский,novel-526,мюсли банан,527,мюсли банан,,,0,True
+hybrid,trap_novel,сырники клубника без сахара,novel-561,сырники клубника,562,сырники клубника,,,0,True
+hybrid,trap_novel,брауни банан копчёный,novel-646,брауни банан,647,брауни банан,,,0,True
+hybrid,trap_novel,гренки вишня обезжиренный,novel-913,гренки вишня,914,гренки вишня,,,0,True
+hybrid,trap_novel,нуга кокос копчёный,novel-758,нуга кокос,759,нуга кокос,,,0,True
+hybrid,trap_novel,мюсли малина веганский,novel-522,мюсли малина,523,мюсли малина,,,0,True
+hybrid,trap_novel,топпинг малина копчёный,novel-782,топпинг малина,783,топпинг малина,,,0,True
+hybrid,trap_novel,варенье лимон копчёный,novel-357,варенье лимон,358,варенье лимон,,,0,True
+hybrid,trap_novel,шоколад малина обезжиренный,novel-82,шоколад малина,83,шоколад малина,,,0,True
+hybrid,trap_novel,вареники лимон без сахара,novel-897,вареники лимон,898,вареники лимон,,,0,True
+hybrid,trap_novel,сок клубника без сахара,novel-361,сок клубника,362,сок клубника,,,0,True
+hybrid,trap_novel,батончик лимон без сахара,novel-707,батончик лимон,708,батончик лимон,,,0,True
+hybrid,trap_novel,паста вишня обезжиренный,novel-803,паста вишня,804,паста вишня,,,0,True
+hybrid,trap_novel,сгущенка клубника обезжиренный,novel-61,сгущенка клубника,62,сгущенка клубника,,,0,True
+hybrid,trap_novel,нектар карамель обезжиренный,novel-379,нектар карамель,380,нектар карамель,,,0,True
+hybrid,trap_novel,морс персик обезжиренный,novel-394,морс персик,395,морс персик,,,0,True
+hybrid,trap_novel,компот карамель копчёный,novel-389,компот карамель,390,компот карамель,,,0,True
+hybrid,trap_novel,мюсли ваниль обезжиренный,novel-520,мюсли ваниль,521,мюсли ваниль,,,0,True
+hybrid,trap_novel,макароны персик веганский,novel-114,макароны персик,115,макароны персик,,,0,True
+hybrid,trap_novel,салат вишня обезжиренный,novel-853,салат вишня,854,салат вишня,,,0,True
+hybrid,trap_novel,газировка лимон копчёный,novel-77,газировка лимон,78,газировка лимон,,,0,True
+hybrid,trap_novel,мармелад карамель без сахара,novel-219,мармелад карамель,220,мармелад карамель,,,0,True
+hybrid,trap_novel,мусс малина обезжиренный,novel-182,мусс малина,183,мусс малина,,,0,True
+hybrid,trap_novel,маффин малина веганский,novel-632,маффин малина,633,маффин малина,,,0,True
+hybrid,trap_novel,эклер ваниль обезжиренный,novel-280,эклер ваниль,281,эклер ваниль,,,0,True
+hybrid,trap_novel,салат банан копчёный,novel-856,салат банан,857,салат банан,,,0,True
+hybrid,trap_novel,сгущенка карамель обезжиренный,novel-69,сгущенка карамель,70,сгущенка карамель,,,0,True
+hybrid,trap_novel,мусс яблоко копчёный,novel-185,мусс яблоко,186,мусс яблоко,,,0,True
+hybrid,trap_novel,пастила персик копчёный,novel-224,пастила персик,225,пастила персик,,,0,True
+hybrid,trap_novel,йогурт персик без сахара,novel-4,йогурт персик,989,йогурт без сахара,,,0,True
+hybrid,trap_novel,соус персик веганский,novel-814,соус персик,815,соус персик,,,0,True
+hybrid,trap_novel,карамель клубника веганский,novel-731,карамель клубника,732,карамель клубника,,,0,True
+hybrid,trap_novel,печенье лимон копчёный,novel-97,печенье лимон,98,печенье лимон,,,0,True
+hybrid,trap_novel,рулет клубника веганский,novel-311,рулет клубника,312,рулет клубника,,,0,True
+hybrid,trap_novel,панкейки яблоко копчёный,novel-545,панкейки яблоко,546,панкейки яблоко,,,0,True
+hybrid,trap_novel,сухари ваниль без сахара,novel-950,сухари ваниль,951,сухари ваниль,,,0,True
+hybrid,trap_novel,молоко вишня обезжиренный,novel-23,молоко вишня,24,молоко вишня,,,0,True
+hybrid,trap_novel,макароны лимон обезжиренный,novel-117,макароны лимон,118,макароны лимон,,,0,True
+hybrid,trap_novel,чизкейк карамель веганский,novel-659,чизкейк карамель,660,чизкейк карамель,,,0,True
+hybrid,trap_novel,молоко малина веганский,novel-22,молоко малина,23,молоко малина,,,0,True
+hybrid,trap_novel,пицца малина обезжиренный,novel-902,пицца малина,903,пицца малина,,,0,True
+hybrid,trap_novel,каша карамель веганский,novel-509,каша карамель,510,каша карамель,,,0,True
+hybrid,trap_novel,запеканка малина обезжиренный,novel-582,запеканка малина,583,запеканка малина,,,0,True
+hybrid,trap_novel,лимонад персик без сахара,novel-404,лимонад персик,405,лимонад персик,,,0,True
+hybrid,trap_novel,лимонад ваниль копчёный,novel-400,лимонад ваниль,401,лимонад ваниль,,,0,True
+hybrid,trap_novel,печенье персик копчёный,novel-94,печенье персик,95,печенье персик,,,0,True
+hybrid,trap_novel,десерт персик без сахара,novel-684,десерт персик,685,десерт персик,,,0,True
+hybrid,trap_novel,пломбир малина веганский,novel-152,пломбир малина,153,пломбир малина,,,0,True
+hybrid,trap_novel,печенье ваниль без сахара,novel-90,печенье ваниль,91,печенье ваниль,,,0,True
+hybrid,trap_novel,пирожное кокос веганский,novel-618,пирожное кокос,619,пирожное кокос,,,0,True
+hybrid,trap_novel,тарт лимон веганский,novel-627,тарт лимон,628,тарт лимон,,,0,True
+hybrid,trap_novel,крекер карамель обезжиренный,novel-279,крекер карамель,280,крекер карамель,,,0,True
+hybrid,trap_novel,лимонад банан без сахара,novel-406,лимонад банан,407,лимонад банан,,,0,True
+hybrid,trap_novel,сок банан без сахара,novel-366,сок банан,367,сок банан,,,0,True
+hybrid,trap_novel,трюфель персик веганский,novel-764,трюфель персик,765,трюфель персик,,,0,True
+hybrid,trap_novel,простокваша карамель веганский,novel-139,простокваша карамель,140,простокваша карамель,,,0,True
+hybrid,trap_novel,паштет лимон копчёный,novel-847,паштет лимон,848,паштет лимон,,,0,True
+hybrid,trap_novel,пирог персик копчёный,novel-604,пирог персик,605,пирог персик,,,0,True
+hybrid,trap_novel,пельмени карамель копчёный,novel-879,пельмени карамель,880,пельмени карамель,,,0,True
+hybrid,trap_novel,мюсли лимон обезжиренный,novel-527,мюсли лимон,528,мюсли лимон,,,0,True
+hybrid,trap_novel,помадка ваниль веганский,novel-740,помадка ваниль,741,помадка ваниль,,,0,True
+hybrid,trap_novel,нектар клубника без сахара,novel-371,нектар клубника,372,нектар клубника,,,0,True
+hybrid,trap_novel,сорбет клубника веганский,novel-671,сорбет клубника,672,сорбет клубника,,,0,True
+hybrid,trap_novel,соус малина обезжиренный,novel-812,соус малина,813,соус малина,,,0,True
+hybrid,trap_novel,карамель малина обезжиренный,novel-732,карамель малина,733,карамель малина,,,0,True
+hybrid,trap_novel,колбаса вишня без сахара,novel-103,колбаса вишня,104,колбаса вишня,,,0,True
+hybrid,trap_novel,газировка яблоко копчёный,novel-75,газировка яблоко,76,газировка яблоко,,,0,True
+hybrid,trap_novel,тарт яблоко обезжиренный,novel-625,тарт яблоко,626,тарт яблоко,,,0,True
+hybrid,trap_novel,пудинг банан без сахара,novel-176,пудинг банан,177,пудинг банан,,,0,True
+hybrid,trap_novel,топпинг банан копчёный,novel-786,топпинг банан,787,топпинг банан,,,0,True
+hybrid,trap_novel,гренки клубника копчёный,novel-911,гренки клубника,912,гренки клубника,,,0,True
+hybrid,trap_novel,сгущенка яблоко без сахара,novel-65,сгущенка яблоко,66,сгущенка яблоко,,,0,True
+hybrid,trap_novel,пломбир клубника обезжиренный,novel-151,пломбир клубника,152,пломбир клубника,,,0,True
+hybrid,trap_novel,какао ваниль без сахара,novel-440,какао ваниль,441,какао ваниль,,,0,True
+hybrid,trap_novel,хумус клубника копчёный,novel-831,хумус клубника,832,хумус клубника,,,0,True
+hybrid,trap_novel,пирог карамель веганский,novel-609,пирог карамель,610,пирог карамель,,,0,True
+hybrid,trap_novel,хлебцы яблоко обезжиренный,novel-925,хлебцы яблоко,926,хлебцы яблоко,,,0,True
+hybrid,trap_novel,пончик лимон обезжиренный,novel-297,пончик лимон,298,пончик лимон,,,0,True
+hybrid,trap_novel,бисквит малина без сахара,novel-262,бисквит малина,263,бисквит малина,,,0,True
+hybrid,trap_novel,сушки карамель копчёный,novel-949,сушки карамель,950,сушки карамель,,,0,True
+hybrid,trap_novel,повидло кокос копчёный,novel-348,повидло кокос,349,повидло кокос,,,0,True
+hybrid,trap_novel,ряженка персик без сахара,novel-124,ряженка персик,125,ряженка персик,,,0,True
+hybrid,trap_novel,чай клубника веганский,novel-421,чай клубника,422,чай клубника,,,0,True
+hybrid,trap_novel,помадка банан веганский,novel-746,помадка банан,747,помадка банан,,,0,True
+hybrid,trap_novel,эклер клубника веганский,novel-281,эклер клубника,282,эклер клубника,,,0,True
+hybrid,trap_novel,крем клубника веганский,novel-161,крем клубника,162,крем клубника,,,0,True
+hybrid,trap_novel,вареники клубника обезжиренный,novel-891,вареники клубника,892,вареники клубника,,,0,True
+hybrid,trap_novel,брауни клубника обезжиренный,novel-641,брауни клубника,642,брауни клубника,,,0,True
+hybrid,trap_novel,газировка кокос веганский,novel-78,газировка кокос,79,газировка кокос,,,0,True
+hybrid,trap_novel,газировка вишня веганский,novel-73,газировка вишня,74,газировка вишня,,,0,True
+hybrid,trap_novel,сироп вишня копчёный,novel-323,сироп вишня,324,сироп вишня,,,0,True
+hybrid,trap_novel,простокваша лимон веганский,novel-137,простокваша лимон,138,простокваша лимон,,,0,True
+hybrid,trap_novel,повидло ваниль копчёный,novel-340,повидло ваниль,341,повидло ваниль,,,0,True
+hybrid,trap_novel,макароны банан веганский,novel-116,макароны банан,117,макароны банан,,,0,True
+hybrid,trap_novel,чизкейк кокос копчёный,novel-658,чизкейк кокос,659,чизкейк кокос,,,0,True
+hybrid,trap_novel,сметана лимон без сахара,novel-47,сметана лимон,48,сметана лимон,,,0,True
+hybrid,trap_novel,ирис карамель веганский,novel-499,ирис карамель,500,ирис карамель,,,0,True
+hybrid,trap_novel,сок персик обезжиренный,novel-364,сок персик,365,сок персик,,,0,True
+hybrid,trap_novel,сорбет банан веганский,novel-676,сорбет банан,677,сорбет банан,,,0,True
+hybrid,trap_novel,крекер лимон без сахара,novel-277,крекер лимон,278,крекер лимон,,,0,True
+hybrid,trap_novel,мюсли клубника обезжиренный,novel-521,мюсли клубника,522,мюсли клубника,,,0,True
+hybrid,trap_novel,булочка банан обезжиренный,novel-306,булочка банан,307,булочка банан,,,0,True
+hybrid,trap_novel,халва клубника обезжиренный,novel-471,халва клубника,472,халва клубника,,,0,True
+hybrid,trap_novel,сырники карамель обезжиренный,novel-569,сырники карамель,570,сырники карамель,,,0,True
+hybrid,trap_novel,леденцы ваниль без сахара,novel-720,леденцы ваниль,721,леденцы ваниль,,,0,True
+hybrid,trap_novel,чипсы малина обезжиренный,novel-932,чипсы малина,933,чипсы малина,,,0,True
+hybrid,trap_novel,рулет яблоко копчёный,novel-315,рулет яблоко,316,рулет яблоко,,,0,True
+hybrid,trap_novel,пудинг яблоко копчёный,novel-175,пудинг яблоко,176,пудинг яблоко,,,0,True
+hybrid,trap_novel,зефир яблоко без сахара,novel-205,зефир яблоко,206,зефир яблоко,,,0,True
+hybrid,trap_novel,желе лимон копчёный,novel-457,желе лимон,458,желе лимон,,,0,True
+hybrid,trap_novel,паштет яблоко копчёный,novel-845,паштет яблоко,846,паштет яблоко,,,0,True
+hybrid,trap_novel,топпинг клубника веганский,novel-781,топпинг клубника,782,топпинг клубника,,,0,True
+hybrid,trap_novel,пончик клубника веганский,novel-291,пончик клубника,292,пончик клубника,,,0,True
+hybrid,trap_novel,топпинг яблоко без сахара,novel-785,топпинг яблоко,786,топпинг яблоко,,,0,True
+hybrid,trap_novel,паштет персик обезжиренный,novel-844,паштет персик,845,паштет персик,,,0,True
+hybrid,trap_novel,джем карамель обезжиренный,novel-339,джем карамель,340,джем карамель,,,0,True
+hybrid,trap_novel,йогурт ваниль без сахара,novel-0,йогурт ваниль,989,йогурт без сахара,,,0,True
+hybrid,trap_novel,хлопья клубника обезжиренный,novel-511,хлопья клубника,512,хлопья клубника,,,0,True
+hybrid,trap_novel,мармелад лимон без сахара,novel-217,мармелад лимон,218,мармелад лимон,,,0,True
+hybrid,trap_novel,паштет карамель копчёный,novel-849,паштет карамель,850,паштет карамель,,,0,True
+hybrid,trap_novel,гренки ваниль веганский,novel-910,гренки ваниль,911,гренки ваниль,,,0,True
+hybrid,trap_novel,сухари малина без сахара,novel-952,сухари малина,953,сухари малина,,,0,True
+hybrid,trap_novel,карамель вишня веганский,novel-733,карамель вишня,734,карамель вишня,,,0,True
+hybrid,trap_novel,печенье карамель веганский,novel-99,печенье карамель,100,печенье карамель,,,0,True
+hybrid,trap_novel,компот клубника обезжиренный,novel-381,компот клубника,382,компот клубника,,,0,True
+hybrid,trap_novel,булочка яблоко копчёный,novel-305,булочка яблоко,306,булочка яблоко,,,0,True
+hybrid,trap_novel,халва ваниль без сахара,novel-470,халва ваниль,471,халва ваниль,,,0,True
+hybrid,trap_present,масло сливочное 300 г,масло сливочное,масло оливковое,985,масло сливочное,985,масло сливочное,0,False
+hybrid,trap_present,масло оливковое 300 г,масло оливковое,масло сливочное,986,масло оливковое,986,масло оливковое,0,False
+hybrid,trap_present,"молоко 2,5% 300 г","молоко 2,5%","молоко 3,2%",987,"молоко 2,5%",987,"молоко 2,5%",0,False
+hybrid,trap_present,"молоко 3,2% 300 г","молоко 3,2%","молоко 2,5%",988,"молоко 3,2%",988,"молоко 3,2%",0,False
+hybrid,trap_present,йогурт без сахара 300 г,йогурт без сахара,йогурт с сахаром,989,йогурт без сахара,989,йогурт без сахара,0,False
+hybrid,trap_present,йогурт с сахаром 300 г,йогурт с сахаром,йогурт без сахара,990,йогурт с сахаром,990,йогурт с сахаром,0,False
+hybrid,trap_present,кофе молотый 300 г,кофе молотый,кофе растворимый,991,кофе молотый,991,кофе молотый,0,False
+hybrid,trap_present,кофе растворимый 300 г,кофе растворимый,кофе молотый,992,кофе растворимый,992,кофе растворимый,0,False
+hybrid,trap_present,лук репчатый 300 г,лук репчатый,лук зелёный,993,лук репчатый,993,лук репчатый,0,False
+hybrid,trap_present,лук зелёный 300 г,лук зелёный,лук репчатый,994,лук зелёный,994,лук зелёный,0,False
+hybrid,trap_present,рис пропаренный 300 г,рис пропаренный,рис непропаренный,995,рис пропаренный,995,рис пропаренный,0,False
+hybrid,trap_present,рис непропаренный 300 г,рис непропаренный,рис пропаренный,996,рис непропаренный,996,рис непропаренный,0,False
+hybrid,trap_present,молоко безлактозное 300 г,молоко безлактозное,молоко цельное,997,молоко безлактозное,997,молоко безлактозное,0,False
+hybrid,trap_present,молоко цельное 300 г,молоко цельное,молоко безлактозное,998,молоко цельное,998,молоко цельное,0,False
+hybrid,trap_present,перец красный 300 г,перец красный,перец чёрный,999,перец красный,999,перец красный,0,False
+hybrid,trap_present,перец чёрный 300 г,перец чёрный,перец красный,1000,перец чёрный,1000,перец чёрный,0,False
+pgvector,trap_novel,колбаса лимон копчёный,novel-107,колбаса лимон,108,колбаса лимон,,,0,True
+pgvector,trap_novel,мороженое кокос веганский,novel-148,мороженое кокос,149,мороженое кокос,,,0,True
+pgvector,trap_novel,хлебцы персик обезжиренный,novel-924,хлебцы персик,925,хлебцы персик,,,0,True
+pgvector,trap_novel,варенье карамель без сахара,novel-359,варенье карамель,360,варенье карамель,,,0,True
+pgvector,trap_novel,ряженка ваниль копчёный,novel-120,ряженка ваниль,121,ряженка ваниль,,,0,True
+pgvector,trap_novel,компот кокос без сахара,novel-388,компот кокос,389,компот кокос,,,0,True
+pgvector,trap_novel,зефир малина обезжиренный,novel-202,зефир малина,203,зефир малина,,,0,True
+pgvector,trap_novel,зефир лимон копчёный,novel-207,зефир лимон,208,зефир лимон,,,0,True
+pgvector,trap_novel,равиоли карамель копчёный,novel-889,равиоли карамель,890,равиоли карамель,,,0,True
+pgvector,trap_novel,ряженка клубника веганский,novel-121,ряженка клубника,122,ряженка клубника,,,0,True
+pgvector,trap_novel,сметана кокос без сахара,novel-48,сметана кокос,49,сметана кокос,,,0,True
+pgvector,trap_novel,вафли лимон копчёный,novel-237,вафли лимон,238,вафли лимон,,,0,True
+pgvector,trap_novel,гранола малина копчёный,novel-532,гранола малина,533,гранола малина,,,0,True
+pgvector,trap_novel,равиоли малина обезжиренный,novel-882,равиоли малина,883,равиоли малина,,,0,True
+pgvector,trap_novel,сухари яблоко без сахара,novel-955,сухари яблоко,956,сухари яблоко,,,0,True
+pgvector,trap_novel,халва яблоко копчёный,novel-475,халва яблоко,476,халва яблоко,,,0,True
+pgvector,trap_novel,пельмени лимон обезжиренный,novel-877,пельмени лимон,878,пельмени лимон,,,0,True
+pgvector,trap_novel,запеканка яблоко обезжиренный,novel-585,запеканка яблоко,586,запеканка яблоко,,,0,True
+pgvector,trap_novel,сырники ваниль веганский,novel-560,сырники ваниль,561,сырники ваниль,,,0,True
+pgvector,trap_novel,нуга лимон без сахара,novel-757,нуга лимон,758,нуга лимон,,,0,True
+pgvector,trap_novel,сырники банан копчёный,novel-566,сырники банан,567,сырники банан,,,0,True
+pgvector,trap_novel,сорбет персик веганский,novel-674,сорбет персик,675,сорбет персик,,,0,True
+pgvector,trap_novel,нектар персик обезжиренный,novel-374,нектар персик,375,нектар персик,,,0,True
+pgvector,trap_novel,каша кокос копчёный,novel-508,каша кокос,509,каша кокос,,,0,True
+pgvector,trap_novel,батончик малина копчёный,novel-702,батончик малина,703,батончик малина,,,0,True
+pgvector,trap_novel,парфе лимон обезжиренный,novel-697,парфе лимон,698,парфе лимон,,,0,True
+pgvector,trap_novel,кофе клубника копчёный,novel-431,кофе клубника,432,кофе клубника,,,0,True
+pgvector,trap_novel,кекс кокос обезжиренный,novel-258,кекс кокос,259,кекс кокос,,,0,True
+pgvector,trap_novel,блины малина обезжиренный,novel-572,блины малина,573,блины малина,,,0,True
+pgvector,trap_novel,сок малина копчёный,novel-362,сок малина,363,сок малина,,,0,True
+pgvector,trap_novel,гренки карамель без сахара,novel-919,гренки карамель,920,гренки карамель,,,0,True
+pgvector,trap_novel,запеканка банан копчёный,novel-586,запеканка банан,587,запеканка банан,,,0,True
+pgvector,trap_novel,колбаса банан без сахара,novel-106,колбаса банан,107,колбаса банан,,,0,True
+pgvector,trap_novel,карамель яблоко копчёный,novel-735,карамель яблоко,736,карамель яблоко,,,0,True
+pgvector,trap_novel,сорбет вишня веганский,novel-673,сорбет вишня,674,сорбет вишня,,,0,True
+pgvector,trap_novel,каша банан копчёный,novel-506,каша банан,507,каша банан,,,0,True
+pgvector,trap_novel,повидло яблоко копчёный,novel-345,повидло яблоко,346,повидло яблоко,,,0,True
+pgvector,trap_novel,какао карамель веганский,novel-449,какао карамель,450,какао карамель,,,0,True
+pgvector,trap_novel,зефир ваниль без сахара,novel-200,зефир ваниль,201,зефир ваниль,,,0,True
+pgvector,trap_novel,сырники яблоко без сахара,novel-565,сырники яблоко,566,сырники яблоко,,,0,True
+pgvector,trap_novel,козинаки кокос обезжиренный,novel-488,козинаки кокос,489,козинаки кокос,,,0,True
+pgvector,trap_novel,сорбет малина копчёный,novel-672,сорбет малина,673,сорбет малина,,,0,True
+pgvector,trap_novel,мороженое лимон обезжиренный,novel-147,мороженое лимон,148,мороженое лимон,,,0,True
+pgvector,trap_novel,драже лимон обезжиренный,novel-717,драже лимон,718,драже лимон,,,0,True
+pgvector,trap_novel,халва вишня веганский,novel-473,халва вишня,474,халва вишня,,,0,True
+pgvector,trap_novel,батончик клубника без сахара,novel-701,батончик клубника,702,батончик клубника,,,0,True
+pgvector,trap_novel,панкейки лимон обезжиренный,novel-547,панкейки лимон,548,панкейки лимон,,,0,True
+pgvector,trap_novel,сироп лимон обезжиренный,novel-327,сироп лимон,328,сироп лимон,,,0,True
+pgvector,trap_novel,маффин лимон копчёный,novel-637,маффин лимон,638,маффин лимон,,,0,True
+pgvector,trap_novel,блины клубника копчёный,novel-571,блины клубника,572,блины клубника,,,0,True
+pgvector,trap_novel,леденцы кокос обезжиренный,novel-728,леденцы кокос,729,леденцы кокос,,,0,True
+pgvector,trap_novel,кекс ваниль копчёный,novel-250,кекс ваниль,251,кекс ваниль,,,0,True
+pgvector,trap_novel,творог ваниль обезжиренный,novel-30,творог ваниль,31,творог ваниль,,,0,True
+pgvector,trap_novel,кофе карамель без сахара,novel-439,кофе карамель,440,кофе карамель,,,0,True
+pgvector,trap_novel,бисквит карамель копчёный,novel-269,бисквит карамель,270,бисквит карамель,,,0,True
+pgvector,trap_novel,суфле карамель копчёный,novel-199,суфле карамель,200,суфле карамель,,,0,True
+pgvector,trap_novel,брауни малина обезжиренный,novel-642,брауни малина,643,брауни малина,,,0,True
+pgvector,trap_novel,макароны карамель обезжиренный,novel-119,макароны карамель,120,макароны карамель,,,0,True
+pgvector,trap_novel,кисель клубника без сахара,novel-411,кисель клубника,412,кисель клубника,,,0,True
+pgvector,trap_novel,вареники малина веганский,novel-892,вареники малина,893,вареники малина,,,0,True
+pgvector,trap_novel,рулет ваниль веганский,novel-310,рулет ваниль,311,рулет ваниль,,,0,True
+pgvector,trap_novel,рулет малина обезжиренный,novel-312,рулет малина,313,рулет малина,,,0,True
+pgvector,trap_novel,гранола кокос веганский,novel-538,гранола кокос,539,гранола кокос,,,0,True
+pgvector,trap_novel,мюсли персик копчёный,novel-524,мюсли персик,525,мюсли персик,,,0,True
+pgvector,trap_novel,конфеты лимон обезжиренный,novel-467,конфеты лимон,468,конфеты лимон,,,0,True
+pgvector,trap_novel,сухарики яблоко копчёный,novel-965,сухарики яблоко,966,сухарики яблоко,,,0,True
+pgvector,trap_novel,салат персик копчёный,novel-854,салат персик,855,салат персик,,,0,True
+pgvector,trap_novel,мороженое банан обезжиренный,novel-146,мороженое банан,147,мороженое банан,,,0,True
+pgvector,trap_novel,паштет ваниль обезжиренный,novel-840,паштет ваниль,841,паштет ваниль,,,0,True
+pgvector,trap_novel,блины банан обезжиренный,novel-576,блины банан,577,блины банан,,,0,True
+pgvector,trap_novel,попкорн клубника веганский,novel-971,попкорн клубника,972,попкорн клубника,,,0,True
+pgvector,trap_novel,чай лимон копчёный,novel-427,чай лимон,428,чай лимон,,,0,True
+pgvector,trap_novel,чипсы банан без сахара,novel-936,чипсы банан,937,чипсы банан,,,0,True
+pgvector,trap_novel,трюфель лимон веганский,novel-767,трюфель лимон,768,трюфель лимон,,,0,True
+pgvector,trap_novel,зефир клубника обезжиренный,novel-201,зефир клубника,202,зефир клубника,,,0,True
+pgvector,trap_novel,сухари вишня обезжиренный,novel-953,сухари вишня,954,сухари вишня,,,0,True
+pgvector,trap_novel,вафли банан без сахара,novel-236,вафли банан,237,вафли банан,,,0,True
+pgvector,trap_novel,тарт вишня копчёный,novel-623,тарт вишня,624,тарт вишня,,,0,True
+pgvector,trap_novel,пончик кокос без сахара,novel-298,пончик кокос,299,пончик кокос,,,0,True
+pgvector,trap_novel,салат ваниль веганский,novel-850,салат ваниль,851,салат ваниль,,,0,True
+pgvector,trap_novel,лимонад лимон без сахара,novel-407,лимонад лимон,408,лимонад лимон,,,0,True
+pgvector,trap_novel,хлопья банан обезжиренный,novel-516,хлопья банан,517,хлопья банан,,,0,True
+pgvector,trap_novel,начинка малина обезжиренный,novel-792,начинка малина,793,начинка малина,,,0,True
+pgvector,trap_novel,пудинг персик без сахара,novel-174,пудинг персик,175,пудинг персик,,,0,True
+pgvector,trap_novel,попкорн ваниль без сахара,novel-970,попкорн ваниль,971,попкорн ваниль,,,0,True
+pgvector,trap_novel,пломбир яблоко обезжиренный,novel-155,пломбир яблоко,156,пломбир яблоко,,,0,True
+pgvector,trap_novel,джем яблоко обезжиренный,novel-335,джем яблоко,336,джем яблоко,,,0,True
+pgvector,trap_novel,котлеты клубника обезжиренный,novel-861,котлеты клубника,862,котлеты клубника,,,0,True
+pgvector,trap_novel,варенье банан без сахара,novel-356,варенье банан,357,варенье банан,,,0,True
+pgvector,trap_novel,сметана банан копчёный,novel-46,сметана банан,47,сметана банан,,,0,True
+pgvector,trap_novel,желе ваниль без сахара,novel-450,желе ваниль,451,желе ваниль,,,0,True
+pgvector,trap_novel,сухари клубника копчёный,novel-951,сухари клубника,952,сухари клубника,,,0,True
+pgvector,trap_novel,конфеты вишня без сахара,novel-463,конфеты вишня,464,конфеты вишня,,,0,True
+pgvector,trap_novel,сухарики карамель копчёный,novel-969,сухарики карамель,970,сухарики карамель,,,0,True
+pgvector,trap_novel,крекер яблоко копчёный,novel-275,крекер яблоко,276,крекер яблоко,,,0,True
+pgvector,trap_novel,десерт малина веганский,novel-682,десерт малина,683,десерт малина,,,0,True
+pgvector,trap_novel,йогурт лимон веганский,novel-7,йогурт лимон,8,йогурт лимон,,,0,True
+pgvector,trap_novel,оладьи яблоко веганский,novel-555,оладьи яблоко,556,оладьи яблоко,,,0,True
+pgvector,trap_novel,салат малина копчёный,novel-852,салат малина,853,салат малина,,,0,True
+pgvector,trap_novel,тарт малина без сахара,novel-622,тарт малина,623,тарт малина,,,0,True
+pgvector,trap_novel,какао вишня обезжиренный,novel-443,какао вишня,444,какао вишня,,,0,True
+pgvector,trap_novel,творог вишня без сахара,novel-33,творог вишня,34,творог вишня,,,0,True
+pgvector,trap_novel,кефир персик обезжиренный,novel-14,кефир персик,15,кефир персик,,,0,True
+pgvector,trap_novel,сок яблоко без сахара,novel-365,сок яблоко,366,сок яблоко,,,0,True
+pgvector,trap_novel,чизкейк вишня копчёный,novel-653,чизкейк вишня,654,чизкейк вишня,,,0,True
+pgvector,trap_novel,желе малина обезжиренный,novel-452,желе малина,453,желе малина,,,0,True
+pgvector,trap_novel,желе яблоко веганский,novel-455,желе яблоко,456,желе яблоко,,,0,True
+pgvector,trap_novel,помадка клубника обезжиренный,novel-741,помадка клубника,742,помадка клубника,,,0,True
+pgvector,trap_novel,дип карамель веганский,novel-829,дип карамель,830,дип карамель,,,0,True
+pgvector,trap_novel,чипсы лимон веганский,novel-937,чипсы лимон,938,чипсы лимон,,,0,True
+pgvector,trap_novel,брауни ваниль копчёный,novel-640,брауни ваниль,641,брауни ваниль,,,0,True
+pgvector,trap_novel,мармелад малина копчёный,novel-212,мармелад малина,213,мармелад малина,,,0,True
+pgvector,trap_novel,бисквит яблоко копчёный,novel-265,бисквит яблоко,266,бисквит яблоко,,,0,True
+pgvector,trap_novel,козинаки персик без сахара,novel-484,козинаки персик,485,козинаки персик,,,0,True
+pgvector,trap_novel,паста ваниль без сахара,novel-800,паста ваниль,801,паста ваниль,,,0,True
+pgvector,trap_novel,карамель лимон копчёный,novel-737,карамель лимон,738,карамель лимон,,,0,True
+pgvector,trap_novel,сироп кокос без сахара,novel-328,сироп кокос,329,сироп кокос,,,0,True
+pgvector,trap_novel,творожок малина обезжиренный,novel-52,творожок малина,53,творожок малина,,,0,True
+pgvector,trap_novel,макарун кокос без сахара,novel-668,макарун кокос,669,макарун кокос,,,0,True
+pgvector,trap_novel,салат кокос копчёный,novel-858,салат кокос,859,салат кокос,,,0,True
+pgvector,trap_novel,простокваша малина веганский,novel-132,простокваша малина,133,простокваша малина,,,0,True
+pgvector,trap_novel,пастила малина копчёный,novel-222,пастила малина,223,пастила малина,,,0,True
+pgvector,trap_novel,блины персик обезжиренный,novel-574,блины персик,575,блины персик,,,0,True
+pgvector,trap_novel,мюсли банан веганский,novel-526,мюсли банан,527,мюсли банан,,,0,True
+pgvector,trap_novel,сырники клубника без сахара,novel-561,сырники клубника,562,сырники клубника,,,0,True
+pgvector,trap_novel,брауни банан копчёный,novel-646,брауни банан,647,брауни банан,,,0,True
+pgvector,trap_novel,гренки вишня обезжиренный,novel-913,гренки вишня,914,гренки вишня,,,0,True
+pgvector,trap_novel,нуга кокос копчёный,novel-758,нуга кокос,759,нуга кокос,,,0,True
+pgvector,trap_novel,мюсли малина веганский,novel-522,мюсли малина,523,мюсли малина,,,0,True
+pgvector,trap_novel,топпинг малина копчёный,novel-782,топпинг малина,783,топпинг малина,,,0,True
+pgvector,trap_novel,варенье лимон копчёный,novel-357,варенье лимон,358,варенье лимон,,,0,True
+pgvector,trap_novel,шоколад малина обезжиренный,novel-82,шоколад малина,83,шоколад малина,,,0,True
+pgvector,trap_novel,вареники лимон без сахара,novel-897,вареники лимон,898,вареники лимон,,,0,True
+pgvector,trap_novel,сок клубника без сахара,novel-361,сок клубника,362,сок клубника,,,0,True
+pgvector,trap_novel,батончик лимон без сахара,novel-707,батончик лимон,708,батончик лимон,,,0,True
+pgvector,trap_novel,паста вишня обезжиренный,novel-803,паста вишня,804,паста вишня,,,0,True
+pgvector,trap_novel,сгущенка клубника обезжиренный,novel-61,сгущенка клубника,62,сгущенка клубника,,,0,True
+pgvector,trap_novel,нектар карамель обезжиренный,novel-379,нектар карамель,380,нектар карамель,,,0,True
+pgvector,trap_novel,морс персик обезжиренный,novel-394,морс персик,395,морс персик,,,0,True
+pgvector,trap_novel,компот карамель копчёный,novel-389,компот карамель,390,компот карамель,,,0,True
+pgvector,trap_novel,мюсли ваниль обезжиренный,novel-520,мюсли ваниль,521,мюсли ваниль,,,0,True
+pgvector,trap_novel,макароны персик веганский,novel-114,макароны персик,115,макароны персик,,,0,True
+pgvector,trap_novel,салат вишня обезжиренный,novel-853,салат вишня,854,салат вишня,,,0,True
+pgvector,trap_novel,газировка лимон копчёный,novel-77,газировка лимон,78,газировка лимон,,,0,True
+pgvector,trap_novel,мармелад карамель без сахара,novel-219,мармелад карамель,220,мармелад карамель,,,0,True
+pgvector,trap_novel,мусс малина обезжиренный,novel-182,мусс малина,183,мусс малина,,,0,True
+pgvector,trap_novel,маффин малина веганский,novel-632,маффин малина,633,маффин малина,,,0,True
+pgvector,trap_novel,эклер ваниль обезжиренный,novel-280,эклер ваниль,281,эклер ваниль,,,0,True
+pgvector,trap_novel,салат банан копчёный,novel-856,салат банан,857,салат банан,,,0,True
+pgvector,trap_novel,сгущенка карамель обезжиренный,novel-69,сгущенка карамель,70,сгущенка карамель,,,0,True
+pgvector,trap_novel,мусс яблоко копчёный,novel-185,мусс яблоко,186,мусс яблоко,,,0,True
+pgvector,trap_novel,пастила персик копчёный,novel-224,пастила персик,225,пастила персик,,,0,True
+pgvector,trap_novel,йогурт персик без сахара,novel-4,йогурт персик,989,йогурт без сахара,,,0,True
+pgvector,trap_novel,соус персик веганский,novel-814,соус персик,815,соус персик,,,0,True
+pgvector,trap_novel,карамель клубника веганский,novel-731,карамель клубника,732,карамель клубника,,,0,True
+pgvector,trap_novel,печенье лимон копчёный,novel-97,печенье лимон,98,печенье лимон,,,0,True
+pgvector,trap_novel,рулет клубника веганский,novel-311,рулет клубника,312,рулет клубника,,,0,True
+pgvector,trap_novel,панкейки яблоко копчёный,novel-545,панкейки яблоко,546,панкейки яблоко,,,0,True
+pgvector,trap_novel,сухари ваниль без сахара,novel-950,сухари ваниль,951,сухари ваниль,,,0,True
+pgvector,trap_novel,молоко вишня обезжиренный,novel-23,молоко вишня,24,молоко вишня,,,0,True
+pgvector,trap_novel,макароны лимон обезжиренный,novel-117,макароны лимон,118,макароны лимон,,,0,True
+pgvector,trap_novel,чизкейк карамель веганский,novel-659,чизкейк карамель,660,чизкейк карамель,,,0,True
+pgvector,trap_novel,молоко малина веганский,novel-22,молоко малина,23,молоко малина,,,0,True
+pgvector,trap_novel,пицца малина обезжиренный,novel-902,пицца малина,903,пицца малина,,,0,True
+pgvector,trap_novel,каша карамель веганский,novel-509,каша карамель,510,каша карамель,,,0,True
+pgvector,trap_novel,запеканка малина обезжиренный,novel-582,запеканка малина,583,запеканка малина,,,0,True
+pgvector,trap_novel,лимонад персик без сахара,novel-404,лимонад персик,405,лимонад персик,,,0,True
+pgvector,trap_novel,лимонад ваниль копчёный,novel-400,лимонад ваниль,401,лимонад ваниль,,,0,True
+pgvector,trap_novel,печенье персик копчёный,novel-94,печенье персик,95,печенье персик,,,0,True
+pgvector,trap_novel,десерт персик без сахара,novel-684,десерт персик,685,десерт персик,,,0,True
+pgvector,trap_novel,пломбир малина веганский,novel-152,пломбир малина,153,пломбир малина,,,0,True
+pgvector,trap_novel,печенье ваниль без сахара,novel-90,печенье ваниль,91,печенье ваниль,,,0,True
+pgvector,trap_novel,пирожное кокос веганский,novel-618,пирожное кокос,619,пирожное кокос,,,0,True
+pgvector,trap_novel,тарт лимон веганский,novel-627,тарт лимон,628,тарт лимон,,,0,True
+pgvector,trap_novel,крекер карамель обезжиренный,novel-279,крекер карамель,280,крекер карамель,,,0,True
+pgvector,trap_novel,лимонад банан без сахара,novel-406,лимонад банан,407,лимонад банан,,,0,True
+pgvector,trap_novel,сок банан без сахара,novel-366,сок банан,367,сок банан,,,0,True
+pgvector,trap_novel,трюфель персик веганский,novel-764,трюфель персик,765,трюфель персик,,,0,True
+pgvector,trap_novel,простокваша карамель веганский,novel-139,простокваша карамель,140,простокваша карамель,,,0,True
+pgvector,trap_novel,паштет лимон копчёный,novel-847,паштет лимон,848,паштет лимон,,,0,True
+pgvector,trap_novel,пирог персик копчёный,novel-604,пирог персик,605,пирог персик,,,0,True
+pgvector,trap_novel,пельмени карамель копчёный,novel-879,пельмени карамель,880,пельмени карамель,,,0,True
+pgvector,trap_novel,мюсли лимон обезжиренный,novel-527,мюсли лимон,528,мюсли лимон,,,0,True
+pgvector,trap_novel,помадка ваниль веганский,novel-740,помадка ваниль,741,помадка ваниль,,,0,True
+pgvector,trap_novel,нектар клубника без сахара,novel-371,нектар клубника,372,нектар клубника,,,0,True
+pgvector,trap_novel,сорбет клубника веганский,novel-671,сорбет клубника,672,сорбет клубника,,,0,True
+pgvector,trap_novel,соус малина обезжиренный,novel-812,соус малина,813,соус малина,,,0,True
+pgvector,trap_novel,карамель малина обезжиренный,novel-732,карамель малина,733,карамель малина,,,0,True
+pgvector,trap_novel,колбаса вишня без сахара,novel-103,колбаса вишня,104,колбаса вишня,,,0,True
+pgvector,trap_novel,газировка яблоко копчёный,novel-75,газировка яблоко,76,газировка яблоко,,,0,True
+pgvector,trap_novel,тарт яблоко обезжиренный,novel-625,тарт яблоко,626,тарт яблоко,,,0,True
+pgvector,trap_novel,пудинг банан без сахара,novel-176,пудинг банан,177,пудинг банан,,,0,True
+pgvector,trap_novel,топпинг банан копчёный,novel-786,топпинг банан,787,топпинг банан,,,0,True
+pgvector,trap_novel,гренки клубника копчёный,novel-911,гренки клубника,912,гренки клубника,,,0,True
+pgvector,trap_novel,сгущенка яблоко без сахара,novel-65,сгущенка яблоко,66,сгущенка яблоко,,,0,True
+pgvector,trap_novel,пломбир клубника обезжиренный,novel-151,пломбир клубника,152,пломбир клубника,,,0,True
+pgvector,trap_novel,какао ваниль без сахара,novel-440,какао ваниль,441,какао ваниль,,,0,True
+pgvector,trap_novel,хумус клубника копчёный,novel-831,хумус клубника,832,хумус клубника,,,0,True
+pgvector,trap_novel,пирог карамель веганский,novel-609,пирог карамель,610,пирог карамель,,,0,True
+pgvector,trap_novel,хлебцы яблоко обезжиренный,novel-925,хлебцы яблоко,926,хлебцы яблоко,,,0,True
+pgvector,trap_novel,пончик лимон обезжиренный,novel-297,пончик лимон,298,пончик лимон,,,0,True
+pgvector,trap_novel,бисквит малина без сахара,novel-262,бисквит малина,263,бисквит малина,,,0,True
+pgvector,trap_novel,сушки карамель копчёный,novel-949,сушки карамель,950,сушки карамель,,,0,True
+pgvector,trap_novel,повидло кокос копчёный,novel-348,повидло кокос,349,повидло кокос,,,0,True
+pgvector,trap_novel,ряженка персик без сахара,novel-124,ряженка персик,125,ряженка персик,,,0,True
+pgvector,trap_novel,чай клубника веганский,novel-421,чай клубника,422,чай клубника,,,0,True
+pgvector,trap_novel,помадка банан веганский,novel-746,помадка банан,747,помадка банан,,,0,True
+pgvector,trap_novel,эклер клубника веганский,novel-281,эклер клубника,282,эклер клубника,,,0,True
+pgvector,trap_novel,крем клубника веганский,novel-161,крем клубника,162,крем клубника,,,0,True
+pgvector,trap_novel,вареники клубника обезжиренный,novel-891,вареники клубника,892,вареники клубника,,,0,True
+pgvector,trap_novel,брауни клубника обезжиренный,novel-641,брауни клубника,642,брауни клубника,,,0,True
+pgvector,trap_novel,газировка кокос веганский,novel-78,газировка кокос,79,газировка кокос,,,0,True
+pgvector,trap_novel,газировка вишня веганский,novel-73,газировка вишня,74,газировка вишня,,,0,True
+pgvector,trap_novel,сироп вишня копчёный,novel-323,сироп вишня,324,сироп вишня,,,0,True
+pgvector,trap_novel,простокваша лимон веганский,novel-137,простокваша лимон,138,простокваша лимон,,,0,True
+pgvector,trap_novel,повидло ваниль копчёный,novel-340,повидло ваниль,341,повидло ваниль,,,0,True
+pgvector,trap_novel,макароны банан веганский,novel-116,макароны банан,117,макароны банан,,,0,True
+pgvector,trap_novel,чизкейк кокос копчёный,novel-658,чизкейк кокос,659,чизкейк кокос,,,0,True
+pgvector,trap_novel,сметана лимон без сахара,novel-47,сметана лимон,48,сметана лимон,,,0,True
+pgvector,trap_novel,ирис карамель веганский,novel-499,ирис карамель,500,ирис карамель,,,0,True
+pgvector,trap_novel,сок персик обезжиренный,novel-364,сок персик,365,сок персик,,,0,True
+pgvector,trap_novel,сорбет банан веганский,novel-676,сорбет банан,677,сорбет банан,,,0,True
+pgvector,trap_novel,крекер лимон без сахара,novel-277,крекер лимон,278,крекер лимон,,,0,True
+pgvector,trap_novel,мюсли клубника обезжиренный,novel-521,мюсли клубника,522,мюсли клубника,,,0,True
+pgvector,trap_novel,булочка банан обезжиренный,novel-306,булочка банан,307,булочка банан,,,0,True
+pgvector,trap_novel,халва клубника обезжиренный,novel-471,халва клубника,472,халва клубника,,,0,True
+pgvector,trap_novel,сырники карамель обезжиренный,novel-569,сырники карамель,570,сырники карамель,,,0,True
+pgvector,trap_novel,леденцы ваниль без сахара,novel-720,леденцы ваниль,721,леденцы ваниль,,,0,True
+pgvector,trap_novel,чипсы малина обезжиренный,novel-932,чипсы малина,933,чипсы малина,,,0,True
+pgvector,trap_novel,рулет яблоко копчёный,novel-315,рулет яблоко,316,рулет яблоко,,,0,True
+pgvector,trap_novel,пудинг яблоко копчёный,novel-175,пудинг яблоко,176,пудинг яблоко,,,0,True
+pgvector,trap_novel,зефир яблоко без сахара,novel-205,зефир яблоко,206,зефир яблоко,,,0,True
+pgvector,trap_novel,желе лимон копчёный,novel-457,желе лимон,458,желе лимон,,,0,True
+pgvector,trap_novel,паштет яблоко копчёный,novel-845,паштет яблоко,846,паштет яблоко,,,0,True
+pgvector,trap_novel,топпинг клубника веганский,novel-781,топпинг клубника,782,топпинг клубника,,,0,True
+pgvector,trap_novel,пончик клубника веганский,novel-291,пончик клубника,292,пончик клубника,,,0,True
+pgvector,trap_novel,топпинг яблоко без сахара,novel-785,топпинг яблоко,786,топпинг яблоко,,,0,True
+pgvector,trap_novel,паштет персик обезжиренный,novel-844,паштет персик,845,паштет персик,,,0,True
+pgvector,trap_novel,джем карамель обезжиренный,novel-339,джем карамель,340,джем карамель,,,0,True
+pgvector,trap_novel,йогурт ваниль без сахара,novel-0,йогурт ваниль,989,йогурт без сахара,,,0,True
+pgvector,trap_novel,хлопья клубника обезжиренный,novel-511,хлопья клубника,512,хлопья клубника,,,0,True
+pgvector,trap_novel,мармелад лимон без сахара,novel-217,мармелад лимон,218,мармелад лимон,,,0,True
+pgvector,trap_novel,паштет карамель копчёный,novel-849,паштет карамель,850,паштет карамель,,,0,True
+pgvector,trap_novel,гренки ваниль веганский,novel-910,гренки ваниль,911,гренки ваниль,,,0,True
+pgvector,trap_novel,сухари малина без сахара,novel-952,сухари малина,953,сухари малина,,,0,True
+pgvector,trap_novel,карамель вишня веганский,novel-733,карамель вишня,734,карамель вишня,,,0,True
+pgvector,trap_novel,печенье карамель веганский,novel-99,печенье карамель,100,печенье карамель,,,0,True
+pgvector,trap_novel,компот клубника обезжиренный,novel-381,компот клубника,382,компот клубника,,,0,True
+pgvector,trap_novel,булочка яблоко копчёный,novel-305,булочка яблоко,306,булочка яблоко,,,0,True
+pgvector,trap_novel,халва ваниль без сахара,novel-470,халва ваниль,471,халва ваниль,,,0,True
+pgvector,trap_present,масло сливочное 300 г,масло сливочное,масло оливковое,985,масло сливочное,985,масло сливочное,0,True
+pgvector,trap_present,масло оливковое 300 г,масло оливковое,масло сливочное,986,масло оливковое,986,масло оливковое,0,True
+pgvector,trap_present,"молоко 2,5% 300 г","молоко 2,5%","молоко 3,2%",987,"молоко 2,5%",987,"молоко 2,5%",0,True
+pgvector,trap_present,"молоко 3,2% 300 г","молоко 3,2%","молоко 2,5%",988,"молоко 3,2%",988,"молоко 3,2%",0,True
+pgvector,trap_present,йогурт без сахара 300 г,йогурт без сахара,йогурт с сахаром,989,йогурт без сахара,989,йогурт без сахара,0,True
+pgvector,trap_present,йогурт с сахаром 300 г,йогурт с сахаром,йогурт без сахара,990,йогурт с сахаром,990,йогурт с сахаром,0,True
+pgvector,trap_present,кофе молотый 300 г,кофе молотый,кофе растворимый,991,кофе молотый,991,кофе молотый,0,False
+pgvector,trap_present,кофе растворимый 300 г,кофе растворимый,кофе молотый,992,кофе растворимый,992,кофе растворимый,0,False
+pgvector,trap_present,лук репчатый 300 г,лук репчатый,лук зелёный,993,лук репчатый,993,лук репчатый,0,True
+pgvector,trap_present,лук зелёный 300 г,лук зелёный,лук репчатый,994,лук зелёный,994,лук зелёный,0,True
+pgvector,trap_present,рис пропаренный 300 г,рис пропаренный,рис непропаренный,995,рис пропаренный,995,рис пропаренный,0,True
+pgvector,trap_present,рис непропаренный 300 г,рис непропаренный,рис пропаренный,996,рис непропаренный,996,рис непропаренный,0,True
+pgvector,trap_present,молоко безлактозное 300 г,молоко безлактозное,молоко цельное,997,молоко безлактозное,997,молоко безлактозное,0,True
+pgvector,trap_present,молоко цельное 300 г,молоко цельное,молоко безлактозное,998,молоко цельное,998,молоко цельное,0,True
+pgvector,trap_present,перец красный 300 г,перец красный,перец чёрный,999,перец красный,999,перец красный,0,True
+pgvector,trap_present,перец чёрный 300 г,перец чёрный,перец красный,1000,перец чёрный,1000,перец чёрный,0,True

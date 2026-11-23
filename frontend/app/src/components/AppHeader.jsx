@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { newsApi, pantryApi, shoppingApi } from '../api/client.js'
+import { useOfflineStatus } from '../api/useOfflineStatus.js'
 import { useAuth } from '../auth/useAuth.js'
 import { mergeMatchingProducts } from '../lib/pantry.js'
 import { notifyPurchaseChanged, usePurchaseChanged } from '../lib/purchaseEvents.js'
@@ -14,6 +15,7 @@ import { BellIcon, FeedbackIcon, NewsIcon } from './icons.jsx'
 
 export function AppHeader({ onToast }) {
   const { user } = useAuth()
+  const { pending, error } = useOfflineStatus(user)
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const groupId = user.groups?.[0]?.id
@@ -143,6 +145,11 @@ export function AppHeader({ onToast }) {
               }}
             />
           </div>
+        )}
+        {pathname !== '/settings' && pending > 0 && (
+          <button className="btn btn--ghost" type="button" onClick={() => navigate('/settings')}>
+            {error ? 'Ошибка синхронизации' : `Ожидают синхронизации: ${pending}`}
+          </button>
         )}
       </header>
 

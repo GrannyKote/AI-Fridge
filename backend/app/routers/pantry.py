@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_session
 from ..dependencies import current_user_id
+from ..offline import OfflineMutationRoute
 from ..schemas import (
     CategoryOut,
     ConsumptionCreate,
@@ -20,7 +21,7 @@ from ..schemas import (
 )
 from ..services import catalog, pantry, stats
 
-router = APIRouter(prefix="/api", tags=["pantry"])
+router = APIRouter(prefix="/api", tags=["pantry"], route_class=OfflineMutationRoute)
 
 
 def _to_item(row) -> PantryItemOut:

@@ -1,0 +1,41 @@
+{
+  "scenario": "duplicate-delivery",
+  "first": {
+    "ids": [
+      22
+    ]
+  },
+  "repeated": {
+    "ids": [
+      22
+    ]
+  },
+  "changedPayloadStatus": 409,
+  "pantry": [
+    {
+      "id": 22,
+      "product_id": 25,
+      "name": "Конфликтный товар",
+      "quantity": 1,
+      "remaining": 1,
+      "price": null,
+      "unit": "шт",
+      "unit_id": 1,
+      "category_id": 11,
+      "category": "Молочные",
+      "storage_place_id": 2,
+      "storage_place": "Холодильник",
+      "best_before": "2027-12-31",
+      "first_reminder_days": null,
+      "second_reminder_days": null,
+      "first_reminder_shown": null,
+      "first_reminder_seen": null,
+      "second_reminder_shown": null,
+      "second_reminder_seen": null,
+      "is_consumed": false,
+      "is_wasted": false,
+      "is_deleted": false,
+      "is_over": false
+    }
+  ]
+}

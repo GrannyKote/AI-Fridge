@@ -1,0 +1,7 @@
+{
+  "scenario": "deleted-shopping-item",
+  "status": 422,
+  "pending": 1,
+  "userError": "Товар не найден в списке покупок",
+  "pantryCount": 0
+}

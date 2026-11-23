@@ -1,0 +1,9 @@
+{
+  "scenario": "same-pantry-item",
+  "initial": 1,
+  "local": 6,
+  "remote": 9,
+  "status": 200,
+  "final": 6,
+  "reportedConflict": false
+}

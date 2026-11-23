@@ -1,0 +1,250 @@
+{
+  "seed": 481723,
+  "horizon_ms": 1200,
+  "overall": {
+    "A": {
+      "n": 300,
+      "error": 60,
+      "mixed": 85,
+      "first_window": 67,
+      "full_state": 156,
+      "exact_content": 173,
+      "capped_ms": 773.0982774043493,
+      "offered_bytes": 1370.5966666666666
+    },
+    "B": {
+      "n": 300,
+      "error": 116,
+      "mixed": 0,
+      "first_window": 42,
+      "full_state": 184,
+      "exact_content": 184,
+      "capped_ms": 906.7558132190891,
+      "offered_bytes": 1097.0033333333333
+    },
+    "C": {
+      "n": 300,
+      "error": 42,
+      "mixed": 0,
+      "first_window": 70,
+      "full_state": 258,
+      "exact_content": 258,
+      "capped_ms": 736.9431362958532,
+      "offered_bytes": 384.6666666666667
+    },
+    "error_A_minus_C_pp": 6.0,
+    "time_B_minus_C_ms": 169.81267692323593
+  },
+  "scenarios": {
+    "1": {
+      "name": "Добавление и покупка",
+      "A": {
+        "n": 50,
+        "error": 9,
+        "mixed": 13,
+        "first_window": 5,
+        "full_state": 28,
+        "exact_content": 28,
+        "capped_ms": 801.0165094585318,
+        "offered_bytes": 1332.84
+      },
+      "B": {
+        "n": 50,
+        "error": 17,
+        "mixed": 0,
+        "first_window": 2,
+        "full_state": 33,
+        "exact_content": 33,
+        "capped_ms": 950.2372629828731,
+        "offered_bytes": 1060.32
+      },
+      "C": {
+        "n": 50,
+        "error": 5,
+        "mixed": 0,
+        "first_window": 8,
+        "full_state": 45,
+        "exact_content": 45,
+        "capped_ms": 742.8063276217457,
+        "offered_bytes": 338
+      },
+      "error_A_minus_C_pp": 8.0,
+      "time_B_minus_C_ms": 207.43093536112735
+    },
+    "2": {
+      "name": "Покупка части списка",
+      "A": {
+        "n": 50,
+        "error": 13,
+        "mixed": 17,
+        "first_window": 13,
+        "full_state": 20,
+        "exact_content": 20,
+        "capped_ms": 789.2302672634368,
+        "offered_bytes": 1260.98
+      },
+      "B": {
+        "n": 50,
+        "error": 21,
+        "mixed": 0,
+        "first_window": 7,
+        "full_state": 29,
+        "exact_content": 29,
+        "capped_ms": 928.7053183678258,
+        "offered_bytes": 988.6
+      },
+      "C": {
+        "n": 50,
+        "error": 10,
+        "mixed": 0,
+        "first_window": 15,
+        "full_state": 40,
+        "exact_content": 40,
+        "capped_ms": 748.9996470651361,
+        "offered_bytes": 337
+      },
+      "error_A_minus_C_pp": 6.0,
+      "time_B_minus_C_ms": 179.70567130268978
+    },
+    "3": {
+      "name": "Покупка разных товаров",
+      "A": {
+        "n": 50,
+        "error": 13,
+        "mixed": 12,
+        "first_window": 10,
+        "full_state": 25,
+        "exact_content": 25,
+        "capped_ms": 817.9835470402213,
+        "offered_bytes": 1565.92
+      },
+      "B": {
+        "n": 50,
+        "error": 23,
+        "mixed": 0,
+        "first_window": 7,
+        "full_state": 27,
+        "exact_content": 27,
+        "capped_ms": 935.9159432932593,
+        "offered_bytes": 1292.2
+      },
+      "C": {
+        "n": 50,
+        "error": 10,
+        "mixed": 0,
+        "first_window": 10,
+        "full_state": 40,
+        "exact_content": 40,
+        "capped_ms": 797.6012584945762,
+        "offered_bytes": 436
+      },
+      "error_A_minus_C_pp": 6.0,
+      "time_B_minus_C_ms": 138.31468479868306
+    },
+    "4": {
+      "name": "Покупка и добавление позиции",
+      "A": {
+        "n": 50,
+        "error": 6,
+        "mixed": 15,
+        "first_window": 6,
+        "full_state": 29,
+        "exact_content": 29,
+        "capped_ms": 794.3481753879877,
+        "offered_bytes": 1381.8
+      },
+      "B": {
+        "n": 50,
+        "error": 17,
+        "mixed": 0,
+        "first_window": 4,
+        "full_state": 33,
+        "exact_content": 33,
+        "capped_ms": 903.8003669117879,
+        "offered_bytes": 1104.9
+      },
+      "C": {
+        "n": 50,
+        "error": 5,
+        "mixed": 0,
+        "first_window": 5,
+        "full_state": 45,
+        "exact_content": 45,
+        "capped_ms": 775.6069224340492,
+        "offered_bytes": 430
+      },
+      "error_A_minus_C_pp": 2.0,
+      "time_B_minus_C_ms": 128.1934444777387
+    },
+    "5": {
+      "name": "Расход и пополнение",
+      "A": {
+        "n": 50,
+        "error": 11,
+        "mixed": 18,
+        "first_window": 14,
+        "full_state": 22,
+        "exact_content": 39,
+        "capped_ms": 760.9878610812118,
+        "offered_bytes": 1459.2
+      },
+      "B": {
+        "n": 50,
+        "error": 25,
+        "mixed": 0,
+        "first_window": 6,
+        "full_state": 25,
+        "exact_content": 25,
+        "capped_ms": 965.6234158445538,
+        "offered_bytes": 1186.68
+      },
+      "C": {
+        "n": 50,
+        "error": 8,
+        "mixed": 0,
+        "first_window": 15,
+        "full_state": 42,
+        "exact_content": 42,
+        "capped_ms": 726.9657930260096,
+        "offered_bytes": 429
+      },
+      "error_A_minus_C_pp": 6.0,
+      "time_B_minus_C_ms": 238.65762281854427
+    },
+    "6": {
+      "name": "Повторное оформление позиции",
+      "A": {
+        "n": 50,
+        "error": 8,
+        "mixed": 10,
+        "first_window": 19,
+        "full_state": 32,
+        "exact_content": 32,
+        "capped_ms": 675.0233041947068,
+        "offered_bytes": 1222.84
+      },
+      "B": {
+        "n": 50,
+        "error": 13,
+        "mixed": 0,
+        "first_window": 16,
+        "full_state": 37,
+        "exact_content": 37,
+        "capped_ms": 756.2525719142347,
+        "offered_bytes": 949.32
+      },
+      "C": {
+        "n": 50,
+        "error": 4,
+        "mixed": 0,
+        "first_window": 17,
+        "full_state": 46,
+        "exact_content": 46,
+        "capped_ms": 629.6788691336022,
+        "offered_bytes": 338
+      },
+      "error_A_minus_C_pp": 8.0,
+      "time_B_minus_C_ms": 126.57370278063252
+    }
+  }
+}

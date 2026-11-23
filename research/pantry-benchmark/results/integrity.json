@@ -1,0 +1,269 @@
+[
+  {
+    "size": 10000,
+    "mode": "A",
+    "initial_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true,
+      "pantry": true
+    },
+    "seeded_count_after_load": 10000,
+    "lost": 0,
+    "unexpected_or_duplicate": 0,
+    "race_http_statuses": [
+      201,
+      201,
+      422,
+      422
+    ],
+    "race_events": 2,
+    "after_race_usage_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true
+    }
+  },
+  {
+    "size": 10000,
+    "mode": "B",
+    "initial_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true,
+      "pantry": true
+    },
+    "seeded_count_after_load": 10000,
+    "lost": 0,
+    "unexpected_or_duplicate": 0,
+    "race_http_statuses": [
+      201,
+      201,
+      201,
+      201
+    ],
+    "race_events": 4,
+    "after_race_usage_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true
+    }
+  },
+  {
+    "size": 10000,
+    "mode": "C",
+    "initial_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true,
+      "pantry": true
+    },
+    "seeded_count_after_load": 10000,
+    "lost": 0,
+    "unexpected_or_duplicate": 0,
+    "race_http_statuses": [
+      201,
+      422,
+      422,
+      422
+    ],
+    "race_events": 1,
+    "lot_balance_mismatches": 0,
+    "hourly_usage_mismatches": 0,
+    "after_race_usage_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true
+    }
+  },
+  {
+    "size": 100000,
+    "mode": "A",
+    "initial_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true,
+      "pantry": true
+    },
+    "seeded_count_after_load": 100000,
+    "lost": 0,
+    "unexpected_or_duplicate": 0,
+    "race_http_statuses": [
+      201,
+      201,
+      201,
+      201
+    ],
+    "race_events": 4,
+    "after_race_usage_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true
+    }
+  },
+  {
+    "size": 100000,
+    "mode": "B",
+    "initial_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true,
+      "pantry": true
+    },
+    "seeded_count_after_load": 100000,
+    "lost": 0,
+    "unexpected_or_duplicate": 0,
+    "race_http_statuses": [
+      201,
+      201,
+      201,
+      201
+    ],
+    "race_events": 4,
+    "after_race_usage_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true
+    }
+  },
+  {
+    "size": 100000,
+    "mode": "C",
+    "initial_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true,
+      "pantry": true
+    },
+    "seeded_count_after_load": 100000,
+    "lost": 0,
+    "unexpected_or_duplicate": 0,
+    "race_http_statuses": [
+      201,
+      422,
+      422,
+      422
+    ],
+    "race_events": 1,
+    "lot_balance_mismatches": 0,
+    "hourly_usage_mismatches": 0,
+    "after_race_usage_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true
+    }
+  },
+  {
+    "size": 500000,
+    "mode": "A",
+    "initial_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true,
+      "pantry": true
+    },
+    "seeded_count_after_load": 500000,
+    "lost": 0,
+    "unexpected_or_duplicate": 0,
+    "race_http_statuses": [
+      201,
+      201,
+      201,
+      201
+    ],
+    "race_events": 4,
+    "after_race_usage_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true
+    }
+  },
+  {
+    "size": 500000,
+    "mode": "B",
+    "initial_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true,
+      "pantry": true
+    },
+    "seeded_count_after_load": 500000,
+    "lost": 0,
+    "unexpected_or_duplicate": 0,
+    "race_http_statuses": [
+      201,
+      201,
+      201,
+      201
+    ],
+    "race_events": 4,
+    "after_race_usage_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true
+    }
+  },
+  {
+    "size": 500000,
+    "mode": "C",
+    "initial_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true,
+      "pantry": true
+    },
+    "seeded_count_after_load": 500000,
+    "lost": 0,
+    "unexpected_or_duplicate": 0,
+    "race_http_statuses": [
+      201,
+      422,
+      422,
+      422
+    ],
+    "race_events": 1,
+    "lot_balance_mismatches": 0,
+    "hourly_usage_mismatches": 0,
+    "after_race_usage_equivalence": {
+      "day": true,
+      "week": true,
+      "month": true,
+      "quarter": true,
+      "year": true
+    }
+  }
+]

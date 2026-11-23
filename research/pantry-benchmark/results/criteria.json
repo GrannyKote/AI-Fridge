@@ -1,0 +1,343 @@
+{
+  "verdict": "подтверждена",
+  "criteria": [
+    {
+      "size": 10000,
+      "profile": "90-10",
+      "mode": "B",
+      "p95_reduction_pct": {
+        "pantry": 43.16,
+        "usage": 80.07,
+        "consumption": 69.93,
+        "waste": 46.88
+      },
+      "read_p95_meets_20_percent": true,
+      "write_p95_growth_at_most_10_percent": true,
+      "reproducible_improvement": {
+        "pantry": true,
+        "usage": true
+      },
+      "baseline_cpu_s_median": 3.101565,
+      "candidate_cpu_s_median": 0.89062,
+      "baseline_peak_rss_mib_median": 90.005,
+      "candidate_peak_rss_mib_median": 83.31,
+      "cpu_and_ram_reduced": true,
+      "integrity_pass": false,
+      "no_load_errors": true
+    },
+    {
+      "size": 10000,
+      "profile": "90-10",
+      "mode": "C",
+      "p95_reduction_pct": {
+        "pantry": 78.09,
+        "usage": 71.57,
+        "consumption": 77.74,
+        "waste": 70.64
+      },
+      "read_p95_meets_20_percent": true,
+      "write_p95_growth_at_most_10_percent": true,
+      "reproducible_improvement": {
+        "pantry": true,
+        "usage": true
+      },
+      "baseline_cpu_s_median": 3.101565,
+      "candidate_cpu_s_median": 0.773435,
+      "baseline_peak_rss_mib_median": 90.005,
+      "candidate_peak_rss_mib_median": 82.265,
+      "cpu_and_ram_reduced": true,
+      "integrity_pass": true,
+      "no_load_errors": true
+    },
+    {
+      "size": 10000,
+      "profile": "70-30",
+      "mode": "B",
+      "p95_reduction_pct": {
+        "pantry": 22.83,
+        "usage": 55.43,
+        "consumption": 6.87,
+        "waste": 11.21
+      },
+      "read_p95_meets_20_percent": true,
+      "write_p95_growth_at_most_10_percent": true,
+      "reproducible_improvement": {
+        "pantry": true,
+        "usage": true
+      },
+      "baseline_cpu_s_median": 2.63281,
+      "candidate_cpu_s_median": 1.86719,
+      "baseline_peak_rss_mib_median": 88.55,
+      "candidate_peak_rss_mib_median": 84.095,
+      "cpu_and_ram_reduced": true,
+      "integrity_pass": false,
+      "no_load_errors": true
+    },
+    {
+      "size": 10000,
+      "profile": "70-30",
+      "mode": "C",
+      "p95_reduction_pct": {
+        "pantry": 66.82,
+        "usage": 57.96,
+        "consumption": 39.95,
+        "waste": 41.18
+      },
+      "read_p95_meets_20_percent": true,
+      "write_p95_growth_at_most_10_percent": true,
+      "reproducible_improvement": {
+        "pantry": true,
+        "usage": true
+      },
+      "baseline_cpu_s_median": 2.63281,
+      "candidate_cpu_s_median": 1.14062,
+      "baseline_peak_rss_mib_median": 88.55,
+      "candidate_peak_rss_mib_median": 82.285,
+      "cpu_and_ram_reduced": true,
+      "integrity_pass": true,
+      "no_load_errors": true
+    },
+    {
+      "size": 100000,
+      "profile": "90-10",
+      "mode": "B",
+      "p95_reduction_pct": {
+        "pantry": 92.47,
+        "usage": 91.18,
+        "consumption": 91.97,
+        "waste": 92.63
+      },
+      "read_p95_meets_20_percent": true,
+      "write_p95_growth_at_most_10_percent": true,
+      "reproducible_improvement": {
+        "pantry": true,
+        "usage": true
+      },
+      "baseline_cpu_s_median": 25.476565,
+      "candidate_cpu_s_median": 1.078125,
+      "baseline_peak_rss_mib_median": 158.5,
+      "candidate_peak_rss_mib_median": 82.525,
+      "cpu_and_ram_reduced": true,
+      "integrity_pass": false,
+      "no_load_errors": true
+    },
+    {
+      "size": 100000,
+      "profile": "90-10",
+      "mode": "C",
+      "p95_reduction_pct": {
+        "pantry": 95.16,
+        "usage": 74.82,
+        "consumption": 91.78,
+        "waste": 90.94
+      },
+      "read_p95_meets_20_percent": true,
+      "write_p95_growth_at_most_10_percent": true,
+      "reproducible_improvement": {
+        "pantry": true,
+        "usage": true
+      },
+      "baseline_cpu_s_median": 25.476565,
+      "candidate_cpu_s_median": 1.17188,
+      "baseline_peak_rss_mib_median": 158.5,
+      "candidate_peak_rss_mib_median": 81.955,
+      "cpu_and_ram_reduced": true,
+      "integrity_pass": true,
+      "no_load_errors": true
+    },
+    {
+      "size": 100000,
+      "profile": "70-30",
+      "mode": "B",
+      "p95_reduction_pct": {
+        "pantry": 92.94,
+        "usage": 90.12,
+        "consumption": 86.36,
+        "waste": 90.32
+      },
+      "read_p95_meets_20_percent": true,
+      "write_p95_growth_at_most_10_percent": true,
+      "reproducible_improvement": {
+        "pantry": true,
+        "usage": true
+      },
+      "baseline_cpu_s_median": 21.007815,
+      "candidate_cpu_s_median": 1.296875,
+      "baseline_peak_rss_mib_median": 165.615,
+      "candidate_peak_rss_mib_median": 83.565,
+      "cpu_and_ram_reduced": true,
+      "integrity_pass": false,
+      "no_load_errors": true
+    },
+    {
+      "size": 100000,
+      "profile": "70-30",
+      "mode": "C",
+      "p95_reduction_pct": {
+        "pantry": 96.31,
+        "usage": 80.35,
+        "consumption": 94.33,
+        "waste": 95.11
+      },
+      "read_p95_meets_20_percent": true,
+      "write_p95_growth_at_most_10_percent": true,
+      "reproducible_improvement": {
+        "pantry": true,
+        "usage": true
+      },
+      "baseline_cpu_s_median": 21.007815,
+      "candidate_cpu_s_median": 1.039065,
+      "baseline_peak_rss_mib_median": 165.615,
+      "candidate_peak_rss_mib_median": 82.065,
+      "cpu_and_ram_reduced": true,
+      "integrity_pass": true,
+      "no_load_errors": true
+    },
+    {
+      "size": 500000,
+      "profile": "90-10",
+      "mode": "B",
+      "p95_reduction_pct": {
+        "pantry": 94.53,
+        "usage": 94.45,
+        "consumption": 94.26,
+        "waste": 94.3
+      },
+      "read_p95_meets_20_percent": true,
+      "write_p95_growth_at_most_10_percent": true,
+      "reproducible_improvement": {
+        "pantry": true,
+        "usage": true
+      },
+      "baseline_cpu_s_median": 141.00781,
+      "candidate_cpu_s_median": 1.24219,
+      "baseline_peak_rss_mib_median": 503.98,
+      "candidate_peak_rss_mib_median": 82.69999999999999,
+      "cpu_and_ram_reduced": true,
+      "integrity_pass": false,
+      "no_load_errors": true
+    },
+    {
+      "size": 500000,
+      "profile": "90-10",
+      "mode": "C",
+      "p95_reduction_pct": {
+        "pantry": 98.65,
+        "usage": 86.54,
+        "consumption": 98.74,
+        "waste": 96.86
+      },
+      "read_p95_meets_20_percent": true,
+      "write_p95_growth_at_most_10_percent": true,
+      "reproducible_improvement": {
+        "pantry": true,
+        "usage": true
+      },
+      "baseline_cpu_s_median": 141.00781,
+      "candidate_cpu_s_median": 1.226565,
+      "baseline_peak_rss_mib_median": 503.98,
+      "candidate_peak_rss_mib_median": 82.07,
+      "cpu_and_ram_reduced": true,
+      "integrity_pass": true,
+      "no_load_errors": true
+    },
+    {
+      "size": 500000,
+      "profile": "70-30",
+      "mode": "B",
+      "p95_reduction_pct": {
+        "pantry": 93.65,
+        "usage": 89.0,
+        "consumption": 93.52,
+        "waste": 94.32
+      },
+      "read_p95_meets_20_percent": true,
+      "write_p95_growth_at_most_10_percent": true,
+      "reproducible_improvement": {
+        "pantry": true,
+        "usage": true
+      },
+      "baseline_cpu_s_median": 103.98437,
+      "candidate_cpu_s_median": 1.4375,
+      "baseline_peak_rss_mib_median": 445.935,
+      "candidate_peak_rss_mib_median": 83.60499999999999,
+      "cpu_and_ram_reduced": true,
+      "integrity_pass": false,
+      "no_load_errors": true
+    },
+    {
+      "size": 500000,
+      "profile": "70-30",
+      "mode": "C",
+      "p95_reduction_pct": {
+        "pantry": 98.89,
+        "usage": 77.3,
+        "consumption": 97.16,
+        "waste": 98.32
+      },
+      "read_p95_meets_20_percent": true,
+      "write_p95_growth_at_most_10_percent": true,
+      "reproducible_improvement": {
+        "pantry": true,
+        "usage": true
+      },
+      "baseline_cpu_s_median": 103.98437,
+      "candidate_cpu_s_median": 1.453125,
+      "baseline_peak_rss_mib_median": 445.935,
+      "candidate_peak_rss_mib_median": 82.34,
+      "cpu_and_ram_reduced": true,
+      "integrity_pass": true,
+      "no_load_errors": true
+    }
+  ],
+  "thresholds": [
+    {
+      "mode": "B",
+      "profile": "90-10",
+      "operation": "pantry",
+      "first_tested_size_with_repeatable_p95_gain": 10000
+    },
+    {
+      "mode": "B",
+      "profile": "90-10",
+      "operation": "usage",
+      "first_tested_size_with_repeatable_p95_gain": 10000
+    },
+    {
+      "mode": "C",
+      "profile": "90-10",
+      "operation": "pantry",
+      "first_tested_size_with_repeatable_p95_gain": 10000
+    },
+    {
+      "mode": "C",
+      "profile": "90-10",
+      "operation": "usage",
+      "first_tested_size_with_repeatable_p95_gain": 10000
+    },
+    {
+      "mode": "B",
+      "profile": "70-30",
+      "operation": "pantry",
+      "first_tested_size_with_repeatable_p95_gain": 10000
+    },
+    {
+      "mode": "B",
+      "profile": "70-30",
+      "operation": "usage",
+      "first_tested_size_with_repeatable_p95_gain": 10000
+    },
+    {
+      "mode": "C",
+      "profile": "70-30",
+      "operation": "pantry",
+      "first_tested_size_with_repeatable_p95_gain": 10000
+    },
+    {
+      "mode": "C",
+      "profile": "70-30",
+      "operation": "usage",
+      "first_tested_size_with_repeatable_p95_gain": 10000
+    }
+  ]
+}

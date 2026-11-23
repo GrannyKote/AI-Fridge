@@ -1,0 +1,54 @@
+Preparing 10000 A
+Preparing 10000 B
+Preparing 10000 C
+Load 10000 A 90-10 repeat 1
+Load 10000 B 90-10 repeat 1
+Load 10000 C 90-10 repeat 1
+Load 10000 A 70-30 repeat 1
+Load 10000 B 70-30 repeat 1
+Load 10000 C 70-30 repeat 1
+Load 10000 C 90-10 repeat 2
+Load 10000 B 90-10 repeat 2
+Load 10000 A 90-10 repeat 2
+Load 10000 C 70-30 repeat 2
+Load 10000 B 70-30 repeat 2
+Load 10000 A 70-30 repeat 2
+D:\�����\������\AI-Fridge\backend\.venv\Lib\site-packages\anyio\_backends\_asyncio.py:1033: StarletteDeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+  result = context.run(func, *args)
+D:\�����\������\AI-Fridge\backend\.venv\Lib\site-packages\anyio\_backends\_asyncio.py:1033: StarletteDeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+  result = context.run(func, *args)
+Preparing 100000 A
+Preparing 100000 B
+Preparing 100000 C
+Load 100000 A 90-10 repeat 1
+Load 100000 B 90-10 repeat 1
+Load 100000 C 90-10 repeat 1
+Load 100000 A 70-30 repeat 1
+Load 100000 B 70-30 repeat 1
+Load 100000 C 70-30 repeat 1
+Load 100000 C 90-10 repeat 2
+Load 100000 B 90-10 repeat 2
+Load 100000 A 90-10 repeat 2
+Load 100000 C 70-30 repeat 2
+Load 100000 B 70-30 repeat 2
+Load 100000 A 70-30 repeat 2
+D:\�����\������\AI-Fridge\backend\.venv\Lib\site-packages\anyio\_backends\_asyncio.py:1033: StarletteDeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+  result = context.run(func, *args)
+Preparing 500000 A
+Preparing 500000 B
+Preparing 500000 C
+Load 500000 A 90-10 repeat 1
+Load 500000 B 90-10 repeat 1
+Load 500000 C 90-10 repeat 1
+Load 500000 A 70-30 repeat 1
+Load 500000 B 70-30 repeat 1
+Load 500000 C 70-30 repeat 1
+Load 500000 C 90-10 repeat 2
+Load 500000 B 90-10 repeat 2
+Load 500000 A 90-10 repeat 2
+Load 500000 C 70-30 repeat 2
+Load 500000 B 70-30 repeat 2
+Load 500000 A 70-30 repeat 2
+D:\�����\������\AI-Fridge\backend\.venv\Lib\site-packages\anyio\_backends\_asyncio.py:1033: StarletteDeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+  result = context.run(func, *args)
+Benchmark complete.

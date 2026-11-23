@@ -1,0 +1,6 @@
+PostgreSQL 17.7 for x86_64-windows, isolated local cluster, locale C, encoding UTF8.
+Windows 10 build 19045, AMD64, 20 logical processors reported to the process.
+Python 3.12.3; SQLAlchemy 2.0.52; FastAPI 0.141.1; Uvicorn 0.52.2; psycopg 3.3.4.
+PostgreSQL: shared_buffers=128MB, work_mem=4MB, max_connections=100,
+fsync=on, synchronous_commit=on, track_io_timing=off.
+HTTP and PostgreSQL both on loopback. Four concurrent clients.

@@ -1,0 +1,259 @@
+PANTRY
+Sort  (cost=245.54..245.59 rows=18 width=165) (actual time=1.871..1.884 rows=19 loops=1)
+  Sort Key: user_group_product.best_before, user_group_product.id
+  Sort Method: quicksort  Memory: 26kB
+  Buffers: shared hit=72 read=1
+  CTE eligible
+    ->  Bitmap Heap Scan on user_group_product user_group_product_1  (cost=4.28..9.51 rows=18 width=4) (actual time=0.007..0.009 rows=19 loops=1)
+          Recheck Cond: ((id_user_group = 1) AND (is_over IS NOT TRUE) AND (is_deleted IS NOT TRUE))
+          Heap Blocks: exact=2
+          Buffers: shared hit=3
+          ->  Bitmap Index Scan on bench_open  (cost=0.00..4.28 rows=18 width=0) (actual time=0.004..0.005 rows=19 loops=1)
+                Index Cond: (id_user_group = 1)
+                Buffers: shared hit=1
+  ->  Hash Left Join  (cost=228.68..235.66 rows=18 width=165) (actual time=1.825..1.861 rows=19 loops=1)
+        Hash Cond: (user_group_product.id_unit_of_measurement = " unit_of_measurement".id)
+        Buffers: shared hit=72 read=1
+        ->  Hash Left Join  (cost=227.66..234.30 rows=18 width=192) (actual time=1.742..1.773 rows=19 loops=1)
+              Hash Cond: (user_group_product."Id_storage_place" = storage_place.id)
+              Buffers: shared hit=71 read=1
+              ->  Hash Left Join  (cost=226.64..233.03 rows=18 width=186) (actual time=1.714..1.742 rows=19 loops=1)
+                    Hash Cond: (user_group_product.id_product_category = product_category.id)
+                    Buffers: shared hit=70 read=1
+                    ->  Hash Left Join  (cost=225.55..231.85 rows=18 width=175) (actual time=1.687..1.712 rows=19 loops=1)
+                          Hash Cond: (user_group_product.id_product = product.id)
+                          Buffers: shared hit=69 read=1
+                          ->  Hash Right Join  (cost=225.54..231.79 rows=18 width=171) (actual time=1.604..1.627 rows=19 loops=1)
+                                Hash Cond: (user_group_product_waste.id_user_group_product = user_group_product.id)
+                                Buffers: shared hit=69 read=1
+                                ->  HashAggregate  (cost=104.84..107.77 rows=234 width=36) (actual time=0.862..0.870 rows=18 loops=1)
+                                      Group Key: user_group_product_waste.id_user_group_product
+                                      Batches: 1  Memory Usage: 37kB
+                                      Buffers: shared hit=32
+                                      ->  Hash Join  (cost=0.58..103.67 rows=234 width=9) (actual time=0.049..0.771 rows=479 loops=1)
+                                            Hash Cond: (user_group_product_waste.id_user_group_product = eligible.id)
+                                            Buffers: shared hit=32
+                                            ->  Seq Scan on user_group_product_waste  (cost=0.00..82.00 rows=5000 width=9) (actual time=0.017..0.358 rows=5000 loops=1)
+                                                  Buffers: shared hit=32
+                                            ->  Hash  (cost=0.36..0.36 rows=18 width=4) (actual time=0.011..0.011 rows=19 loops=1)
+                                                  Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                                  ->  CTE Scan on eligible  (cost=0.00..0.36 rows=18 width=4) (actual time=0.002..0.004 rows=19 loops=1)
+                                ->  Hash  (cost=120.47..120.47 rows=18 width=139) (actual time=0.728..0.735 rows=19 loops=1)
+                                      Buckets: 1024  Batches: 1  Memory Usage: 10kB
+                                      Buffers: shared hit=37 read=1
+                                      ->  Hash Right Join  (cost=114.58..120.47 rows=18 width=139) (actual time=0.695..0.715 rows=19 loops=1)
+                                            Hash Cond: (user_group_product_consumption.id_user_group_product = user_group_product.id)
+                                            Buffers: shared hit=37 read=1
+                                            ->  HashAggregate  (cost=104.84..107.77 rows=234 width=36) (actual time=0.605..0.614 rows=18 loops=1)
+                                                  Group Key: user_group_product_consumption.id_user_group_product
+                                                  Batches: 1  Memory Usage: 37kB
+                                                  Buffers: shared hit=35
+                                                  ->  Hash Join  (cost=0.58..103.67 rows=234 width=9) (actual time=0.036..0.539 rows=442 loops=1)
+                                                        Hash Cond: (user_group_product_consumption.id_user_group_product = eligible_1.id)
+                                                        Buffers: shared hit=35
+                                                        ->  Seq Scan on user_group_product_consumption  (cost=0.00..82.00 rows=5000 width=9) (actual time=0.013..0.265 rows=5000 loops=1)
+                                                              Buffers: shared hit=32
+                                                        ->  Hash  (cost=0.36..0.36 rows=18 width=4) (actual time=0.013..0.015 rows=19 loops=1)
+                                                              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                                              Buffers: shared hit=3
+                                                              ->  CTE Scan on eligible eligible_1  (cost=0.00..0.36 rows=18 width=4) (actual time=0.008..0.011 rows=19 loops=1)
+                                                                    Buffers: shared hit=3
+                                            ->  Hash  (cost=9.51..9.51 rows=18 width=107) (actual time=0.076..0.078 rows=19 loops=1)
+                                                  Buckets: 1024  Batches: 1  Memory Usage: 10kB
+                                                  Buffers: shared hit=2 read=1
+                                                  ->  Bitmap Heap Scan on user_group_product  (cost=4.28..9.51 rows=18 width=107) (actual time=0.063..0.069 rows=19 loops=1)
+                                                        Recheck Cond: ((id_user_group = 1) AND (is_over IS NOT TRUE) AND (is_deleted IS NOT TRUE))
+                                                        Heap Blocks: exact=2
+                                                        Buffers: shared hit=2 read=1
+                                                        ->  Bitmap Index Scan on bench_open  (cost=0.00..4.28 rows=18 width=0) (actual time=0.041..0.042 rows=19 loops=1)
+                                                              Index Cond: (id_user_group = 1)
+                                                              Buffers: shared read=1
+                          ->  Hash  (cost=0.00..0.00 rows=1 width=8) (actual time=0.015..0.015 rows=0 loops=1)
+                                Buckets: 1024  Batches: 1  Memory Usage: 8kB
+                                ->  Seq Scan on product  (cost=0.00..0.00 rows=1 width=8) (actual time=0.014..0.014 rows=0 loops=1)
+                    ->  Hash  (cost=1.04..1.04 rows=4 width=15) (actual time=0.017..0.017 rows=4 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                          Buffers: shared hit=1
+                          ->  Seq Scan on product_category  (cost=0.00..1.04 rows=4 width=15) (actual time=0.011..0.012 rows=4 loops=1)
+                                Buffers: shared hit=1
+              ->  Hash  (cost=1.01..1.01 rows=1 width=10) (actual time=0.015..0.015 rows=1 loops=1)
+                    Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                    Buffers: shared hit=1
+                    ->  Seq Scan on storage_place  (cost=0.00..1.01 rows=1 width=10) (actual time=0.010..0.010 rows=1 loops=1)
+                          Buffers: shared hit=1
+        ->  Hash  (cost=1.01..1.01 rows=1 width=9) (actual time=0.012..0.012 rows=1 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+              Buffers: shared hit=1
+              ->  Seq Scan on " unit_of_measurement"  (cost=0.00..1.01 rows=1 width=9) (actual time=0.008..0.008 rows=1 loops=1)
+                    Buffers: shared hit=1
+Planning:
+  Buffers: shared hit=347 read=13
+Planning Time: 11.637 ms
+Execution Time: 2.133 ms
+
+DAY
+GroupAggregate  (cost=86.87..87.27 rows=8 width=584) (actual time=0.218..0.229 rows=17 loops=1)
+  Group Key: "*SELECT* 1".kind, ((LEAST('11'::numeric, (EXTRACT(epoch FROM (date_bin('02:00:00'::interval, "*SELECT* 1".date_time, '2025-12-31 12:17:33'::timestamp without time zone) - '2025-12-31 12:17:33'::timestamp without time zone)) / '7200'::numeric)))::integer), l.product_name, l.id_product_category, c.name, u.name
+  Buffers: shared hit=41
+  CTE eligible
+    ->  Seq Scan on user_group_product  (cost=0.00..9.81 rows=97 width=22) (actual time=0.013..0.042 rows=97 loops=1)
+          Filter: (id_user_group = '1'::smallint)
+          Rows Removed by Filter: 288
+          Buffers: shared hit=5
+  ->  Sort  (cost=77.06..77.08 rows=8 width=549) (actual time=0.212..0.215 rows=22 loops=1)
+        Sort Key: "*SELECT* 1".kind, ((LEAST('11'::numeric, (EXTRACT(epoch FROM (date_bin('02:00:00'::interval, "*SELECT* 1".date_time, '2025-12-31 12:17:33'::timestamp without time zone) - '2025-12-31 12:17:33'::timestamp without time zone)) / '7200'::numeric)))::integer), l.product_name, l.id_product_category, c.name, u.name
+        Sort Method: quicksort  Memory: 26kB
+        Buffers: shared hit=41
+        ->  Nested Loop Left Join  (cost=72.70..76.94 rows=8 width=549) (actual time=0.174..0.201 rows=22 loops=1)
+              Buffers: shared hit=41
+              ->  Nested Loop Left Join  (cost=72.57..76.12 rows=8 width=552) (actual time=0.159..0.178 rows=22 loops=1)
+                    Buffers: shared hit=39
+                    ->  Hash Join  (cost=72.43..74.81 rows=8 width=541) (actual time=0.151..0.162 rows=22 loops=1)
+                          Hash Cond: (l.id = "*SELECT* 1".lot_id)
+                          Buffers: shared hit=31
+                          ->  CTE Scan on eligible l  (cost=0.00..1.94 rows=97 width=528) (actual time=0.015..0.019 rows=97 loops=1)
+                                Buffers: shared hit=2
+                          ->  Hash  (cost=72.33..72.33 rows=8 width=21) (actual time=0.128..0.129 rows=22 loops=1)
+                                Buckets: 1024  Batches: 1  Memory Usage: 10kB
+                                Buffers: shared hit=29
+                                ->  Append  (cost=7.57..72.33 rows=8 width=21) (actual time=0.078..0.123 rows=22 loops=1)
+                                      Buffers: shared hit=29
+                                      ->  Subquery Scan on "*SELECT* 1"  (cost=7.57..36.14 rows=4 width=21) (actual time=0.078..0.092 rows=14 loops=1)
+                                            Buffers: shared hit=20
+                                            ->  Hash Join  (cost=7.57..36.10 rows=4 width=21) (actual time=0.077..0.091 rows=14 loops=1)
+                                                  Hash Cond: (e.id_user_group_product = l_1.id)
+                                                  Buffers: shared hit=20
+                                                  ->  Bitmap Heap Scan on user_group_product_consumption e  (cost=4.41..32.85 rows=17 width=17) (actual time=0.010..0.023 rows=22 loops=1)
+                                                        Recheck Cond: (date_time >= '2025-12-31 12:17:33'::timestamp without time zone)
+                                                        Heap Blocks: exact=15
+                                                        Buffers: shared hit=17
+                                                        ->  Bitmap Index Scan on bench_time_0  (cost=0.00..4.41 rows=17 width=0) (actual time=0.004..0.004 rows=22 loops=1)
+                                                              Index Cond: (date_time >= '2025-12-31 12:17:33'::timestamp without time zone)
+                                                              Buffers: shared hit=2
+                                                  ->  Hash  (cost=1.94..1.94 rows=97 width=4) (actual time=0.060..0.060 rows=97 loops=1)
+                                                        Buckets: 1024  Batches: 1  Memory Usage: 12kB
+                                                        Buffers: shared hit=3
+                                                        ->  CTE Scan on eligible l_1  (cost=0.00..1.94 rows=97 width=4) (actual time=0.001..0.050 rows=97 loops=1)
+                                                              Buffers: shared hit=3
+                                      ->  Subquery Scan on "*SELECT* 2"  (cost=7.57..36.14 rows=4 width=21) (actual time=0.022..0.029 rows=8 loops=1)
+                                            Buffers: shared hit=9
+                                            ->  Hash Join  (cost=7.57..36.10 rows=4 width=21) (actual time=0.022..0.028 rows=8 loops=1)
+                                                  Hash Cond: (e_1.id_user_group_product = l_2.id)
+                                                  Buffers: shared hit=9
+                                                  ->  Bitmap Heap Scan on user_group_product_waste e_1  (cost=4.41..32.85 rows=17 width=17) (actual time=0.007..0.012 rows=13 loops=1)
+                                                        Recheck Cond: (date_time >= '2025-12-31 12:17:33'::timestamp without time zone)
+                                                        Heap Blocks: exact=7
+                                                        Buffers: shared hit=9
+                                                        ->  Bitmap Index Scan on bench_time_1  (cost=0.00..4.41 rows=17 width=0) (actual time=0.003..0.003 rows=13 loops=1)
+                                                              Index Cond: (date_time >= '2025-12-31 12:17:33'::timestamp without time zone)
+                                                              Buffers: shared hit=2
+                                                  ->  Hash  (cost=1.94..1.94 rows=97 width=4) (actual time=0.011..0.011 rows=97 loops=1)
+                                                        Buckets: 1024  Batches: 1  Memory Usage: 12kB
+                                                        ->  CTE Scan on eligible l_2  (cost=0.00..1.94 rows=97 width=4) (actual time=0.000..0.004 rows=97 loops=1)
+                    ->  Memoize  (cost=0.14..0.28 rows=1 width=15) (actual time=0.001..0.001 rows=1 loops=22)
+                          Cache Key: l.id_product_category
+                          Cache Mode: logical
+                          Hits: 18  Misses: 4  Evictions: 0  Overflows: 0  Memory Usage: 1kB
+                          Buffers: shared hit=8
+                          ->  Index Scan using product_category_pkey on product_category c  (cost=0.13..0.27 rows=1 width=15) (actual time=0.002..0.002 rows=1 loops=4)
+                                Index Cond: (id = l.id_product_category)
+                                Buffers: shared hit=8
+              ->  Memoize  (cost=0.14..0.28 rows=1 width=9) (actual time=0.000..0.000 rows=1 loops=22)
+                    Cache Key: l.id_unit_of_measurement
+                    Cache Mode: logical
+                    Hits: 21  Misses: 1  Evictions: 0  Overflows: 0  Memory Usage: 1kB
+                    Buffers: shared hit=2
+                    ->  Index Scan using " unit_of_measurement_pkey" on " unit_of_measurement" u  (cost=0.12..0.27 rows=1 width=9) (actual time=0.005..0.005 rows=1 loops=1)
+                          Index Cond: (id = l.id_unit_of_measurement)
+                          Buffers: shared hit=2
+Planning:
+  Buffers: shared hit=35 read=4
+Planning Time: 0.748 ms
+Execution Time: 0.356 ms
+
+YEAR
+HashAggregate  (cost=371.40..403.85 rows=1180 width=584) (actual time=6.226..6.398 rows=288 loops=1)
+  Group Key: "*SELECT* 1".kind, (LEAST('11'::numeric, (EXTRACT(epoch FROM (date_bin('30 days 10:00:00'::interval, "*SELECT* 1".date_time, '2025-01-01 12:17:33'::timestamp without time zone) - '2025-01-01 12:17:33'::timestamp without time zone)) / '2628000'::numeric)))::integer, l.product_name, l.id_product_category, c.name, u.name
+  Batches: 1  Memory Usage: 193kB
+  Buffers: shared hit=71
+  CTE eligible
+    ->  Seq Scan on user_group_product  (cost=0.00..9.81 rows=97 width=22) (actual time=0.008..0.029 rows=97 loops=1)
+          Filter: (id_user_group = '1'::smallint)
+          Rows Removed by Filter: 288
+          Buffers: shared hit=5
+  ->  Hash Join  (cost=10.27..337.99 rows=1180 width=549) (actual time=0.138..4.579 rows=4828 loops=1)
+        Hash Cond: ("*SELECT* 1".lot_id = l.id)
+        Buffers: shared hit=71
+        ->  Append  (cost=3.15..292.25 rows=2433 width=21) (actual time=0.075..2.486 rows=4828 loops=1)
+              Buffers: shared hit=69
+              ->  Subquery Scan on "*SELECT* 1"  (cost=3.15..139.99 rows=1215 width=21) (actual time=0.075..0.892 rows=2410 loops=1)
+                    Buffers: shared hit=37
+                    ->  Hash Join  (cost=3.15..127.84 rows=1215 width=21) (actual time=0.074..0.759 rows=2410 loops=1)
+                          Hash Cond: (e.id_user_group_product = l_1.id)
+                          Buffers: shared hit=37
+                          ->  Seq Scan on user_group_product_consumption e  (cost=0.00..94.50 rows=4810 width=17) (actual time=0.013..0.318 rows=4803 loops=1)
+                                Filter: (date_time >= '2025-01-01 12:17:33'::timestamp without time zone)
+                                Rows Removed by Filter: 197
+                                Buffers: shared hit=32
+                          ->  Hash  (cost=1.94..1.94 rows=97 width=4) (actual time=0.056..0.058 rows=97 loops=1)
+                                Buckets: 1024  Batches: 1  Memory Usage: 12kB
+                                Buffers: shared hit=5
+                                ->  CTE Scan on eligible l_1  (cost=0.00..1.94 rows=97 width=4) (actual time=0.011..0.048 rows=97 loops=1)
+                                      Buffers: shared hit=5
+              ->  Subquery Scan on "*SELECT* 2"  (cost=3.15..140.09 rows=1218 width=21) (actual time=0.043..1.370 rows=2418 loops=1)
+                    Buffers: shared hit=32
+                    ->  Hash Join  (cost=3.15..127.91 rows=1218 width=21) (actual time=0.042..1.189 rows=2418 loops=1)
+                          Hash Cond: (e_1.id_user_group_product = l_2.id)
+                          Buffers: shared hit=32
+                          ->  Seq Scan on user_group_product_waste e_1  (cost=0.00..94.50 rows=4821 width=17) (actual time=0.017..0.511 rows=4811 loops=1)
+                                Filter: (date_time >= '2025-01-01 12:17:33'::timestamp without time zone)
+                                Rows Removed by Filter: 189
+                                Buffers: shared hit=32
+                          ->  Hash  (cost=1.94..1.94 rows=97 width=4) (actual time=0.013..0.015 rows=97 loops=1)
+                                Buckets: 1024  Batches: 1  Memory Usage: 12kB
+                                ->  CTE Scan on eligible l_2  (cost=0.00..1.94 rows=97 width=4) (actual time=0.001..0.005 rows=97 loops=1)
+        ->  Hash  (cost=5.91..5.91 rows=97 width=540) (actual time=0.052..0.060 rows=97 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 15kB
+              Buffers: shared hit=2
+              ->  Hash Left Join  (cost=2.11..5.91 rows=97 width=540) (actual time=0.019..0.048 rows=97 loops=1)
+                    Hash Cond: (l.id_unit_of_measurement = u.id)
+                    Buffers: shared hit=2
+                    ->  Hash Left Join  (cost=1.09..3.55 rows=97 width=539) (actual time=0.009..0.026 rows=97 loops=1)
+                          Hash Cond: (l.id_product_category = c.id)
+                          Buffers: shared hit=1
+                          ->  CTE Scan on eligible l  (cost=0.00..1.94 rows=97 width=528) (actual time=0.000..0.004 rows=97 loops=1)
+                          ->  Hash  (cost=1.04..1.04 rows=4 width=15) (actual time=0.006..0.009 rows=4 loops=1)
+                                Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                Buffers: shared hit=1
+                                ->  Seq Scan on product_category c  (cost=0.00..1.04 rows=4 width=15) (actual time=0.004..0.006 rows=4 loops=1)
+                                      Buffers: shared hit=1
+                    ->  Hash  (cost=1.01..1.01 rows=1 width=9) (actual time=0.005..0.006 rows=1 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                          Buffers: shared hit=1
+                          ->  Seq Scan on " unit_of_measurement" u  (cost=0.00..1.01 rows=1 width=9) (actual time=0.003..0.004 rows=1 loops=1)
+                                Buffers: shared hit=1
+Planning:
+  Buffers: shared hit=16
+Planning Time: 0.556 ms
+Execution Time: 6.611 ms
+
+INSERT user_group_product_consumption
+Insert on user_group_product_consumption  (cost=0.00..0.01 rows=0 width=0) (actual time=1.249..1.251 rows=0 loops=1)
+  Buffers: shared hit=80 dirtied=2
+  WAL: records=5 bytes=333
+  ->  Result  (cost=0.00..0.01 rows=1 width=48) (actual time=0.074..0.076 rows=1 loops=1)
+        Buffers: shared hit=13
+        WAL: records=1 bytes=54
+Planning:
+  Buffers: shared hit=13
+Planning Time: 0.102 ms
+Execution Time: 1.283 ms
+
+INSERT user_group_product_waste
+Insert on user_group_product_waste  (cost=0.00..0.01 rows=0 width=0) (actual time=0.798..0.799 rows=0 loops=1)
+  Buffers: shared hit=61 dirtied=2
+  WAL: records=4 bytes=279
+  ->  Result  (cost=0.00..0.01 rows=1 width=48) (actual time=0.045..0.045 rows=1 loops=1)
+        Buffers: shared hit=12
+Planning Time: 0.047 ms
+Execution Time: 0.825 ms

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { authApi, setUnauthorizedHandler } from '../api/client.js'
+import { authApi, setUnauthorizedHandler, startOfflineSync } from '../api/client.js'
 import { AuthContext } from './authContext.js'
 import { clearSession, readSession, writeSession } from './sessionStore.js'
 
@@ -30,6 +30,8 @@ export function AuthProvider({ children }) {
     setUnauthorizedHandler(signOut)
     return () => setUnauthorizedHandler(null)
   }, [signOut])
+
+  useEffect(() => startOfflineSync(user), [user])
 
   const value = useMemo(
     () => ({

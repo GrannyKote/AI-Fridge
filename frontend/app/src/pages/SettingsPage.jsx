@@ -1,3 +1,7 @@
+import { useState } from 'react'
+import { prepareOffline, synchronizeOffline } from '../api/client.js'
+import { changeMode } from '../api/offlineStore.js'
+import { useOfflineStatus } from '../api/useOfflineStatus.js'
 import { useAuth } from '../auth/useAuth.js'
 import { AppHeader } from '../components/AppHeader.jsx'
 import { PantryDock } from '../components/PantryDock.jsx'
@@ -12,6 +16,26 @@ export default function SettingsPage() {
   const { user, signOut } = useAuth()
   const { isDark, setDark } = useTheme()
   const [toast, setToast] = useToast()
+  const [busy, setBusy] = useState(false)
+  const { enabled, pending, error } = useOfflineStatus(user)
+
+  async function run(action) {
+    setBusy(true)
+    try {
+      await action()
+    } catch (failure) {
+      setToast(failure.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  function toggleMode() {
+    return run(async () => {
+      await changeMode(user, !enabled)
+      if (!enabled) await prepareOffline(user)
+    })
+  }
 
   const letter = (user.login?.trim()?.[0] ?? '?').toUpperCase()
   const groupName = user.groups?.[0]?.name ?? ''
@@ -55,6 +79,48 @@ export default function SettingsPage() {
                 <span className="theme-switch__thumb" />
               </button>
             </div>
+          </section>
+
+          <section className="settings-block" aria-labelledby="data-mode-title">
+            <h2 className="settings-block__title" id="data-mode-title">Режим работы</h2>
+            <div className="settings-row">
+              <span className="settings-row__label">{enabled ? 'Offline-first' : 'Online-only'}</span>
+              <button
+                className={`theme-switch${enabled ? ' is-on' : ''}`}
+                type="button"
+                role="switch"
+                aria-label="Offline-first"
+                aria-checked={enabled}
+                disabled={busy || pending > 0}
+                onClick={toggleMode}
+              >
+                <span className="theme-switch__thumb" />
+              </button>
+            </div>
+            <p className="settings-about__text" role="status">
+              {pending > 0
+                ? `Изменений в очереди: ${pending}. Для смены режима завершите синхронизацию.`
+                : enabled
+                  ? 'Кладовая и покупки доступны после первой загрузки. Изменения отправляются при подключении.'
+                  : 'Чтение и изменение данных требуют подключения к серверу.'}
+            </p>
+            {error && <p className="settings-about__text" role="alert">{error}</p>}
+            {pending > 0 && (
+              <button className="btn btn--ghost" type="button" disabled={busy}
+                onClick={() => run(() => synchronizeOffline(user, 'retry'))}>
+                Синхронизировать
+              </button>
+            )}
+            {error && pending > 0 && (
+              <button className="btn btn--ghost" type="button" disabled={busy}
+                onClick={() => {
+                  if (window.confirm('Удалить все неподтверждённые изменения с этого устройства?')) {
+                    run(() => synchronizeOffline(user, 'discard'))
+                  }
+                }}>
+                Удалить неподтверждённые изменения
+              </button>
+            )}
           </section>
 
           <div className="settings-footer">

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { usePurchaseChanged } from '../lib/purchaseEvents.js'
 import { pantryApi } from '../api/client.js'
 import { categoryView, displayProductName, formatNumber } from '../lib/pantry.js'
 import { useHorizontalScroll } from '../lib/useHorizontalScroll.js'
@@ -126,6 +127,7 @@ export function ConsumptionView({ groupId, refreshKey }) {
   useEffect(() => {
     load()
   }, [load, refreshKey])
+  usePurchaseChanged(load)
 
   const selected = PERIODS.find((item) => item.key === period)
   const withEaten = kind !== 'waste'

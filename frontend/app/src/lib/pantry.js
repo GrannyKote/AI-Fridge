@@ -316,6 +316,8 @@ export function categoryView(name, id = 0) {
 }
 
 function lotKey(item) {
+  // Temporary entries have no server lot identity until synchronization.
+  if (item.id < 0) return `local:${item.id}`
   return [
     item.product_id ?? '',
     String(item.name ?? '').trim().toLowerCase(),

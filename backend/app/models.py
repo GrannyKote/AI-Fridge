@@ -1,5 +1,6 @@
 from datetime import date, datetime, time
 from decimal import Decimal
+from uuid import UUID
 
 from sqlalchemy import (
     Boolean,
@@ -12,6 +13,7 @@ from sqlalchemy import (
     String,
     Text,
     Time,
+    Uuid,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -19,6 +21,17 @@ from .config import settings
 from .database import Base
 
 SCHEMA = settings.db_schema
+
+
+class OfflineOperation(Base):
+    __tablename__ = "offline_operation"
+    __table_args__ = {"schema": SCHEMA}
+
+    user_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    operation_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
+    fingerprint: Mapped[str] = mapped_column(String(64), nullable=False)
+    status_code: Mapped[int] = mapped_column(Integer, nullable=False)
+    response_body: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
 
 
 class User(Base):

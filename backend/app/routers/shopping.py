@@ -1,12 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from ..database import get_session
 from ..dependencies import current_user_id
+from ..offline import OfflineMutationRoute
 from ..schemas import PlanDateUpdate, PurchaseCheckout, PurchaseCreate, PurchaseHeaderOut, PurchaseOut
 from ..services import catalog, shopping
 
-router = APIRouter(prefix="/api", tags=["shopping"])
+router = APIRouter(prefix="/api", tags=["shopping"], route_class=OfflineMutationRoute)
 
 
 def _to_item(row) -> PurchaseOut:
@@ -83,9 +85,12 @@ def set_plan_date(
 def checkout_purchase(
     group_id: int,
     payload: PurchaseCheckout,
+    request: Request,
     session: Session = Depends(get_session),
-) -> None:
+):
     try:
-        shopping.checkout_purchase(session, group_id, payload)
+        ids = shopping.checkout_purchase(session, group_id, payload)
     except ValueError as error:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
+    if hasattr(request.state, "offline_connection"):
+        return JSONResponse({"ids": ids})
