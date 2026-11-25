@@ -1,0 +1,313 @@
+{
+  "seed": 481723,
+  "horizon_ms": 1200,
+  "overall": {
+    "A": {
+      "n": 300,
+      "base_only": 59,
+      "intermediate": 0,
+      "mixed": 85,
+      "first_window": 24,
+      "full_state": 156,
+      "exact_content": 173,
+      "pantry_matches": 184,
+      "shopping_matches": 240,
+      "capped_ms": 978.1359108519102,
+      "offered_bytes": 1370.5966666666666
+    },
+    "B": {
+      "n": 300,
+      "base_only": 116,
+      "intermediate": 0,
+      "mixed": 0,
+      "first_window": 42,
+      "full_state": 184,
+      "exact_content": 184,
+      "pantry_matches": 209,
+      "shopping_matches": 184,
+      "capped_ms": 906.7558132190891,
+      "offered_bytes": 1097.0033333333333
+    },
+    "C": {
+      "n": 300,
+      "base_only": 35,
+      "intermediate": 7,
+      "mixed": 0,
+      "first_window": 70,
+      "full_state": 258,
+      "exact_content": 258,
+      "pantry_matches": 263,
+      "shopping_matches": 258,
+      "capped_ms": 736.9431362958532,
+      "offered_bytes": 384.6666666666667
+    },
+    "state_C_minus_A_pp": 34.0,
+    "time_B_minus_C_ms": 169.81267692323593
+  },
+  "scenarios": {
+    "1": {
+      "name": "Добавление и покупка",
+      "A": {
+        "n": 50,
+        "base_only": 9,
+        "intermediate": 0,
+        "mixed": 13,
+        "first_window": 1,
+        "full_state": 28,
+        "exact_content": 28,
+        "pantry_matches": 28,
+        "shopping_matches": 41,
+        "capped_ms": 982.2161336640723,
+        "offered_bytes": 1332.84
+      },
+      "B": {
+        "n": 50,
+        "base_only": 17,
+        "intermediate": 0,
+        "mixed": 0,
+        "first_window": 2,
+        "full_state": 33,
+        "exact_content": 33,
+        "pantry_matches": 33,
+        "shopping_matches": 33,
+        "capped_ms": 950.2372629828731,
+        "offered_bytes": 1060.32
+      },
+      "C": {
+        "n": 50,
+        "base_only": 5,
+        "intermediate": 0,
+        "mixed": 0,
+        "first_window": 8,
+        "full_state": 45,
+        "exact_content": 45,
+        "pantry_matches": 45,
+        "shopping_matches": 45,
+        "capped_ms": 742.8063276217457,
+        "offered_bytes": 338
+      },
+      "state_C_minus_A_pp": 34.0,
+      "time_B_minus_C_ms": 207.43093536112735
+    },
+    "2": {
+      "name": "Покупка части списка",
+      "A": {
+        "n": 50,
+        "base_only": 13,
+        "intermediate": 0,
+        "mixed": 17,
+        "first_window": 3,
+        "full_state": 20,
+        "exact_content": 20,
+        "pantry_matches": 20,
+        "shopping_matches": 37,
+        "capped_ms": 1012.9828883027445,
+        "offered_bytes": 1260.98
+      },
+      "B": {
+        "n": 50,
+        "base_only": 21,
+        "intermediate": 0,
+        "mixed": 0,
+        "first_window": 7,
+        "full_state": 29,
+        "exact_content": 29,
+        "pantry_matches": 29,
+        "shopping_matches": 29,
+        "capped_ms": 928.7053183678258,
+        "offered_bytes": 988.6
+      },
+      "C": {
+        "n": 50,
+        "base_only": 10,
+        "intermediate": 0,
+        "mixed": 0,
+        "first_window": 15,
+        "full_state": 40,
+        "exact_content": 40,
+        "pantry_matches": 40,
+        "shopping_matches": 40,
+        "capped_ms": 748.9996470651361,
+        "offered_bytes": 337
+      },
+      "state_C_minus_A_pp": 40.0,
+      "time_B_minus_C_ms": 179.70567130268978
+    },
+    "3": {
+      "name": "Покупка разных товаров",
+      "A": {
+        "n": 50,
+        "base_only": 13,
+        "intermediate": 0,
+        "mixed": 12,
+        "first_window": 7,
+        "full_state": 25,
+        "exact_content": 25,
+        "pantry_matches": 25,
+        "shopping_matches": 37,
+        "capped_ms": 968.0926313988734,
+        "offered_bytes": 1565.92
+      },
+      "B": {
+        "n": 50,
+        "base_only": 23,
+        "intermediate": 0,
+        "mixed": 0,
+        "first_window": 7,
+        "full_state": 27,
+        "exact_content": 27,
+        "pantry_matches": 27,
+        "shopping_matches": 27,
+        "capped_ms": 935.9159432932593,
+        "offered_bytes": 1292.2
+      },
+      "C": {
+        "n": 50,
+        "base_only": 7,
+        "intermediate": 3,
+        "mixed": 0,
+        "first_window": 10,
+        "full_state": 40,
+        "exact_content": 40,
+        "pantry_matches": 40,
+        "shopping_matches": 40,
+        "capped_ms": 797.6012584945762,
+        "offered_bytes": 436
+      },
+      "state_C_minus_A_pp": 30.0,
+      "time_B_minus_C_ms": 138.31468479868306
+    },
+    "4": {
+      "name": "Покупка и добавление позиции",
+      "A": {
+        "n": 50,
+        "base_only": 6,
+        "intermediate": 0,
+        "mixed": 15,
+        "first_window": 2,
+        "full_state": 29,
+        "exact_content": 29,
+        "pantry_matches": 29,
+        "shopping_matches": 44,
+        "capped_ms": 986.3313286637509,
+        "offered_bytes": 1381.8
+      },
+      "B": {
+        "n": 50,
+        "base_only": 17,
+        "intermediate": 0,
+        "mixed": 0,
+        "first_window": 4,
+        "full_state": 33,
+        "exact_content": 33,
+        "pantry_matches": 33,
+        "shopping_matches": 33,
+        "capped_ms": 903.8003669117879,
+        "offered_bytes": 1104.9
+      },
+      "C": {
+        "n": 50,
+        "base_only": 4,
+        "intermediate": 1,
+        "mixed": 0,
+        "first_window": 5,
+        "full_state": 45,
+        "exact_content": 45,
+        "pantry_matches": 45,
+        "shopping_matches": 45,
+        "capped_ms": 775.6069224340492,
+        "offered_bytes": 430
+      },
+      "state_C_minus_A_pp": 32.0,
+      "time_B_minus_C_ms": 128.1934444777387
+    },
+    "5": {
+      "name": "Расход и пополнение",
+      "A": {
+        "n": 50,
+        "base_only": 10,
+        "intermediate": 0,
+        "mixed": 18,
+        "first_window": 2,
+        "full_state": 22,
+        "exact_content": 39,
+        "pantry_matches": 50,
+        "shopping_matches": 39,
+        "capped_ms": 1026.1524992011105,
+        "offered_bytes": 1459.2
+      },
+      "B": {
+        "n": 50,
+        "base_only": 25,
+        "intermediate": 0,
+        "mixed": 0,
+        "first_window": 6,
+        "full_state": 25,
+        "exact_content": 25,
+        "pantry_matches": 50,
+        "shopping_matches": 25,
+        "capped_ms": 965.6234158445538,
+        "offered_bytes": 1186.68
+      },
+      "C": {
+        "n": 50,
+        "base_only": 5,
+        "intermediate": 3,
+        "mixed": 0,
+        "first_window": 15,
+        "full_state": 42,
+        "exact_content": 42,
+        "pantry_matches": 47,
+        "shopping_matches": 42,
+        "capped_ms": 726.9657930260096,
+        "offered_bytes": 429
+      },
+      "state_C_minus_A_pp": 40.0,
+      "time_B_minus_C_ms": 238.65762281854427
+    },
+    "6": {
+      "name": "Повторное оформление позиции",
+      "A": {
+        "n": 50,
+        "base_only": 8,
+        "intermediate": 0,
+        "mixed": 10,
+        "first_window": 9,
+        "full_state": 32,
+        "exact_content": 32,
+        "pantry_matches": 32,
+        "shopping_matches": 42,
+        "capped_ms": 893.0399838809095,
+        "offered_bytes": 1222.84
+      },
+      "B": {
+        "n": 50,
+        "base_only": 13,
+        "intermediate": 0,
+        "mixed": 0,
+        "first_window": 16,
+        "full_state": 37,
+        "exact_content": 37,
+        "pantry_matches": 37,
+        "shopping_matches": 37,
+        "capped_ms": 756.2525719142347,
+        "offered_bytes": 949.32
+      },
+      "C": {
+        "n": 50,
+        "base_only": 4,
+        "intermediate": 0,
+        "mixed": 0,
+        "first_window": 17,
+        "full_state": 46,
+        "exact_content": 46,
+        "pantry_matches": 46,
+        "shopping_matches": 46,
+        "capped_ms": 629.6788691336022,
+        "offered_bytes": 338
+      },
+      "state_C_minus_A_pp": 28.0,
+      "time_B_minus_C_ms": 126.57370278063252
+    }
+  }
+}

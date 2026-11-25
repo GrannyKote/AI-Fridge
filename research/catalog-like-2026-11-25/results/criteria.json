@@ -1,0 +1,11 @@
+{
+  "checks": {
+    "DCR reduction >= 50%": false,
+    "Recall@5 >= 85%": true,
+    "Recall gain >= 30 pp": true,
+    "FMR <= 2%": true,
+    "p95 <= 50 ms": false
+  },
+  "dcr_reduction": 0.24449300261500795,
+  "worst_http_p95_ms": 75.04839999455726
+}

@@ -1,0 +1,5 @@
+.deps/
+.venv/
+.pgdata/
+__pycache__/
+.pytest_cache/
